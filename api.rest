@@ -1,0 +1,35 @@
+
+@base = http://localhost:8000/api/v1
+@access = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijc1NDBjNmI5LTFjZjQtNDE0My1hNDI5LWM2Y2ZiMWUzNGI2YyIsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NzM5Mjc1MDEsImV4cCI6MTc3MzkyODQwMX0.3uIxB8VOQsM33wHS7pVoz1JlVjO7Wfi3_3Z1BooVB6k
+@refresh =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijc1NDBjNmI5LTFjZjQtNDE0My1hNDI5LWM2Y2ZiMWUzNGI2YyIsInR5cGUiOiJyZWZyZXNoIiwiaWF0IjoxNzczOTI3NTAxLCJleHAiOjE3NzQ1MzIzMDF9.O1bXKkRam-zbj0Tv3vRwh158H7BUJ5nNHiJW8dU2erM
+
+## auth
+
+### register
+
+POST {{base}}/auth/register
+content-type: application/json
+
+{
+    "name": "test",
+    "email": "test@test.com",
+    "password": "TEst@@1234"
+}
+
+
+### login
+
+POST {{base}}/auth/login
+content-type: application/json
+
+{
+    "name": "test",
+    "email": "test@test.com",
+    "password": "TEst@@1234"
+}
+
+### refresh token
+
+POST {{base}}/auth/refresh
+content-type: application/json
+Authorization: Bearer {{refresh}}

@@ -134,6 +134,9 @@ const init: AuthType = ({
 			reqId,
 		});
 
+		// @ts-expect-error
+		delete user.pass;
+
 		return {
 			token,
 			user,
@@ -211,6 +214,9 @@ const init: AuthType = ({
 			who: user.name,
 			reqId,
 		});
+
+		// @ts-expect-error
+		delete user.pass;
 
 		return {
 			token,
@@ -397,6 +403,10 @@ const init: AuthType = ({
 				who: user.name,
 				reqId,
 			});
+
+			// @ts-expect-error
+			delete user.pass;
+
 			return {
 				token,
 				user,

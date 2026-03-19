@@ -1,5 +1,5 @@
 {
-	"name": "@auth-guard/backend",
+	"name": "@auth-guard/express",
 	"version": "0.0.0",
 	"description": "",
 	"main": "index.js",
@@ -20,15 +20,16 @@
 	},
 	"author": "Rahul Roy",
 	"license": "MIT",
-	"dependencies": {
-		"bcrypt": "^6.0.0",
-		"jsonwebtoken": "^9.0.3"
-	},
 	"devDependencies": {
 		"@biomejs/biome": "2.4.8",
 		"@types/bcrypt": "^6.0.0",
+		"@types/express": "^5.0.6",
 		"@types/jsonwebtoken": "^9.0.10",
 		"biome-config": "workspace:^",
 		"ts-config": "workspace:^"
+	},
+	"dependencies": {
+		"@auth-guard/backend": "workspace:^",
+		"zod": "^4.3.6"
 	}
 }

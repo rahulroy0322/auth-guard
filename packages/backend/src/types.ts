@@ -67,7 +67,7 @@ type RegisterPropsType = Pick<UserType, "email" | "name"> & {
 };
 
 type RegisterReturnType = {
-	user: UserType;
+	user: Omit<UserType, "pass">;
 	token: {
 		refresh: string;
 		access: string;
@@ -83,7 +83,7 @@ type LoginPropsType = Pick<UserType, "email"> & {
 type LoginType = (data: LoginPropsType) => Promise<RegisterReturnType>;
 
 type CheckAuthReturnType = {
-	user: UserType | null;
+	user: Omit<UserType, "pass"> | null;
 };
 
 type CheckAuthType = (
@@ -92,7 +92,7 @@ type CheckAuthType = (
 ) => Promise<CheckAuthReturnType>;
 
 type LoginRequiredReturnType = {
-	user: UserType;
+	user: Omit<UserType, "pass">;
 };
 
 type LoginRequiredType = (
