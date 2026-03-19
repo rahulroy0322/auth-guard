@@ -1,0 +1,7 @@
+{
+	"extends": "ts-config/react",
+	"compilerOptions": {
+		"tsBuildInfoFile": "node_modules/.tsbuildinfo"
+	},
+	"include": ["src"]
+}

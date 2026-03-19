@@ -1,0 +1,7 @@
+{
+	"extends": "ts-config/react.node",
+	"compilerOptions": {
+		"tsBuildInfoFile": "node_modules/.tsbuildinfo"
+	},
+	"include": ["vite.config.ts"]
+}

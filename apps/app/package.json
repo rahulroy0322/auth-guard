@@ -1,0 +1,32 @@
+{
+	"name": "app",
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"build": "vite build && tsc -b",
+		"check": "biome check",
+		"check:fix": "biome check --fix",
+		"dev": "vite",
+		"start": "vite preview"
+	},
+	"dependencies": {
+		"@auth-guard/react": "workspace:^",
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.29.0",
+		"@biomejs/biome": "2.4.8",
+		"@rolldown/plugin-babel": "^0.2.1",
+		"@types/babel__core": "^7.20.5",
+		"@types/node": "^24.12.0",
+		"@types/react": "^19.2.14",
+		"@types/react-dom": "^19.2.3",
+		"@vitejs/plugin-react": "^6.0.1",
+		"babel-plugin-react-compiler": "^1.0.0",
+		"biome-config": "workspace:^",
+		"ts-config": "workspace:^",
+		"typescript": "~5.9.3",
+		"vite": "^8.0.1"
+	}
+}

@@ -1,0 +1,30 @@
+{
+	"name": "@auth-guard/react",
+	"version": "0.0.0",
+	"description": "",
+	"main": "dist/main.js",
+	"module": "dist/main.mjs",
+	"types": "dist/main.d.ts",
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "tsup",
+		"check": "biome check",
+		"check:fix": "biome check --fix",
+		"dev": "tsup --watch"
+	},
+	"author": "Rahul Roy",
+	"license": "MIT",
+	"devDependencies": {
+		"@biomejs/biome": "2.4.8",
+		"@types/react": "^19.2.14",
+		"biome-config": "workspace:^",
+		"ts-config": "workspace:^",
+		"tsup": "^8.5.1"
+	},
+	"peerDependencies": {
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
+	}
+}
