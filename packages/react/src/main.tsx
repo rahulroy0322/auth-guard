@@ -1,9 +1,3 @@
-import type { FC } from "react";
-
-const Test: FC = () => {
-	return <div>Test</div>;
-};
-
-/// <reference types="react" />
-
-export { Test };
+export * from "./components/login";
+export * from "./components/register";
+export * from "./provider";

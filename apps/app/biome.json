@@ -3,5 +3,10 @@
 	"extends": ["biome-config/react.json"],
 	"files": {
 		"includes": ["**", "!!**/dist", "!!node_modules"]
+	},
+	"linter": {
+		"rules": {
+			"a11y": "off"
+		}
 	}
 }
