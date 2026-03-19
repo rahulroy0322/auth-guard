@@ -1,0 +1,9 @@
+{
+  "name": "ts-config",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "author": "Rahul Roy",
+  "license": "MIT"
+}

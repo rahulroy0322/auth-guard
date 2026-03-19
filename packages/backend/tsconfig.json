@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "ts-config/server",
+  "compilerOptions": {
+    "tsBuildInfoFile": "node_modules/.tsbuildinfo",
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "include":[
+    "src"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
+}
