@@ -1,124 +1,122 @@
-import { IncomingMessage } from "node:http"
+import type { IncomingMessage } from "node:http";
 
-type RoleType = "super" | "admin" | "moderator" | "editor" | "user" | 'geast'
+type RoleType = "super" | "admin" | "moderator" | "editor" | "user" | "geast";
 
 type UserType = {
-    id: string
-    name: string
-    email: string
-    pass: string | null
-    roles: RoleType[]
-}
+	id: string;
+	name: string;
+	email: string;
+	pass: string | null;
+	roles: RoleType[];
+};
 
 type LogType = {
-    who: '[SYSTEM]' | (UserType['name'] & {})
-    userId: UserType['id'] | null
-    msg: Capitalize<string>
-    reqId?: string
-    extra?: Record<string, string>
-}
+	who: "[SYSTEM]" | (UserType["name"] & {});
+	userId: UserType["id"] | null;
+	msg: Capitalize<string>;
+	reqId?: string;
+	extra?: Record<string, string>;
+};
 
-
-type LoggerFnType =  (data: LogType | Record<string,unknown>,msg?: string) => void
-
+type LoggerFnType = (
+	data: LogType | Record<string, unknown>,
+	msg?: string,
+) => void;
 
 type LoggerType = {
-    info: LoggerFnType
-    error: LoggerFnType
-    trace:LoggerFnType
-}
+	info: LoggerFnType;
+	error: LoggerFnType;
+	trace: LoggerFnType;
+};
 
 type AuthPropsType = {
-    User: {
-        findById: (id: UserType['id']) => Promise<UserType | null>
-        findByEmail: (email: UserType['email']) => Promise<UserType | null>
+	User: {
+		findById: (id: UserType["id"]) => Promise<UserType | null>;
+		findByEmail: (email: UserType["email"]) => Promise<UserType | null>;
 
-        create: (data: Pick<UserType, 'email' | 'name' | 'pass' | 'roles'>) => Promise<UserType | null>
-    }
-    extractToken: {
-        access: (req: IncomingMessage) => string | null
-        refresh: (req: IncomingMessage) => string | null
-    }
-    jwt: {
-        expires: {
-            access: number
-            refresh: number
-        }
-        secret: string
-    }
-    logger: LoggerType
-}
+		create: (
+			data: Pick<UserType, "email" | "name" | "pass" | "roles">,
+		) => Promise<UserType | null>;
+	};
+	extractToken: {
+		access: (req: IncomingMessage) => string | null;
+		refresh: (req: IncomingMessage) => string | null;
+	};
+	jwt: {
+		expires: {
+			access: number;
+			refresh: number;
+		};
+		secret: string;
+	};
+	logger: LoggerType;
+};
 
 type AuthReturnType = {
-    login: LoginType
-    register: RegisterType
-    checkAuth: CheckAuthType
-    loginRequired: LoginRequiredType
-    tokenRefresh: TokenRefreshType
-}
+	login: LoginType;
+	register: RegisterType;
+	checkAuth: CheckAuthType;
+	loginRequired: LoginRequiredType;
+	tokenRefresh: TokenRefreshType;
+};
 
+type AuthType = (props: AuthPropsType) => AuthReturnType;
 
-type AuthType = (props: AuthPropsType) => AuthReturnType
-
-type RegisterPropsType = Pick<UserType, 'email' | 'name'> & {
-    pass: string
-}
+type RegisterPropsType = Pick<UserType, "email" | "name"> & {
+	pass: string;
+};
 
 type RegisterReturnType = {
-    user: UserType
-    token: {
-        refresh: string
-        access: string
-    }
-}
+	user: UserType;
+	token: {
+		refresh: string;
+		access: string;
+	};
+};
 
-type RegisterType = (data: RegisterPropsType) => Promise<RegisterReturnType>
+type RegisterType = (data: RegisterPropsType) => Promise<RegisterReturnType>;
 
-type LoginPropsType = Pick<UserType, 'email'> & {
-    pass: string
-}
+type LoginPropsType = Pick<UserType, "email"> & {
+	pass: string;
+};
 
-type LoginType = (data: LoginPropsType) => Promise<RegisterReturnType>
+type LoginType = (data: LoginPropsType) => Promise<RegisterReturnType>;
 
 type CheckAuthReturnType = {
-    user: UserType | null
-}
+	user: UserType | null;
+};
 
-type CheckAuthType = (req: IncomingMessage, reqId?: string) => Promise<CheckAuthReturnType>
+type CheckAuthType = (
+	req: IncomingMessage,
+	reqId?: string,
+) => Promise<CheckAuthReturnType>;
 
 type LoginRequiredReturnType = {
-    user: UserType
-}
+	user: UserType;
+};
 
-type LoginRequiredType = (req: IncomingMessage) => Promise<LoginRequiredReturnType>
+type LoginRequiredType = (
+	req: IncomingMessage,
+) => Promise<LoginRequiredReturnType>;
 
+type TokenRefreshType = (req: IncomingMessage) => Promise<RegisterReturnType>;
 
-type TokenRefreshType = (req: IncomingMessage) => Promise<RegisterReturnType>
-
-
-
-
-
-
-type TokenType = Pick<UserType, 'id'> & {
-    type: 'refresh' | 'access'
-}
+type TokenType = Pick<UserType, "id"> & {
+	type: "refresh" | "access";
+};
 
 export type {
-    LogType,
-    UserType,
-    RoleType,
-    TokenType,
-
-    AuthType,
-    AuthPropsType,
-    RegisterType,
-    RegisterPropsType,
-
-    LoginType,
-    LoginPropsType,
-
-    CheckAuthType,
-    LoginRequiredType,
-    TokenRefreshType,
-}
+	AuthPropsType,
+	AuthType,
+	CheckAuthType,
+	LoginPropsType,
+	LoginRequiredType,
+	LoginType,
+	LogType,
+	RegisterPropsType,
+	RegisterType,
+	RoleType,
+	TokenRefreshType,
+	TokenType,
+	UserType,
+};

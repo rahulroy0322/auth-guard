@@ -1,41 +1,41 @@
 class AuthError extends Error {
 	constructor(
 		message: string,
-		public status = 500
+		public status = 500,
 	) {
-		super(message)
-		this.name = this.constructor.name
+		super(message);
+		this.name = this.constructor.name;
 	}
 }
 
 // 4**
 class AuthBadError extends AuthError {
-	constructor(msg = 'Invalid credentials provided!') {
-		super(msg, 400)
+	constructor(msg = "Invalid credentials provided!") {
+		super(msg, 400);
 	}
 }
 
 class AuthExpiredError extends AuthError {
-	constructor(msg = 'Token Expired!') {
-		super(msg, 401)
+	constructor(msg = "Token Expired!") {
+		super(msg, 401);
 	}
 }
 
 class AuthNoTokenError extends AuthError {
-	constructor(msg = 'No Token Provided!') {
-		super(msg, 401)
+	constructor(msg = "No Token Provided!") {
+		super(msg, 401);
 	}
 }
 
 class AuthWrongTokenError extends AuthError {
-	constructor(msg = 'Wrong Token Provided!') {
-		super(msg, 401)
+	constructor(msg = "Wrong Token Provided!") {
+		super(msg, 401);
 	}
 }
 
 class AuthUnAuthenticatedError extends AuthError {
-	constructor(msg = 'Token Required!') {
-		super(msg, 401)
+	constructor(msg = "Token Required!") {
+		super(msg, 401);
 	}
 }
 
@@ -46,28 +46,28 @@ class AuthUnAuthenticatedError extends AuthError {
 // }
 
 class AuthConflictError extends AuthError {
-	constructor(msg = 'Conflict') {
-		super(msg, 409)
+	constructor(msg = "Conflict") {
+		super(msg, 409);
 	}
 }
 
 //5**
 class AuthServerError extends AuthError {
-	constructor(msg = 'Something went wrong!') {
-		super(msg, 500)
+	constructor(msg = "Something went wrong!") {
+		super(msg, 500);
 	}
 }
 
 export {
-	AuthError,
 	// 4**
 	AuthBadError,
-	AuthExpiredError,
-	AuthNoTokenError,
-	AuthWrongTokenError,
-	AuthUnAuthenticatedError,
 	// ForbidenError,
 	AuthConflictError,
+	AuthError,
+	AuthExpiredError,
+	AuthNoTokenError,
 	// 5**
 	AuthServerError,
-}
+	AuthUnAuthenticatedError,
+	AuthWrongTokenError,
+};
