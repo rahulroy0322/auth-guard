@@ -1,25 +1,18 @@
 import { useGuard } from "@auth-guard/react";
-import { type FC, useState } from "react";
-import { LoginForm } from "shared";
+import type { FC } from "react";
+import { Button } from "ui/components/ui/button";
+import { LoginButton } from "./login.button";
+import { RegisterButton } from "./register.button";
 
 // TODO! plx remove "a11y": "off" as it is temp
 
 const Auth: FC = () => {
-	const [page, setPage] = useState<"login" | "register">("login");
-
 	return (
 		<div>
-			{/* {page === "login" ? <Login /> : <Register />} */}
-
-			<LoginForm />
-
-			<button
-				onClick={() => {
-					setPage(page === "login" ? "register" : "login");
-				}}
-			>
-				Go To {page === "login" ? "Register" : "Login"}
-			</button>
+			<div className="flex gap-4">
+				<LoginButton render={<Button variant="link">Login</Button>} />
+				<RegisterButton render={<Button variant="link">Register</Button>} />
+			</div>
 		</div>
 	);
 };
