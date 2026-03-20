@@ -11,13 +11,15 @@ import {
 } from "ui/components/ui/field";
 
 // biome-ignore lint/complexity/noBannedTypes: temp
-type LoginFormPropsType = {};
+type RegisterFormPropsType = {};
 
-const LoginForm: FC<LoginFormPropsType> = () => {
+const RegisterForm: FC<RegisterFormPropsType> = () => {
 	const { AppField } = useAppForm({
 		defaultValues: {
+			name: "",
 			email: "",
 			password: "",
+			confirm: "",
 		},
 	});
 
@@ -26,11 +28,9 @@ const LoginForm: FC<LoginFormPropsType> = () => {
 			<CardContent className="grid p-0 md:grid-cols-2 overflow-hidden items-center">
 				<FieldGroup className="p-6 md:p-8">
 					<Field className="text-center">
-						<h1 className="text-2xl font-bold">Welcome back</h1>
-						{/* // ! TODO
-                    / */}
+						<h1 className="text-2xl font-bold">Create your account</h1>
 						<p className="text-balance text-muted-foreground">
-							Login to your Auth Guard account
+							Enter your details below to create your account
 						</p>
 					</Field>
 
@@ -53,11 +53,6 @@ const LoginForm: FC<LoginFormPropsType> = () => {
 						<AppField name="password">
 							{({ Password }) => (
 								<Password
-									addon={
-										<Button variant="link" className="ml-auto">
-											Forgot your password?
-										</Button>
-									}
 									className="cursor-pointer!"
 									label="Password"
 									placeholder={"*".repeat(8)}
@@ -65,13 +60,22 @@ const LoginForm: FC<LoginFormPropsType> = () => {
 								/>
 							)}
 						</AppField>
-
+						<AppField name="confirm">
+							{({ Password }) => (
+								<Password
+									className="cursor-pointer!"
+									label="Password"
+									placeholder={"*".repeat(8)}
+									required
+								/>
+							)}
+						</AppField>
 						<Field>
-							<Button type="submit">Login</Button>
+							<Button type="submit">Register</Button>
 						</Field>
 						<FieldDescription>
-							Don&apos;t have an account?{" "}
-							<Button variant="link">Register Here</Button>
+							Already have an account?{" "}
+							<Button variant="link">Login Here</Button>
 						</FieldDescription>
 					</form>
 
@@ -105,4 +109,4 @@ const LoginForm: FC<LoginFormPropsType> = () => {
 	);
 };
 
-export { LoginForm };
+export { RegisterForm };
