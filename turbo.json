@@ -11,29 +11,14 @@
         ".env*"
       ],
       "outputs": [
-        ".next/**",
-        "!.next/cache/**"
+        "dist/**"
       ]
     },
     "check": {
-      "dependsOn": [
-        "^check"
-      ]
+      "dependsOn": []
     },
     "check:fix": {
-      "dependsOn": [
-        "^check:fix"
-      ]
-    },
-    "lint": {
-      "dependsOn": [
-        "^lint"
-      ]
-    },
-    "check-types": {
-      "dependsOn": [
-        "^check-types"
-      ]
+      "dependsOn": []
     },
     "dev": {
       "cache": false,

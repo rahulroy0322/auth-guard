@@ -1,6 +1,6 @@
 import { useGuard } from "@auth-guard/react";
 import { type FC, useState } from "react";
-import { LoginForm } from "ui/components/login-form";
+import { LoginForm } from "shared";
 
 // TODO! plx remove "a11y": "off" as it is temp
 
@@ -10,7 +10,6 @@ const Auth: FC = () => {
 	return (
 		<div>
 			{/* {page === "login" ? <Login /> : <Register />} */}
-
 
 			<LoginForm />
 

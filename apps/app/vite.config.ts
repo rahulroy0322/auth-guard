@@ -4,9 +4,13 @@ import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-	plugins: [react(), tailwindcss({
-		optimize: {
-			minify: true
-		}
-	}), babel({ presets: [reactCompilerPreset()] })],
+	plugins: [
+		react(),
+		tailwindcss({
+			optimize: {
+				minify: true,
+			},
+		}),
+		babel({ presets: [reactCompilerPreset()] }),
+	],
 });

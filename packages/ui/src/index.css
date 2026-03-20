@@ -125,4 +125,15 @@
 	body {
 		@apply bg-background text-foreground;
 	}
+
+	svg,
+	img,
+	figure {
+		@apply size-full object-cover;
+	}
+
+	button,
+	a {
+		@apply cursor-pointer;
+	}
 }
