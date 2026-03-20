@@ -1,8 +1,6 @@
-import { useGuard } from "@auth-guard/react";
+import { LoginButton, RegisterButton, useGuard } from "@auth-guard/react";
 import type { FC } from "react";
 import { Button } from "ui/components/ui/button";
-import { LoginButton } from "./login.button";
-import { RegisterButton } from "./register.button";
 
 // TODO! plx remove "a11y": "off" as it is temp
 

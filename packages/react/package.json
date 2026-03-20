@@ -2,9 +2,14 @@
 	"name": "@auth-guard/react",
 	"version": "0.0.0",
 	"description": "",
-	"main": "dist/main.js",
-	"module": "dist/main.mjs",
-	"types": "dist/main.d.ts",
+	"exports": {
+		".": {
+			"main": "./dist/main.js",
+			"module": "./dist/main.mjs",
+			"types": "./dist/main.d.ts"
+		},
+		"./styles.css":"./dist/main.css"
+	},
 	"files": [
 		"dist"
 	],
@@ -26,5 +31,12 @@
 	"peerDependencies": {
 		"react": "^18 || ^19",
 		"react-dom": "^18 || ^19"
+	},
+	"dependencies": {
+		"@tailwindcss/postcss": "^4.2.2",
+		"autoprefixer": "^10.4.27",
+		"shared": "workspace:^",
+		"tailwindcss": "^4.2.2",
+		"ui": "workspace:^"
 	}
 }
