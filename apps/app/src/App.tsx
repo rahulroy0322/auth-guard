@@ -1,5 +1,6 @@
-import { Login, Register, useGuard } from "@auth-guard/react";
+import { useGuard } from "@auth-guard/react";
 import { type FC, useState } from "react";
+import { LoginForm } from "ui/components/login-form";
 
 // TODO! plx remove "a11y": "off" as it is temp
 
@@ -8,7 +9,10 @@ const Auth: FC = () => {
 
 	return (
 		<div>
-			{page === "login" ? <Login /> : <Register />}
+			{/* {page === "login" ? <Login /> : <Register />} */}
+
+
+			<LoginForm />
 
 			<button
 				onClick={() => {

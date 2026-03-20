@@ -11,8 +11,10 @@
 	},
 	"dependencies": {
 		"@auth-guard/react": "workspace:^",
+		"@tailwindcss/vite": "^4.2.2",
 		"react": "^19.2.4",
-		"react-dom": "^19.2.4"
+		"react-dom": "^19.2.4",
+		"ui": "workspace:^"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.29.0",
@@ -25,6 +27,7 @@
 		"@vitejs/plugin-react": "^6.0.1",
 		"babel-plugin-react-compiler": "^1.0.0",
 		"biome-config": "workspace:^",
+		"tailwindcss": "^4.2.2",
 		"ts-config": "workspace:^",
 		"typescript": "~5.9.3",
 		"vite": "^8.0.1"

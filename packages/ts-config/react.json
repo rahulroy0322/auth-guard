@@ -7,7 +7,6 @@
 		"module": "esnext",
 
 		"lib": ["ES2023", "DOM", "DOM.Iterable"],
-		"types": ["vite/client"],
 
 		"moduleResolution": "bundler",
 		"allowImportingTsExtensions": true,

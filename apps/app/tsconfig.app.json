@@ -1,5 +1,5 @@
 {
-	"extends": "ts-config/react",
+	"extends": "ts-config/vite",
 	"compilerOptions": {
 		"tsBuildInfoFile": "node_modules/.tsbuildinfo"
 	},
