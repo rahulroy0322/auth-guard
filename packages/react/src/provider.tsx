@@ -4,11 +4,16 @@ import {
 	type ReactNode,
 	use,
 	useCallback,
+	useEffect,
 	useState,
 } from "react";
 
 type UserType = {
 	name: string;
+	email: string;
+	avatar?: {
+		src: string;
+	};
 };
 
 // TODO! dummy
@@ -41,7 +46,11 @@ const GuardProvider: FC<GuardProviderPropsType> = ({ children }) => {
 		try {
 			await sleep(200);
 			setUser({
-				name: "dummy",
+				name: "Jhon Dow",
+				email: "jhon@dow.com",
+				avatar: {
+					src: "/user.png",
+				},
 			});
 		} catch (e) {
 			if (e instanceof Error) {
@@ -59,7 +68,11 @@ const GuardProvider: FC<GuardProviderPropsType> = ({ children }) => {
 		try {
 			await sleep(200);
 			setUser({
-				name: "dummy",
+				name: "Jhon Dow",
+				email: "jhon@dow.com",
+				avatar: {
+					src: "/user.png",
+				},
 			});
 		} catch (e) {
 			if (e instanceof Error) {
@@ -84,6 +97,29 @@ const GuardProvider: FC<GuardProviderPropsType> = ({ children }) => {
 		} finally {
 			setLoading(false);
 		}
+	}, []);
+
+	// simulate user is loged in
+	useEffect(() => {
+		const fetchUser = async () => {
+			setLoading(true);
+			try {
+				await sleep(2000);
+				setUser({
+					name: "Jhon Dow",
+					email: "jhon@dow.com",
+					avatar: {
+						src: "/user.png",
+					},
+				});
+			} catch (e) {
+				setError(e as Error);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchUser();
 	}, []);
 
 	return (
