@@ -42,7 +42,7 @@ const LoginForm: FC<LoginFormPropsType> = (props) => {
 					{({ Password }) => (
 						<Password
 							addon={
-								<Button variant="link" className="ml-auto">
+								<Button variant="link" type="button" className="ml-auto">
 									Forgot your password?
 								</Button>
 							}
@@ -59,7 +59,7 @@ const LoginForm: FC<LoginFormPropsType> = (props) => {
 				</Field>
 				<FieldDescription>
 					Don&apos;t have an account?{" "}
-					<Button variant="link" className="p-0" {...props}>
+					<Button variant="link" type="button" className="p-0" {...props}>
 						Register Here
 					</Button>
 				</FieldDescription>

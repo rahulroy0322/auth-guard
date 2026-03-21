@@ -65,7 +65,7 @@ const RegisterForm: FC<RegisterFormPropsType> = (props) => {
 
 				<FieldDescription>
 					Already have an account?{" "}
-					<Button variant="link" className="p-0" {...props}>
+					<Button type="button" variant="link" className="p-0" {...props}>
 						Login Here
 					</Button>
 				</FieldDescription>

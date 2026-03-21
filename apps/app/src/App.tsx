@@ -1,28 +1,36 @@
-import { LoginButton, ProfileButton, RegisterButton } from "@auth-guard/react";
-import type { FC } from "react";
-import { Button } from "ui/components/ui/button";
+// // import { LoginButton, ProfileButton, RegisterButton } from "@auth-guard/react";
 
-// TODO! plx remove "a11y": "off" as it is temp
+// import { ProfileButton } from "@auth-guard/react";
+// import type { FC } from "react";
+// import { Button } from "ui/components/ui/button";
+// import { LoginButton } from "./auth/login.button";
+// import { RegisterButton } from "./auth/register.button";
 
-const Header: FC = () => {
-	return (
-		<header className="flex items-center justify-between p-4">
-			<div className="flex gap-4">
-				<LoginButton render={<Button variant="link">Login</Button>} />
-				<RegisterButton render={<Button variant="link">Register</Button>} />
-			</div>
+// // TODO! plx remove "a11y": "off" as it is temp
 
-			<ProfileButton />
-		</header>
-	);
-};
+// const Header: FC = () => {
+// 	return (
+// 		<header className="flex items-center justify-between p-4">
+// 			<div className="flex gap-4">
+// 				<LoginButton mode="page" render={<Button variant={"link"} />}>
+// 					Login
+// 				</LoginButton>
+// 				<RegisterButton render={<Button variant="link" />}>
+// 					Register
+// 				</RegisterButton>
+// 			</div>
 
-const App: FC = () => {
-	return (
-		<div>
-			<Header />
-		</div>
-	);
-};
+// 			{/* <ProfileButton /> */}
+// 		</header>
+// 	);
+// };
 
-export default App;
+// const App: FC = () => {
+// 	return (
+// 		<div>
+// 			<Header />
+// 		</div>
+// 	);
+// };
+
+// export default App;
