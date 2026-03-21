@@ -1,9 +1,8 @@
 import type { FC } from "react";
 import { useGuard } from "../provider";
 
-type RegisterPropsType = {
-	// TODO!
-};
+// biome-ignore lint/complexity/noBannedTypes: temp
+type RegisterPropsType = {};
 
 const Register: FC<RegisterPropsType> = () => {
 	const { register, loading } = useGuard();
@@ -11,6 +10,7 @@ const Register: FC<RegisterPropsType> = () => {
 	return (
 		<div>
 			<h2>Register page</h2>
+			{/* biome-ignore lint/a11y/useButtonType: temp */}
 			<button onClick={register} disabled={loading}>
 				Go Dummy Login
 			</button>

@@ -8,7 +8,7 @@
 			"module": "./dist/main.mjs",
 			"types": "./dist/main.d.ts"
 		},
-		"./styles.css":"./dist/main.css"
+		"./styles.css": "./dist/main.css"
 	},
 	"files": [
 		"dist"
