@@ -33,6 +33,7 @@
 		"react-dom": "^18 || ^19"
 	},
 	"dependencies": {
+		"@remixicon/react": "^4.9.0",
 		"@tailwindcss/postcss": "^4.2.2",
 		"autoprefixer": "^10.4.27",
 		"shared": "workspace:^",

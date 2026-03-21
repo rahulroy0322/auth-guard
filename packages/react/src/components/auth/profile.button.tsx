@@ -1,4 +1,3 @@
-import { useGuard } from "@auth-guard/react";
 import {
 	RiLogoutBoxRLine,
 	RiSettings2Line,
@@ -49,6 +48,7 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "ui/components/ui/tabs";
+import { useGuard } from "../../provider";
 
 // biome-ignore lint/complexity/noBannedTypes: temp
 type SecurityPropsType = {};
