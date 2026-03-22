@@ -134,13 +134,11 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 	);
 };
 
-const GuardProvider: FC<GuardProviderPropsType> = ({ children }) => {
-	return (
-		<GuardProviderImpl>
-			<PathProvider>{children}</PathProvider>
-		</GuardProviderImpl>
-	);
-};
+const GuardProvider: FC<GuardProviderPropsType> = ({ children }) => (
+	<GuardProviderImpl>
+		<PathProvider>{children}</PathProvider>
+	</GuardProviderImpl>
+);
 
 const useGuard = () => {
 	const context = use(GuardContext);

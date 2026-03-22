@@ -1,3 +1,4 @@
+import { connectCache } from "./cache/main";
 import { isDev, PORT } from "./config/env.config";
 import { closeDb, connectDb } from "./db/main";
 import http from "./http";
@@ -26,7 +27,7 @@ const close = async () => {
 const server = http.listen(PORT, () => {
 	logger.debug(`SERVER app is running on port : ${PORT}`);
 	connectDb(close);
-	//   connectCache()
+	connectCache();
 });
 
 process.once("SIGINT", close).once("SIGTERM", close);

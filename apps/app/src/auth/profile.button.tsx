@@ -187,7 +187,7 @@ const UserManagemant: FC<UserManagemantPropsType> = ({ children }) => {
 type ProfileButtonPropsType = {};
 
 const ProfileButton: FC<ProfileButtonPropsType> = () => {
-	const { user, loading } = useGuard();
+	const { user, loading, logout } = useGuard();
 
 	if (loading || !user) {
 		return null;
@@ -227,7 +227,7 @@ const ProfileButton: FC<ProfileButtonPropsType> = () => {
 							<span>Manage account</span>
 						</DropdownMenuItem>
 						<Separator className="p-0!" />
-						<DropdownMenuItem>
+						<DropdownMenuItem onClick={logout}>
 							<RiLogoutBoxRLine size={20} />
 							<span>Log out</span>
 						</DropdownMenuItem>

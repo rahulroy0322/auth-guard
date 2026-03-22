@@ -28,7 +28,7 @@ const envSchema = z.object({
 	DB_PASSWORD: z.string(),
 	DB_DATABASE: z.string(),
 
-	// REDIS_URI: z.string(),
+	REDIS_URI: z.string(),
 	JWT_SECRET: z.string().min(25),
 	FRONTEND_URLS: z
 		.string()

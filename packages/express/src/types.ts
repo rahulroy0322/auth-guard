@@ -11,17 +11,27 @@ type AuthExpressPropsType = AuthPropsType & {
 
 type ResType = {
 	success: true;
-	data: {
-		user: Omit<UserType, "password">;
-		token?: {
-			refresh?: string;
-			access: string;
-		};
-	};
+	data:
+		| {
+				user: Omit<UserType, "password">;
+				token?: {
+					refresh?: string;
+					access: string;
+				};
+		  }
+		| {
+				message: string;
+		  };
 };
 
 type AuthExpressReturnType = Record<
-	"login" | "register" | "checkAuth" | "loginRequired" | "tokenRefresh" | "me",
+	| "login"
+	| "register"
+	| "checkAuth"
+	| "loginRequired"
+	| "tokenRefresh"
+	| "me"
+	| "logout",
 	RequestHandler
 >;
 

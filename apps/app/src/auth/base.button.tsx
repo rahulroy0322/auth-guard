@@ -72,13 +72,14 @@ const AuthBaseButtonImpl: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 
 const AuthBaseButton: FC<AuthBaseButtonPropsType> = ({
 	mode = "model",
+	defaultState,
 	...props
 }) => {
 	if (mode === "page") {
 		return <Button {...props} />;
 	}
 
-	return <AuthBaseButtonImpl {...props} />;
+	return <AuthBaseButtonImpl defaultState={defaultState} {...props} />;
 };
 
 export type { AuthBaseButtonPropsType };

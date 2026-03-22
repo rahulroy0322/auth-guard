@@ -15,6 +15,7 @@ import type {
 	CheckAuthType,
 	LoginRequiredType,
 	LoginType,
+	LogoutType,
 	LogType,
 	RegisterType,
 	TokenRefreshType,
@@ -24,6 +25,7 @@ import { signToken, verifyToken } from "./utils/token";
 
 const init: AuthType = ({
 	User: { findById, findByEmail, create: createUser },
+	Cache: { set: setCache }, //get: getCache,  },
 	extractToken,
 	jwt,
 	logger,
@@ -425,9 +427,46 @@ const init: AuthType = ({
 		}
 	};
 
+	const logout: LogoutType = async (req) => {
+		const reqId = genReqId();
+
+		logger.trace({ reqId }, "Checking Tokens to logout");
+
+		const [, accessToken] = (extractToken.access(req) || "").split(" ");
+
+		const [, refreshToken] = (extractToken.refresh(req) || "").split(" ");
+
+		console.log(accessToken, refreshToken);
+
+		const promises: Promise<void>[] = [];
+
+		if (accessToken) {
+			logger.trace({ reqId }, "Access Token found Baning it");
+
+			promises.push(
+				setCache(`token:${accessToken}`, accessToken, jwt.expires.access),
+			);
+		}
+
+		if (refreshToken) {
+			logger.trace({ reqId }, "Refresh Token found Baning it");
+
+			promises.push(
+				setCache(`token:${refreshToken}`, refreshToken, jwt.expires.refresh),
+			);
+		}
+
+		if (promises.length) {
+			logger.trace({ reqId }, "Some Token found to Ban");
+			await Promise.all(promises);
+			logger.trace({ reqId }, "Tokens Baned succesfully");
+		}
+	};
+
 	return {
 		register,
 		login,
+		logout,
 		checkAuth,
 		loginRequired,
 		tokenRefresh,

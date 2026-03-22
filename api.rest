@@ -1,6 +1,6 @@
 
 @base = http://localhost:8000/api/v1
-@access = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU2NDVmYmYxLWQzMjYtNGY3MC05YzI1LTJiNjdhMzQwZGUzZCIsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NzQxNzc1NjksImV4cCI6MTc3NDE3ODQ2OX0.U8YkWRygZaoj8kGlQx9kZwIR6omB_GFKvztNcN8-EBA
+@access = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU2NDVmYmYxLWQzMjYtNGY3MC05YzI1LTJiNjdhMzQwZGUzZCIsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NzQxOTc0MDMsImV4cCI6MTc3NDE5ODMwM30.IVw5j0BPiwq7U5hDqfoW-_i2Nlbc3Y9DFT5VhDxXP9E
 @refresh =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU2NDVmYmYxLWQzMjYtNGY3MC05YzI1LTJiNjdhMzQwZGUzZCIsInR5cGUiOiJyZWZyZXNoIiwiaWF0IjoxNzc0MTYzODA1LCJleHAiOjE3NzQ3Njg2MDV9.E1uYfuNbi1y1FzJDGBUmbV8ertGJiWZZ7TCoce8TFis
 
 ## auth
@@ -15,7 +15,6 @@ content-type: application/json
     "email": "test@test.com",
     "password": "TEst@@1234"
 }
-
 
 ### login
 
@@ -37,5 +36,11 @@ Authorization: Bearer {{refresh}}
 ### me
 
 GET {{base}}/auth/me
+content-type: application/json
+Authorization: Bearer {{access}}
+
+### logout
+
+POST {{base}}/auth/logout
 content-type: application/json
 Authorization: Bearer {{access}}

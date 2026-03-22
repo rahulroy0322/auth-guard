@@ -20,6 +20,8 @@ type LoggerType = {
 	trace: LoggerFnType;
 };
 
+type CacheKeyType = `token:${string}`;
+
 type AuthPropsType = {
 	User: {
 		findById: (id: UserType["id"]) => Promise<UserType | null>;
@@ -28,6 +30,10 @@ type AuthPropsType = {
 		create: (
 			data: Pick<UserType, "email" | "name" | "password" | "roles">,
 		) => Promise<UserType | null>;
+	};
+	Cache: {
+		set: (key: CacheKeyType, value: string, seconds: number) => Promise<void>;
+		get: (key: CacheKeyType) => Promise<string | null>;
 	};
 	extractToken: {
 		access: (req: IncomingMessage) => string | null;
@@ -46,6 +52,7 @@ type AuthPropsType = {
 type AuthReturnType = {
 	login: LoginType;
 	register: RegisterType;
+	logout: LogoutType;
 	checkAuth: CheckAuthType;
 	loginRequired: LoginRequiredType;
 	tokenRefresh: TokenRefreshType;
@@ -92,6 +99,8 @@ type LoginRequiredType = (
 
 type TokenRefreshType = (req: IncomingMessage) => Promise<RegisterReturnType>;
 
+type LogoutType = (req: IncomingMessage) => Promise<void>;
+
 type TokenType = Pick<UserType, "id"> & {
 	type: "refresh" | "access";
 };
@@ -103,6 +112,7 @@ export type {
 	LoginPropsType,
 	LoginRequiredType,
 	LoginType,
+	LogoutType,
 	LogType,
 	RegisterPropsType,
 	RegisterType,

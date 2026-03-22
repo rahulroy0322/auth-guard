@@ -1,13 +1,21 @@
-import type { IncomingMessage } from "node:http";
 import { auth } from "@auth-guard/express";
+import type { Request } from "express";
+import { redis } from "../cache/main";
 import ENV from "../config/env.config";
 import { logger } from "../logger/pino";
 import * as User from "../services/user.service";
 
-const extractToken = (req: IncomingMessage) =>
-	req.headers.authorization || (req.headers.token as string) || null;
-// ? maybe u can add cookie extract here
-// * req.c
+const extractAccessToken = (req: Request) =>
+	req.cookies?.["auth-access"] ||
+	req.headers.authorization ||
+	(req.headers.token as string) ||
+	null;
+
+const extractRefreshToken = (req: Request) =>
+	req.cookies?.["auth-refresh"] ||
+	req.headers.authorization ||
+	(req.headers.token as string) ||
+	null;
 
 const guard = auth({
 	cookie: {
@@ -22,11 +30,21 @@ const guard = auth({
 		secret: ENV.JWT_SECRET,
 	},
 	extractToken: {
-		access: extractToken,
-		refresh: extractToken,
+		access: extractAccessToken as () => string | null,
+		refresh: extractRefreshToken as () => string | null,
 	},
 	logger,
 	User,
+	Cache: {
+		set: (key, value, seconds) =>
+			redis.set(
+				key,
+				value,
+				...(["EX", seconds] as const),
+			) as unknown as Promise<void>,
+
+		get: (key) => redis.get(key),
+	},
 });
 
 export { guard };

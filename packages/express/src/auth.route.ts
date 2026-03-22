@@ -12,6 +12,8 @@ const authRouter = (props: AuthExpressReturnType) => {
 
 	authRouter.get("/me", props.checkAuth, props.loginRequired, props.me);
 
+	authRouter.post("/logout", props.logout);
+
 	return authRouter;
 };
 
