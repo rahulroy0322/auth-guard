@@ -10,5 +10,5 @@ type UserType = {
 type AvatarType = {
 	src: string
 }
-export type { RoleType, UserType, AvatarType }
+export type { AvatarType, RoleType, UserType }
 //# sourceMappingURL=main.d.ts.map

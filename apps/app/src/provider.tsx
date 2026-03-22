@@ -8,7 +8,12 @@ import {
 	useEffect,
 	useState,
 } from "react";
-import { post } from "./api/main";
+import {
+	type AuthResType,
+	getWithAccessToken,
+	post,
+	saveToken,
+} from "./api/main";
 import { PathProvider } from "./auth/provider";
 import { config } from "./config";
 
@@ -20,9 +25,6 @@ type RegisterSchemaType = Omit<UserType, "id" | "roles"> & {
 
 type LoginSchemaType = Omit<RegisterSchemaType, "name">;
 
-// TODO! dummy
-const sleep = (delay: number) => new Promise((res) => setTimeout(res, delay));
-
 type GuardContextType = {
 	user: GuardUserType | null;
 	error: Error | null;
@@ -33,14 +35,6 @@ type GuardContextType = {
 };
 
 const GuardContext = createContext<GuardContextType | null>(null);
-
-type AuthResType = {
-	user: Omit<UserType, "password">;
-	token: {
-		refresh?: string;
-		access: string;
-	};
-};
 
 type GuardProviderPropsType = {
 	children: ReactNode;
@@ -58,10 +52,7 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 		try {
 			const { user, token } = await cb();
 
-			if (token.refresh) {
-				localStorage.setItem(config.refresh, token.refresh);
-			}
-			localStorage.setItem(config.access, token.access);
+			saveToken(token);
 			setUser(user);
 		} catch (e) {
 			if (e && typeof e === "object" && "message" in e && "name" in e) {
@@ -104,7 +95,7 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 		setError(null);
 
 		try {
-			await sleep(200);
+			// ! TODO
 			setUser(null);
 		} catch (e) {
 			if (e instanceof Error) {
@@ -115,29 +106,16 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 		}
 	}, []);
 
-	// simulate user is loged in
+	// biome-ignore lint/correctness/useExhaustiveDependencies: on init only
 	useEffect(() => {
-		const fetchUser = async () => {
-			setLoading(true);
-			try {
-				await sleep(2000);
-				// setUser({
-				// 	id: '1',
-				// 	roles: ['geast'],
-				// 	name: "Jhon Dow",
-				// 	email: "jhon@dow.com",
-				// 	avatar: {
-				// 		src: "/user.png",
-				// 	},
-				// });
-			} catch (e) {
-				setError(e as Error);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchUser();
+		if (localStorage.getItem(config.refresh)) {
+			req(() =>
+				getWithAccessToken<AuthResType>({
+					base: "http://localhost:8000",
+					url: "me",
+				}),
+			);
+		}
 	}, []);
 
 	return (

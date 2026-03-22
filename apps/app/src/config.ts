@@ -1,6 +1,14 @@
 const config = {
 	refresh: "REFRESH_TOKEN",
 	access: "ACCESS_TOKEN",
-} as const;
+};
+
+window.config = config;
+
+declare global {
+	interface Window {
+		config: typeof config;
+	}
+}
 
 export { config };

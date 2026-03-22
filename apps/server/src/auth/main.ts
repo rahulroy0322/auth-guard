@@ -6,6 +6,8 @@ import * as User from "../services/user.service";
 
 const extractToken = (req: IncomingMessage) =>
 	req.headers.authorization || (req.headers.token as string) || null;
+// ? maybe u can add cookie extract here
+// * req.c
 
 const guard = auth({
 	cookie: {

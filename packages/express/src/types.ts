@@ -13,7 +13,7 @@ type ResType = {
 	success: true;
 	data: {
 		user: Omit<UserType, "password">;
-		token: {
+		token?: {
 			refresh?: string;
 			access: string;
 		};
@@ -21,7 +21,7 @@ type ResType = {
 };
 
 type AuthExpressReturnType = Record<
-	"login" | "register" | "checkAuth" | "loginRequired" | "tokenRefresh",
+	"login" | "register" | "checkAuth" | "loginRequired" | "tokenRefresh" | "me",
 	RequestHandler
 >;
 

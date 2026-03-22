@@ -1,7 +1,7 @@
 
 @base = http://localhost:8000/api/v1
-@access = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijc1NDBjNmI5LTFjZjQtNDE0My1hNDI5LWM2Y2ZiMWUzNGI2YyIsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NzM5Mjc1MDEsImV4cCI6MTc3MzkyODQwMX0.3uIxB8VOQsM33wHS7pVoz1JlVjO7Wfi3_3Z1BooVB6k
-@refresh =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijc1NDBjNmI5LTFjZjQtNDE0My1hNDI5LWM2Y2ZiMWUzNGI2YyIsInR5cGUiOiJyZWZyZXNoIiwiaWF0IjoxNzczOTI3NTAxLCJleHAiOjE3NzQ1MzIzMDF9.O1bXKkRam-zbj0Tv3vRwh158H7BUJ5nNHiJW8dU2erM
+@access = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU2NDVmYmYxLWQzMjYtNGY3MC05YzI1LTJiNjdhMzQwZGUzZCIsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NzQxNzc1NjksImV4cCI6MTc3NDE3ODQ2OX0.U8YkWRygZaoj8kGlQx9kZwIR6omB_GFKvztNcN8-EBA
+@refresh =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU2NDVmYmYxLWQzMjYtNGY3MC05YzI1LTJiNjdhMzQwZGUzZCIsInR5cGUiOiJyZWZyZXNoIiwiaWF0IjoxNzc0MTYzODA1LCJleHAiOjE3NzQ3Njg2MDV9.E1uYfuNbi1y1FzJDGBUmbV8ertGJiWZZ7TCoce8TFis
 
 ## auth
 
@@ -33,3 +33,9 @@ content-type: application/json
 POST {{base}}/auth/refresh
 content-type: application/json
 Authorization: Bearer {{refresh}}
+
+### me
+
+GET {{base}}/auth/me
+content-type: application/json
+Authorization: Bearer {{access}}

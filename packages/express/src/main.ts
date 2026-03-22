@@ -1,4 +1,5 @@
 import { init as core } from "@auth-guard/backend";
+import { AuthServerError } from "@auth-guard/backend/error";
 import type { RequestHandler, Response } from "express";
 import { loginSchema, registerSchema } from "schema";
 import type { AuthExpressType, ResType } from "./types";
@@ -94,11 +95,25 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		if (req.user) {
 			// already checked
 			next();
+			return;
 		}
 
 		const { user } = await coreApi.loginRequired(req);
 		req.user = user;
 		next();
+	};
+
+	const me: RequestHandler = async (req, res) => {
+		if (!req.user) {
+			throw new AuthServerError("some event dosn't handled properly!");
+		}
+
+		res.status(200).json({
+			success: true,
+			data: {
+				user: req.user,
+			},
+		} satisfies ResType);
 	};
 
 	return {
@@ -107,6 +122,7 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		tokenRefresh,
 		checkAuth,
 		loginRequired,
+		me,
 	};
 };
 

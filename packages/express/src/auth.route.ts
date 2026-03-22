@@ -10,6 +10,8 @@ const authRouter = (props: AuthExpressReturnType) => {
 
 	authRouter.post("/refresh", props.tokenRefresh);
 
+	authRouter.get("/me", props.checkAuth, props.loginRequired, props.me);
+
 	return authRouter;
 };
 
