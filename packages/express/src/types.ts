@@ -1,4 +1,5 @@
-import type { AuthPropsType, UserType } from "@auth-guard/backend/types";
+import type { AuthPropsType } from "@auth-guard/backend/types";
+import type { UserType } from "base";
 import type { RequestHandler } from "express";
 
 type AuthExpressPropsType = AuthPropsType & {

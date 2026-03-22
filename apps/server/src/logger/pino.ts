@@ -31,7 +31,7 @@ const logger = pino({
 		: {}),
 	base: {
 		processId: process.pid,
-		appName: `permissionly Server`,
+		appName: `<auth-guard> Server`,
 	},
 	redact: {
 		paths: [

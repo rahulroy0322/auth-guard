@@ -1,3 +1,4 @@
+import type { UserType } from "base";
 import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import {
 	AuthBadError,
@@ -17,7 +18,6 @@ import type {
 	LogType,
 	RegisterType,
 	TokenRefreshType,
-	UserType,
 } from "./types";
 import { hashPassword, validPassword } from "./utils/password";
 import { signToken, verifyToken } from "./utils/token";
@@ -100,12 +100,12 @@ const init: AuthType = ({
 		}
 
 		logger.trace({ reqId }, "Hashing Password");
-		const pass = await hashPassword(passwd);
+		const password = await hashPassword(passwd);
 
 		logger.trace({ reqId }, "Creating User");
 		const user = await createUser({
 			...data,
-			pass,
+			password,
 			roles: ["user"],
 		});
 		logger.trace({ reqId, user }, "User Created");
@@ -170,7 +170,7 @@ const init: AuthType = ({
 		}
 
 		logger.trace({ reqId }, "Chacking if registered or maybe social");
-		if (!user.pass) {
+		if (!user.password) {
 			// social login
 			logError({
 				msg: "Trying To Login With Password with no pass",
@@ -188,7 +188,7 @@ const init: AuthType = ({
 		if (
 			!(await validPassword({
 				current: passwd,
-				hash: user.pass,
+				hash: user.password,
 			}))
 		) {
 			logError({

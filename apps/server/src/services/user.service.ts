@@ -1,4 +1,5 @@
-import type { AuthPropsType, UserType } from "@auth-guard/express/types";
+import type { AuthPropsType } from "@auth-guard/express/types";
+import type { UserType } from "base";
 import { eq, isNull, type SQL, type TableConfig } from "drizzle-orm";
 import type { PgTable } from "drizzle-orm/pg-core";
 import { db } from "../db/main";
@@ -41,7 +42,7 @@ const findUsers = ({
 			id: true,
 			email: true,
 			name: true,
-			pass: true,
+			password: true,
 			roles: true,
 		},
 		limit,

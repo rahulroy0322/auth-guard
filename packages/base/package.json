@@ -1,0 +1,23 @@
+{
+  "name": "base",
+  "version": "0.0.0",
+  "description": "",
+  "files": [
+    "src"
+  ],
+  "exports": {
+    ".": "./src/main.ts"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "check": "biome check",
+    "check:fix": "biome check --fix"
+  },
+  "author": "Rahul Roy",
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "2.4.8",
+    "biome-config": "workspace:^",
+    "ts-config": "workspace:^"
+  }
+}

@@ -30,6 +30,8 @@
 	},
 	"dependencies": {
 		"@auth-guard/backend": "workspace:^",
+		"base": "workspace:^",
+		"schema": "workspace:^",
 		"zod": "^4.3.6"
 	}
 }

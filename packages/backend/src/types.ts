@@ -1,14 +1,5 @@
 import type { IncomingMessage } from "node:http";
-
-type RoleType = "super" | "admin" | "moderator" | "editor" | "user" | "geast";
-
-type UserType = {
-	id: string;
-	name: string;
-	email: string;
-	pass: string | null;
-	roles: RoleType[];
-};
+import type { UserType } from "base";
 
 type LogType = {
 	who: "[SYSTEM]" | (UserType["name"] & {});
@@ -35,7 +26,7 @@ type AuthPropsType = {
 		findByEmail: (email: UserType["email"]) => Promise<UserType | null>;
 
 		create: (
-			data: Pick<UserType, "email" | "name" | "pass" | "roles">,
+			data: Pick<UserType, "email" | "name" | "password" | "roles">,
 		) => Promise<UserType | null>;
 	};
 	extractToken: {
@@ -115,8 +106,6 @@ export type {
 	LogType,
 	RegisterPropsType,
 	RegisterType,
-	RoleType,
 	TokenRefreshType,
 	TokenType,
-	UserType,
 };

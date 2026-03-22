@@ -1,4 +1,4 @@
-import type { RoleType, UserType } from "@auth-guard/express/types";
+import type { RoleType, UserType } from "base";
 import { customType, pgTable, varchar } from "drizzle-orm/pg-core";
 import { defaults } from "./helper";
 
@@ -26,7 +26,7 @@ const rolesType = customType<{
 const User = pgTable("users", {
 	name: varchar({ length: 255 }).notNull(),
 	email: varchar({ length: 155 }).notNull().unique(),
-	pass: varchar(),
+	password: varchar("pass"),
 	roles: rolesType({
 		length: 15,
 		enum: ROLES,

@@ -1,6 +1,6 @@
 import { init as core } from "@auth-guard/backend";
 import type { RequestHandler, Response } from "express";
-import { loginSchema, registerSchema } from "./auth.schema";
+import { loginSchema, registerSchema } from "schema";
 import type { AuthExpressType, ResType } from "./types";
 
 const init: AuthExpressType = ({ cookie, ...props }) => {
