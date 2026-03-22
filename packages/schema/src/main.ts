@@ -23,4 +23,4 @@ const loginSchema = registerSchema.pick({
 	password: true,
 }) satisfies z.ZodType<Omit<UserType, "roles" | "id" | "name">>;
 
-export { loginSchema, registerSchema };
+export { loginSchema, passwordSchema, registerSchema };

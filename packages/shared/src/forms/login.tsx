@@ -1,18 +1,45 @@
+import type { UserType } from "base";
 import { useAppForm } from "form";
-import type { FC } from "react";
+import { type FC, type SubmitEvent, useCallback } from "react";
+import { loginSchema } from "schema";
 import { Button } from "ui/components/ui/button";
 import { Field, FieldDescription } from "ui/components/ui/field";
 import { Base } from "./base";
 
-type LoginFormPropsType = Parameters<typeof Button>[0];
+type LoginSchemaType = Omit<UserType, "id" | "roles" | "name"> & {
+	password: string;
+};
 
-const LoginForm: FC<LoginFormPropsType> = (props) => {
-	const { AppField } = useAppForm({
+type LoginFormPropsType = Parameters<typeof Button>[0] & {
+	handleSubmit: (value: LoginSchemaType) => void;
+	pending: boolean;
+};
+
+const LoginForm: FC<LoginFormPropsType> = ({
+	handleSubmit: parentSubmit,
+	pending,
+	...props
+}) => {
+	const { AppField, handleSubmit: submit } = useAppForm({
 		defaultValues: {
 			email: "",
 			password: "",
+		} satisfies LoginSchemaType as LoginSchemaType,
+		validators: {
+			onSubmit: loginSchema,
+		},
+		onSubmit: ({ value }) => {
+			parentSubmit(value);
 		},
 	});
+
+	const handleSubmit = useCallback(
+		(e: SubmitEvent<HTMLFormElement>) => {
+			e.preventDefault();
+			submit();
+		},
+		[submit],
+	);
 
 	return (
 		<Base
@@ -24,9 +51,8 @@ const LoginForm: FC<LoginFormPropsType> = (props) => {
 		>
 			<form
 				className="space-y-2"
-				onSubmit={(e) => {
-					e.preventDefault();
-				}}
+				onSubmit={handleSubmit}
+				aria-disabled={pending}
 			>
 				<AppField name="email">
 					{({ Input }) => (
@@ -55,7 +81,9 @@ const LoginForm: FC<LoginFormPropsType> = (props) => {
 				</AppField>
 
 				<Field>
-					<Button type="submit">Login</Button>
+					<Button type="submit" disabled={pending} aria-disabled={pending}>
+						Login
+					</Button>
 				</Field>
 				<FieldDescription>
 					Don&apos;t have an account?{" "}

@@ -1,6 +1,7 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import type { FC, ReactNode } from "react";
+import { Toaster } from "ui/components/ui/sonner";
 import { GuardProvider } from "../provider";
 
 export const Route = createRootRoute({
@@ -23,6 +24,7 @@ function RootComponent() {
 					<Outlet />
 				</div>
 			</App>
+			<Toaster richColors closeButton />
 			<TanStackRouterDevtools />
 		</>
 	);

@@ -2,6 +2,8 @@ import { type FC, type ReactNode, useEffect } from "react";
 import { LoginForm, RegisterForm } from "shared";
 import { Button } from "ui/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "ui/components/ui/dialog";
+import { toast } from "ui/components/ui/sonner";
+import { useGuard } from "../provider";
 import { type AuthPathsType, usePath } from "./provider";
 
 type AuthBaseButtonPropsType = {
@@ -14,7 +16,16 @@ const AuthModelBaseButton: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 	defaultState,
 	...props
 }) => {
+	const { loading, login, register, error } = useGuard();
 	const { path, setPath } = usePath();
+
+	useEffect(() => {
+		if (error) {
+			toast.error(error.name, {
+				description: error.message,
+			});
+		}
+	}, [error]);
 
 	return (
 		<Dialog>
@@ -28,6 +39,8 @@ const AuthModelBaseButton: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 						onClick={() => {
 							setPath("register");
 						}}
+						handleSubmit={login}
+						pending={loading}
 					/>
 				) : null}
 				{path === "register" ? (
@@ -35,6 +48,8 @@ const AuthModelBaseButton: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 						onClick={() => {
 							setPath("login");
 						}}
+						handleSubmit={register}
+						pending={loading}
 					/>
 				) : null}
 			</DialogContent>

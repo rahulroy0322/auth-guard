@@ -1,3 +1,4 @@
+import type { UserType } from "base";
 import {
 	createContext,
 	type FC,
@@ -7,29 +8,39 @@ import {
 	useEffect,
 	useState,
 } from "react";
+import { post } from "./api/main";
 import { PathProvider } from "./auth/provider";
+import { config } from "./config";
 
-type UserType = {
-	name: string;
-	email: string;
-	avatar?: {
-		src: string;
-	};
+type GuardUserType = Omit<UserType, "password">;
+
+type RegisterSchemaType = Omit<UserType, "id" | "roles"> & {
+	password: string;
 };
+
+type LoginSchemaType = Omit<RegisterSchemaType, "name">;
 
 // TODO! dummy
 const sleep = (delay: number) => new Promise((res) => setTimeout(res, delay));
 
 type GuardContextType = {
-	user: UserType | null;
+	user: GuardUserType | null;
 	error: Error | null;
 	loading: boolean;
-	login: (data: unknown) => Promise<void>;
-	register: (data: unknown) => Promise<void>;
+	login: (data: LoginSchemaType) => Promise<void>;
+	register: (data: RegisterSchemaType) => Promise<void>;
 	logout: () => Promise<void>;
 };
 
 const GuardContext = createContext<GuardContextType | null>(null);
+
+type AuthResType = {
+	user: Omit<UserType, "password">;
+	token: {
+		refresh?: string;
+		access: string;
+	};
+};
 
 type GuardProviderPropsType = {
 	children: ReactNode;
@@ -40,49 +51,53 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<Error | null>(null);
 
-	const login = useCallback(async (_data: unknown) => {
+	const req = useCallback(async (cb: () => Promise<AuthResType>) => {
 		setLoading(true);
 		setError(null);
 
 		try {
-			await sleep(200);
-			setUser({
-				name: "Jhon Dow",
-				email: "jhon@dow.com",
-				avatar: {
-					src: "/user.png",
-				},
-			});
-		} catch (e) {
-			if (e instanceof Error) {
-				setError(e);
+			const { user, token } = await cb();
+
+			if (token.refresh) {
+				localStorage.setItem(config.refresh, token.refresh);
 			}
+			localStorage.setItem(config.access, token.access);
+			setUser(user);
+		} catch (e) {
+			if (e && typeof e === "object" && "message" in e && "name" in e) {
+				setError(e as Error);
+			}
+			throw e;
 		} finally {
 			setLoading(false);
 		}
 	}, []);
 
-	const register = useCallback(async (_data: unknown) => {
-		setLoading(true);
-		setError(null);
-
-		try {
-			await sleep(200);
-			setUser({
-				name: "Jhon Dow",
-				email: "jhon@dow.com",
-				avatar: {
-					src: "/user.png",
-				},
+	const login = useCallback(
+		async (data: LoginSchemaType) => {
+			req(async () => {
+				return await post<AuthResType>({
+					body: data,
+					base: "http://localhost:8000",
+					url: "login",
+				});
 			});
-		} catch (e) {
-			if (e instanceof Error) {
-				setError(e);
-			}
-		} finally {
-			setLoading(false);
-		}
-	}, []);
+		},
+		[req],
+	);
+
+	const register = useCallback(
+		async (data: RegisterSchemaType) => {
+			req(async () => {
+				return await post<AuthResType>({
+					body: data,
+					base: "http://localhost:8000",
+					url: "register",
+				});
+			});
+		},
+		[req],
+	);
 
 	const logout = useCallback(async () => {
 		setLoading(true);
@@ -106,13 +121,15 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 			setLoading(true);
 			try {
 				await sleep(2000);
-				setUser({
-					name: "Jhon Dow",
-					email: "jhon@dow.com",
-					avatar: {
-						src: "/user.png",
-					},
-				});
+				// setUser({
+				// 	id: '1',
+				// 	roles: ['geast'],
+				// 	name: "Jhon Dow",
+				// 	email: "jhon@dow.com",
+				// 	avatar: {
+				// 		src: "/user.png",
+				// 	},
+				// });
 			} catch (e) {
 				setError(e as Error);
 			} finally {

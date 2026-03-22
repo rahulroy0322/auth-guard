@@ -25,12 +25,12 @@
 		"@types/bcrypt": "^6.0.0",
 		"@types/express": "^5.0.6",
 		"@types/jsonwebtoken": "^9.0.10",
+		"base": "workspace:^",
 		"biome-config": "workspace:^",
 		"ts-config": "workspace:^"
 	},
 	"dependencies": {
 		"@auth-guard/backend": "workspace:^",
-		"base": "workspace:^",
 		"schema": "workspace:^",
 		"zod": "^4.3.6"
 	}

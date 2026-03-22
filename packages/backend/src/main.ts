@@ -78,7 +78,7 @@ const init: AuthType = ({
 		};
 	};
 
-	const register: RegisterType = async ({ pass: passwd, ...data }) => {
+	const register: RegisterType = async ({ password: passwd, ...data }) => {
 		const reqId = genReqId();
 
 		logger.trace(
@@ -143,7 +143,7 @@ const init: AuthType = ({
 		};
 	};
 
-	const login: LoginType = async ({ pass: passwd, email }) => {
+	const login: LoginType = async ({ password: passwd, email }) => {
 		const reqId = genReqId();
 
 		logger.trace(

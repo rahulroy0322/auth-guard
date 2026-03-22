@@ -2,7 +2,7 @@
 	"$schema": "https://biomejs.dev/schemas/2.4.8/schema.json",
 	"extends": ["biome-config/react.json"],
 	"files": {
-		"includes": ["**", "!!**/dist", "!!node_modules"]
+		"includes": ["**", "!!**/dist", "!!node_modules", "!!**/routeTree.gen.ts"]
 	},
 	"linter": {
 		"rules": {

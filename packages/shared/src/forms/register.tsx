@@ -1,20 +1,59 @@
+import type { UserType } from "base";
 import { useAppForm } from "form";
-import type { FC } from "react";
+import { type FC, type SubmitEvent, useCallback } from "react";
+import { passwordSchema, registerSchema } from "schema";
 import { Button } from "ui/components/ui/button";
 import { Field, FieldDescription } from "ui/components/ui/field";
 import { Base } from "./base";
 
-type RegisterFormPropsType = Parameters<typeof Button>[0];
+const registerFrontendSchema = registerSchema
+	.extend({
+		confirm: passwordSchema,
+	} satisfies {
+		confirm: unknown;
+	})
+	.refine(({ password, confirm }) => password === confirm, {
+		message: "Passwords don't match",
+		path: ["confirm"],
+	});
 
-const RegisterForm: FC<RegisterFormPropsType> = (props) => {
-	const { AppField } = useAppForm({
+type RegisterSchemaType = Omit<UserType, "id" | "roles"> & {
+	confirm: string;
+	password: string;
+};
+
+type RegisterFormPropsType = Parameters<typeof Button>[0] & {
+	handleSubmit: (value: RegisterSchemaType) => void;
+	pending: boolean;
+};
+
+const RegisterForm: FC<RegisterFormPropsType> = ({
+	handleSubmit: parentSubmit,
+	pending,
+	...props
+}) => {
+	const { AppField, handleSubmit: submit } = useAppForm({
 		defaultValues: {
 			name: "",
 			email: "",
 			password: "",
 			confirm: "",
+		} satisfies RegisterSchemaType as RegisterSchemaType,
+		validators: {
+			onSubmit: registerFrontendSchema,
+		},
+		onSubmit: ({ value }) => {
+			parentSubmit(value);
 		},
 	});
+
+	const handleSubmit = useCallback(
+		(e: SubmitEvent<HTMLFormElement>) => {
+			e.preventDefault();
+			submit();
+		},
+		[submit],
+	);
 
 	return (
 		<Base
@@ -25,10 +64,12 @@ const RegisterForm: FC<RegisterFormPropsType> = (props) => {
 		>
 			<form
 				className="space-y-2"
-				onSubmit={(e) => {
-					e.preventDefault();
-				}}
+				onSubmit={handleSubmit}
+				aria-disabled={pending}
 			>
+				<AppField name="name">
+					{({ Input }) => <Input label="Name" placeholder="Jhon Doe" />}
+				</AppField>
 				<AppField name="email">
 					{({ Input }) => (
 						<Input
@@ -60,7 +101,9 @@ const RegisterForm: FC<RegisterFormPropsType> = (props) => {
 					)}
 				</AppField>
 				<Field>
-					<Button type="submit">Register</Button>
+					<Button type="submit" disabled={pending}>
+						Register
+					</Button>
 				</Field>
 
 				<FieldDescription>

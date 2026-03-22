@@ -6,6 +6,11 @@ type UserType = {
 	email: string
 	password: string | null
 	roles: RoleType[]
+	avatar?: AvatarType
 }
 
-export type { RoleType, UserType }
+type AvatarType = {
+	src: string
+}
+
+export type { AvatarType, RoleType, UserType }

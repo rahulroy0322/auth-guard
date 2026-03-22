@@ -1,3 +1,4 @@
+import { AuthError } from "@auth-guard/express";
 import type { ErrorRequestHandler } from "express";
 import { isDev } from "../config/env.config";
 import { AppError, type MetaType } from "../error/app.error";
@@ -14,6 +15,14 @@ const getError = (
 	meta?: MetaType;
 	extra?: unknown;
 } => {
+	if (e instanceof AuthError) {
+		return {
+			name: e.name,
+			message: e.message,
+			stack: e.stack,
+			status: e.status,
+		};
+	}
 	if (e instanceof AppError) {
 		return {
 			name: e.name,

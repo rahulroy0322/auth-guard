@@ -35,7 +35,7 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 
 		const { token, user } = await coreApi.register({
 			...data,
-			pass: data.password,
+			password: data.password,
 		});
 
 		setAuthCookie(res, token);
@@ -54,7 +54,7 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 
 		const { token, user } = await coreApi.login({
 			...data,
-			pass: data.password,
+			password: data.password,
 		});
 
 		setAuthCookie(res, token);
@@ -112,4 +112,5 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 
 const auth = init;
 
+export * from "@auth-guard/backend/error";
 export { auth, init };

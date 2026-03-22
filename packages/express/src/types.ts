@@ -12,7 +12,7 @@ type AuthExpressPropsType = AuthPropsType & {
 type ResType = {
 	success: true;
 	data: {
-		user: Omit<UserType, "pass">;
+		user: Omit<UserType, "password">;
 		token: {
 			refresh?: string;
 			access: string;
@@ -30,7 +30,7 @@ type AuthExpressType = (props: AuthExpressPropsType) => AuthExpressReturnType;
 declare global {
 	namespace Express {
 		interface Request {
-			user?: Omit<UserType, "pass">;
+			user?: Omit<UserType, "password">;
 		}
 	}
 }
