@@ -15,10 +15,10 @@
       ]
     },
     "check": {
-      "dependsOn": []
+      "cache": false
     },
     "check:fix": {
-      "dependsOn": []
+      "cache": false
     },
     "dev": {
       "cache": false,

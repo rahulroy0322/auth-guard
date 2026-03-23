@@ -19,6 +19,7 @@ import type {
 	LogType,
 	RegisterType,
 	TokenRefreshType,
+	TokenType,
 } from "./types";
 import { hashPassword, validPassword } from "./utils/password";
 import { signToken, verifyToken } from "./utils/token";
@@ -189,12 +190,8 @@ const init: AuthType = ({
 		}
 
 		logger.trace({ reqId }, "Validating Password");
-		if (
-			!(await validPassword({
-				current: passwd,
-				hash: user.password,
-			}))
-		) {
+
+		if (!(await validPassword({ current: passwd, hash: user.password }))) {
 			logError({
 				msg: "Password not match",
 				who: user.name,
@@ -233,94 +230,31 @@ const init: AuthType = ({
 			reqId = genReqId();
 		}
 
-		try {
-			logger.trace({ reqId }, "Checking Token to authenticate");
+		logger.trace({ reqId }, "Checking Token to authenticate");
 
-			const [, token] = (extractToken.access(req) || "").split(" ");
+		const [, token] = (extractToken.access(req) || "").split(" ");
 
-			if (!token) {
-				return {
-					user: null,
-				};
-			}
-
-			logger.trace({ reqId }, "Token found varifing token");
-			const { id, type } = verifyToken(token, jwt.secret);
-
-			if (type === "refresh") {
-				logError({
-					msg: "Wrong Token provided in loginRequired",
-					who: "[SYSTEM]",
-					reqId,
-					userId: id,
-					extra: {
-						token,
-					},
-				});
-				throw new AuthWrongTokenError();
-			}
-
-			logger.trace({ reqId, token }, "Checking For token Baned");
-
-			const baned = await getCache(`token:${token}`);
-
-			if (baned) {
-				logError({
-					msg: "Banned Access Token Found",
-					who: "[SYSTEM]",
-					reqId,
-					userId: id,
-					extra: {
-						token,
-					},
-				});
-				throw new AuthBadError("You Have loged out previously");
-			}
-
-			logger.trace(
-				{
-					id,
-					reqId,
-				},
-				"Checking User For to authenticate this must be chached!",
-			);
-			const user = await findById(id);
-
-			// ? add ban check
-			if (!user) {
-				logError({
-					msg: "Failed to get User",
-					who: "[SYSTEM]",
-					reqId,
-					userId: id,
-					extra: {
-						token,
-					},
-				});
-				throw new AuthUnAuthenticatedError("Maybe you got blocked");
-			}
-
-			log({
-				msg: "Authenticate Succesful:)",
-				userId: user.id,
-				who: user.name,
-				reqId,
-			});
+		if (!token) {
 			return {
-				user,
+				user: null,
 			};
-		} catch (e) {
-			// todo!
-			if (e instanceof TokenExpiredError) {
-				throw new AuthExpiredError();
-			}
-
-			if (e instanceof AuthError || e instanceof JsonWebTokenError) {
-				throw e;
-			}
-
-			throw new AuthError((e as Error).message);
 		}
+
+		const { user } = await verifyAndCheckBan({
+			reqId,
+			token: token,
+			type: "access",
+		});
+
+		log({
+			msg: "Authenticate Succesful:)",
+			userId: user.id,
+			who: user.name,
+			reqId,
+		});
+		return {
+			user,
+		};
 	};
 
 	const loginRequired: LoginRequiredType = async (req) => {
@@ -343,51 +277,46 @@ const init: AuthType = ({
 		};
 	};
 
-	const tokenRefresh: TokenRefreshType = async (req) => {
-		const reqId = genReqId();
-
+	const verifyAndCheckBan = async ({
+		token: _token,
+		type: reqType,
+		reqId,
+	}: {
+		token: string;
+		type: TokenType["type"];
+		reqId: string;
+	}) => {
 		try {
-			logger.trace({ reqId }, "Checking Token to refresh");
-
-			const [, _token] = (extractToken.refresh(req) || "").split(" ");
-
-			if (!_token) {
-				logError({
-					msg: "Token Not Found",
-					who: "[SYSTEM]",
-					reqId,
-					userId: null,
-				});
-				throw new AuthNoTokenError();
-			}
-
 			logger.trace({ reqId }, "Token found varifing token");
-			const { id, type, exp } = verifyToken(_token, jwt.secret);
-
-			if (type === "access") {
+			const token = verifyToken(_token, jwt.secret);
+			const { id, type } = token;
+			if (type !== reqType) {
 				logError({
-					msg: "Wrong Token provided in tokenRefresh",
+					msg: "Wrong Token provided in verifyAndCheckBan",
 					who: "[SYSTEM]",
 					reqId,
 					userId: id,
 					extra: {
 						token: _token,
+						expected: reqType,
+						got: type,
 					},
 				});
 				throw new AuthWrongTokenError();
 			}
 
-			logger.trace({ reqId, _token }, "Checking For token Baned");
+			logger.trace({ reqId, token }, "Checking For token Baned");
+
 			const baned = await getCache(`token:${_token}`);
 
 			if (baned) {
 				logError({
-					msg: "Banned Access Token Found",
+					msg: "Banned Token Found",
 					who: "[SYSTEM]",
 					reqId,
 					userId: id,
 					extra: {
-						_token,
+						token: _token,
 					},
 				});
 				throw new AuthBadError("You Have loged out previously");
@@ -398,7 +327,7 @@ const init: AuthType = ({
 					id,
 					reqId,
 				},
-				"Checking User For to authenticate this must be chached!",
+				"Checking User in verifyAndCheckBan, this must be chached!",
 			);
 			const user = await findById(id);
 
@@ -416,34 +345,17 @@ const init: AuthType = ({
 				throw new AuthUnAuthenticatedError("Maybe you got blocked");
 			}
 
-			const { token } = signTokens({
-				reqId,
-				data: user,
-			});
-
-			const expiry = new Date(exp * 1000);
-
-			if (!(expiry <= new Date(Date.now() + 1000 * 60 * 60 * 24 * 2))) {
-				// @ts-expect-error
-				delete token.refresh;
-			}
-
 			log({
-				msg: "Token Refresh Succesful:)",
+				msg: "Verifyed not Ban:)",
 				userId: user.id,
 				who: user.name,
 				reqId,
 			});
-
-			// @ts-expect-error
-			delete user.pass;
-
 			return {
-				token,
 				user,
+				token,
 			};
 		} catch (e) {
-			// todo!
 			if (e instanceof TokenExpiredError) {
 				throw new AuthExpiredError();
 			}
@@ -454,6 +366,60 @@ const init: AuthType = ({
 
 			throw new AuthError((e as Error).message);
 		}
+	};
+
+	const tokenRefresh: TokenRefreshType = async (req) => {
+		const reqId = genReqId();
+
+		logger.trace({ reqId }, "Checking Token to refresh");
+
+		const [, _token] = (extractToken.refresh(req) || "").split(" ");
+
+		if (!_token) {
+			logError({
+				msg: "Token Not Found",
+				who: "[SYSTEM]",
+				reqId,
+				userId: null,
+			});
+			throw new AuthNoTokenError();
+		}
+
+		const {
+			token: { exp },
+			user,
+		} = await verifyAndCheckBan({
+			reqId,
+			token: _token,
+			type: "refresh",
+		});
+
+		const { token } = signTokens({
+			reqId,
+			data: user,
+		});
+
+		const expiry = new Date(exp * 1000);
+
+		if (!(expiry <= new Date(Date.now() + 1000 * 60 * 60 * 24 * 2))) {
+			// @ts-expect-error
+			delete token.refresh;
+		}
+
+		log({
+			msg: "Token Refresh Succesful:)",
+			userId: user.id,
+			who: user.name,
+			reqId,
+		});
+
+		// @ts-expect-error
+		delete user.pass;
+
+		return {
+			token,
+			user,
+		};
 	};
 
 	const logout: LogoutType = async (req) => {
