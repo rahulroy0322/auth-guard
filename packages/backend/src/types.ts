@@ -70,6 +70,8 @@ type AuthReturnType = {
 	verifieAccount: VerifieAccountType;
 	checkAuth: CheckAuthType;
 	loginRequired: LoginRequiredType;
+	forgotPassword: ForgotPasswordType;
+	resetPassword: ResetPasswordType;
 	tokenRefresh: TokenRefreshType;
 };
 
@@ -131,6 +133,20 @@ type VerifieAccountType = (
 	data: VerifieAccountPropsType,
 ) => Promise<LoginReturnType>;
 
+type ForgotPasswordPropsType = Pick<UserType, "email">;
+
+type ForgotPasswordType = (
+	data: ForgotPasswordPropsType,
+) => Promise<RegisterReturnType>;
+
+type ResetPasswordPropsType = VerifieAccountPropsType & {
+	password: string;
+};
+
+type ResetPasswordType = (
+	data: ResetPasswordPropsType,
+) => Promise<LoginReturnType>;
+
 type TokenType = Pick<UserType, "id"> & {
 	type: "refresh" | "access";
 };
@@ -139,6 +155,7 @@ export type {
 	AuthPropsType,
 	AuthType,
 	CheckAuthType,
+	ForgotPasswordType,
 	LoginPropsType,
 	LoginRequiredType,
 	LoginType,
@@ -146,6 +163,7 @@ export type {
 	LogType,
 	RegisterPropsType,
 	RegisterType,
+	ResetPasswordType,
 	StartVerificationType,
 	TokenRefreshType,
 	TokenType,

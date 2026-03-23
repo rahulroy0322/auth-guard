@@ -47,7 +47,7 @@ Authorization: Bearer {{refresh}}
 
 ### verify
 
-POST {{base}}/auth/verify?id=f4d68d8a-a37d-41c6-a289-f32b15ed6356
+PATCH {{base}}/auth/verify?id=f4d68d8a-a37d-41c6-a289-f32b15ed6356
 content-type: application/json
 Authorization: Bearer {{access}}
 
@@ -63,4 +63,26 @@ Authorization: Bearer {{access}}
 
 {
     "email": "test@test.com"
+}
+
+
+### forgot-password
+
+POST {{base}}/auth/forgot-password
+content-type: application/json
+Authorization: Bearer {{access}}
+
+{
+    "email": "test@test.com"
+}
+
+### reset-password
+
+PATCH {{base}}/auth/reset-password?id=f4d68d8a-a37d-41c6-a289-f32b15ed6356
+content-type: application/json
+Authorization: Bearer {{access}}
+
+{
+    "code":"ZJA0Fh",
+    "password": "TEst@@1234"
 }

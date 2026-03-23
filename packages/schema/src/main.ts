@@ -28,4 +28,14 @@ const verifieSchema = z.object({
 	code: z.string().length(6, "Invalid code"),
 });
 
-export { loginSchema, passwordSchema, registerSchema, verifieSchema };
+const resetPasswordSchema = verifieSchema.extend({
+	password: passwordSchema,
+});
+
+export {
+	loginSchema,
+	passwordSchema,
+	registerSchema,
+	resetPasswordSchema,
+	verifieSchema,
+};

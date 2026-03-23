@@ -15,11 +15,13 @@ import {
 import type {
 	AuthType,
 	CheckAuthType,
+	ForgotPasswordType,
 	LoginRequiredType,
 	LoginType,
 	LogoutType,
 	LogType,
 	RegisterType,
+	ResetPasswordType,
 	StartVerificationType,
 	TokenRefreshType,
 	TokenType,
@@ -106,6 +108,182 @@ const init: AuthType = ({
 		logger.trace({ reqId }, "Code send succefully!");
 	};
 
+	const forgotPassword: ForgotPasswordType = async ({ email }) => {
+		const reqId = genReqId();
+
+		logger.trace(
+			{
+				email,
+				reqId,
+			},
+			"Checking User For Forgot req!",
+		);
+
+		const user = await findByEmail(email);
+
+		logger.trace({ reqId, user }, "User fetched For Forgot req");
+		if (!user) {
+			logError({
+				msg: "Failed to get User For Forgot req",
+				who: "[SYSTEM]",
+				reqId,
+				userId: null,
+				extra: {
+					email,
+				},
+			});
+			throw new AuthBadError("Email is invalid!");
+		}
+
+		logger.trace({ reqId }, "Chacking if registered or maybe social");
+		if (!user.password) {
+			// social login
+			logError({
+				msg: "Trying To Login With Password with no pass",
+				who: user.name,
+				reqId,
+				userId: user.id,
+				extra: {
+					email,
+				},
+			});
+			throw new AuthBadError("Email is invalid!");
+		}
+
+		logger.trace({ reqId }, "Checking if user is verified");
+		if (!user.verifiedAt) {
+			logError({
+				msg: "User is not verified",
+				who: "[SYSTEM]",
+				reqId,
+				userId: user.id,
+			});
+			throw new AuthBadError(
+				"your account is not verified yet,plese verify first:)",
+			);
+		}
+
+		logger.trace({ reqId }, "Account is verified check if already req made");
+		if (await getCache(`code:${user.id}`)) {
+			logError({
+				msg: "Too Many Requests",
+				who: "[SYSTEM]",
+				reqId,
+				userId: user.id,
+			});
+			return {
+				id: user.id,
+			};
+		}
+
+		// TODO! clear session
+
+		sendCode({
+			reqId,
+			userId: user.id,
+		});
+
+		return {
+			id: user.id,
+		};
+	};
+
+	const resetPassword: ResetPasswordType = async ({
+		id,
+		password: passwd,
+		code,
+	}) => {
+		const reqId = genReqId();
+
+		logger.trace(
+			{
+				id,
+				reqId,
+			},
+			"Checking User For reset password!",
+		);
+
+		logger.trace({ reqId }, "Checking for code in reset password");
+		const cachedCode = await getCache(`code:${id}`);
+
+		if (!cachedCode || cachedCode !== code) {
+			logError({
+				msg: "Code not matched in reset password",
+				who: "[SYSTEM]",
+				reqId,
+				userId: null,
+				extra: {
+					cachedCode,
+					code,
+					id,
+				},
+			});
+			throw new AuthBadError("Invalid Code");
+		}
+
+		await removeCache(`code:${id}`);
+
+		logger.trace({ reqId }, "Hashing Password");
+		const password = await hashPassword(passwd);
+
+		logger.trace({ reqId }, "Reseting user Password");
+		if (
+			!(await updateById(id, {
+				password,
+			}))
+		) {
+			logError({
+				msg: "Failed to update User",
+				who: "[SYSTEM]",
+				reqId,
+				userId: null,
+				extra: {
+					id,
+				},
+			});
+			throw new AuthBadError("Invalid Code");
+		}
+
+		logger.trace({ reqId }, "Fetching updated user in reset password");
+		const user = await findById(id);
+
+		if (!user) {
+			// ? this should never called
+			logError({
+				msg: "Failed to get User after reset password",
+				who: "[SYSTEM]",
+				reqId,
+				userId: null,
+				extra: {
+					id,
+				},
+			});
+			throw new AuthServerError();
+		}
+
+		// TODO! clear session
+
+		const { token } = signTokens({
+			reqId,
+			data: user,
+		});
+
+		log({
+			msg: "User Password reset Succesful:)",
+			userId: user.id,
+			who: user.name,
+			reqId,
+		});
+
+		// @ts-expect-error
+		delete user.password;
+
+		return {
+			token,
+			user,
+		};
+	};
+
 	const startVerification: StartVerificationType = async ({ email }) => {
 		const reqId = genReqId();
 
@@ -189,7 +367,7 @@ const init: AuthType = ({
 			verifiedAt: new Date(),
 		});
 
-		logger.trace({ reqId, user }, "User fetched For verify");
+		logger.trace({ reqId, user }, "User updated For verify");
 		if (!user) {
 			logError({
 				msg: "Failed to update User",
@@ -206,11 +384,12 @@ const init: AuthType = ({
 		logger.trace({ reqId }, "Account is verified,removing all code's");
 		await removeCache(`code:${user.id}`);
 
+		logger.trace({ reqId }, "Fetching updated user in verifie");
 		const uptodatedUser = await findById(user.id);
 		if (!uptodatedUser) {
 			// ? this should never called
 			logError({
-				msg: "Failed to get User after delete",
+				msg: "Failed to get User after verify",
 				who: "[SYSTEM]",
 				reqId,
 				userId: user.id,
@@ -227,7 +406,7 @@ const init: AuthType = ({
 		});
 
 		log({
-			msg: "User Login Succesful:)",
+			msg: "User Verification Succesful:)",
 			userId: uptodatedUser.id,
 			who: uptodatedUser.name,
 			reqId,
@@ -642,6 +821,8 @@ const init: AuthType = ({
 		logout,
 		startVerification,
 		verifieAccount,
+		forgotPassword,
+		resetPassword,
 		checkAuth,
 		loginRequired,
 		tokenRefresh,

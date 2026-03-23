@@ -1,7 +1,12 @@
 import { init as core } from "@auth-guard/backend";
 import { AuthServerError } from "@auth-guard/backend/error";
 import type { RequestHandler, Response } from "express";
-import { loginSchema, registerSchema, verifieSchema } from "schema";
+import {
+	loginSchema,
+	registerSchema,
+	resetPasswordSchema,
+	verifieSchema,
+} from "schema";
 import type { AuthExpressType, ResType } from "./types";
 
 const options = {
@@ -169,6 +174,42 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		} satisfies ResType);
 	};
 
+	const forgotPassword: RequestHandler = async (req, res) => {
+		const data = loginSchema
+			.pick({
+				email: true,
+			})
+			.parse(req.body || {});
+
+		const { id } = await coreApi.forgotPassword(data);
+
+		res.status(200).json({
+			success: true,
+			data: {
+				id,
+				message: "Token is send",
+			},
+		} satisfies ResType);
+	};
+
+	const resetPassword: RequestHandler = async (req, res) => {
+		const data = resetPasswordSchema.parse({
+			...req.body,
+			...req.query,
+		});
+
+		const { token, user } = await coreApi.resetPassword(data);
+
+		setAuthCookie(res, token);
+
+		res.status(200).json({
+			success: true,
+			data: {
+				user,
+				token,
+			},
+		} satisfies ResType);
+	};
 	return {
 		login,
 		register,
@@ -176,6 +217,8 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		me,
 		startVerification,
 		verifieAccount,
+		forgotPassword,
+		resetPassword,
 		tokenRefresh,
 		checkAuth,
 		loginRequired,

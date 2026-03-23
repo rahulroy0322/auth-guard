@@ -5,13 +5,15 @@ const authRouter = (props: AuthExpressReturnType) => {
 	const authRouter: Router = Router();
 
 	authRouter.post("/register", props.register);
-
 	authRouter.post("/login", props.login);
 
 	authRouter.post("/refresh", props.tokenRefresh);
 
 	authRouter.post("/start-verification", props.startVerification);
-	authRouter.post("/verify", props.verifieAccount);
+	authRouter.patch("/verify", props.verifieAccount);
+
+	authRouter.post("/forgot-password", props.forgotPassword);
+	authRouter.patch("/reset-password", props.resetPassword);
 
 	authRouter.get("/me", props.checkAuth, props.loginRequired, props.me);
 
