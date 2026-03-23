@@ -1,6 +1,7 @@
 import type { RoleType, UserType } from "base";
 import { customType, pgTable, varchar } from "drizzle-orm/pg-core";
 import { defaults } from "./helper";
+import { boolean } from "drizzle-orm/pg-core";
 
 const ROLES = (<const>[
 	"super",
@@ -33,7 +34,10 @@ const User = pgTable("users", {
 	})
 		.default(["user"])
 		.notNull(),
+	isVerified: boolean('is_verified').default(false).notNull(),
+	isBaned: boolean('is_baned').default(false).notNull(),
+
 	...defaults,
-}) satisfies { $inferSelect: UserType };
+}) satisfies { $inferSelect: Omit<UserType, 'avatar' | 'profiles'> };
 
 export { User };

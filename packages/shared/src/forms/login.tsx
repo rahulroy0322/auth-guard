@@ -6,7 +6,7 @@ import { Button } from "ui/components/ui/button";
 import { Field, FieldDescription } from "ui/components/ui/field";
 import { Base } from "./base";
 
-type LoginSchemaType = Omit<UserType, "id" | "roles" | "name"> & {
+type LoginSchemaType = Pick<UserType, 'email' | 'password'> & {
 	password: string;
 };
 

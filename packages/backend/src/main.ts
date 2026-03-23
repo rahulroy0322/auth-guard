@@ -31,6 +31,7 @@ const init: AuthType = ({
 	jwt,
 	logger,
 }) => {
+	const blocked = new AuthUnAuthenticatedError("Maybe you got blocked");
 	const genReqId = (): string => {
 		// TODO!
 		return "[UUID]";
@@ -138,11 +139,16 @@ const init: AuthType = ({
 		});
 
 		// @ts-expect-error
-		delete user.pass;
+		delete user.password;
 
+		// TODO! add profiles and avaters
 		return {
 			token,
-			user,
+			user: {
+				...user,
+				profiles: [],
+				avatar: null
+			},
 		};
 	};
 
@@ -156,6 +162,7 @@ const init: AuthType = ({
 			},
 			"Checking User For Login!",
 		);
+
 		const user = await findByEmail(email);
 
 		logger.trace({ reqId, user }, "User fetched For login");
@@ -172,7 +179,19 @@ const init: AuthType = ({
 			throw new AuthBadError("Email or Password is invalid!");
 		}
 
-		// ? TODO user ban check
+		logger.trace({ reqId }, "Checking if user is verified");
+		console.error('TODO!')
+
+		logger.trace({ reqId }, "Checking if user is banned");
+		if (user.isBaned) {
+			logError({
+				msg: "User Is banned",
+				who: "[SYSTEM]",
+				reqId,
+				userId: user.id,
+			});
+			throw blocked
+		}
 
 		logger.trace({ reqId }, "Chacking if registered or maybe social");
 		if (!user.password) {
@@ -217,11 +236,12 @@ const init: AuthType = ({
 		});
 
 		// @ts-expect-error
-		delete user.pass;
+		delete user.password;
 
+		// TODO! add profiles and avaters
 		return {
 			token,
-			user,
+			user
 		};
 	};
 
@@ -329,10 +349,10 @@ const init: AuthType = ({
 				},
 				"Checking User in verifyAndCheckBan, this must be chached!",
 			);
+
 			const user = await findById(id);
 
-			// ? add ban check
-			if (!user) {
+			if (!user || user.isBaned) {
 				logError({
 					msg: "Failed to get User",
 					who: "[SYSTEM]",
@@ -342,7 +362,7 @@ const init: AuthType = ({
 						token: _token,
 					},
 				});
-				throw new AuthUnAuthenticatedError("Maybe you got blocked");
+				throw blocked
 			}
 
 			log({
@@ -351,6 +371,7 @@ const init: AuthType = ({
 				who: user.name,
 				reqId,
 			});
+
 			return {
 				user,
 				token,
@@ -414,7 +435,7 @@ const init: AuthType = ({
 		});
 
 		// @ts-expect-error
-		delete user.pass;
+		delete user.password;
 
 		return {
 			token,

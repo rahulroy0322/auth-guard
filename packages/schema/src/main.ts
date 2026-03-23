@@ -16,11 +16,11 @@ const registerSchema = z.object({
 	name: z.string("Name is required").min(1, "Name is required"),
 	email: z.email(),
 	password: passwordSchema,
-}) satisfies z.ZodType<Omit<UserType, "roles" | "id">>;
+}) satisfies z.ZodType<Pick<UserType, 'name' | 'email' | 'password'>>;
 
 const loginSchema = registerSchema.pick({
 	email: true,
 	password: true,
-}) satisfies z.ZodType<Omit<UserType, "roles" | "id" | "name">>;
+}) satisfies z.ZodType<Pick<UserType, 'email' | 'password'>>;
 
 export { loginSchema, passwordSchema, registerSchema };

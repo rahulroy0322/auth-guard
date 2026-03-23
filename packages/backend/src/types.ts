@@ -29,7 +29,7 @@ type AuthPropsType = {
 
 		create: (
 			data: Pick<UserType, "email" | "name" | "password" | "roles">,
-		) => Promise<UserType | null>;
+		) => Promise<Omit<UserType, 'profiles' | 'avatar'> | null>;
 	};
 	Cache: {
 		set: (key: CacheKeyType, value: string, seconds: number) => Promise<void>;
@@ -65,7 +65,7 @@ type RegisterPropsType = Pick<UserType, "email" | "name"> & {
 };
 
 type RegisterReturnType = {
-	user: Omit<UserType, "pass">;
+	user: Omit<UserType, "password">;
 	token: {
 		refresh: string;
 		access: string;
@@ -89,9 +89,7 @@ type CheckAuthType = (
 	reqId?: string,
 ) => Promise<CheckAuthReturnType>;
 
-type LoginRequiredReturnType = {
-	user: Omit<UserType, "password">;
-};
+type LoginRequiredReturnType = Pick<RegisterReturnType, 'user'>;
 
 type LoginRequiredType = (
 	req: IncomingMessage,

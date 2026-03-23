@@ -19,7 +19,7 @@ import { config } from "./config";
 
 type GuardUserType = Omit<UserType, "password">;
 
-type RegisterSchemaType = Omit<UserType, "id" | "roles"> & {
+type RegisterSchemaType = Pick<UserType, 'name' | "email"> & {
 	password: string;
 };
 

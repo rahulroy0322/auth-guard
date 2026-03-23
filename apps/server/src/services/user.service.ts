@@ -4,6 +4,7 @@ import { eq, isNull, type SQL, type TableConfig } from "drizzle-orm";
 import type { PgTable } from "drizzle-orm/pg-core";
 import { db } from "../db/main";
 import { User } from "../db/schema/user";
+import { Avatar } from "../db/schema/avatar";
 
 type UserModelType = AuthPropsType["User"];
 
@@ -29,14 +30,14 @@ const checkNull = <T extends PgTable<TableConfig>>({
 	);
 };
 
-const findUsers = ({
+const findUsers = async ({
 	filter = undefined,
 	limit = undefined,
 }: {
 	filter?: SQL<unknown>;
 	limit?: number;
-}): Promise<UserType[]> =>
-	db.query.User.findMany({
+}): Promise<UserType[]> => {
+	const users = await db.query.User.findMany({
 		where: filter,
 		columns: {
 			id: true,
@@ -44,9 +45,32 @@ const findUsers = ({
 			name: true,
 			password: true,
 			roles: true,
+			isBaned: true,
+			isVerified: true,
+		},
+		with: {
+			profiles: {
+				columns: {
+					email: true,
+					provider: true,
+				}
+			},
+			avatars: {
+				limit: 1,
+				where: eq(Avatar.active, true),
+				columns: {
+					src: true
+				}
+			}
 		},
 		limit,
 	});
+
+	return users.map((user) => ({
+		...user,
+		avatar: user.avatars.at(0) || null
+	}))
+}
 
 const findByEmail: UserModelType["findByEmail"] = async (email) => {
 	const [user = null] = await findUsers({

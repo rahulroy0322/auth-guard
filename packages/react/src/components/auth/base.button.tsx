@@ -1,5 +1,5 @@
-import { type FC, type ReactNode, useState } from "react";
-import { LoginForm, RegisterForm } from "shared";
+import { type FC, type ReactNode } from "react";
+// import { LoginForm, RegisterForm } from "shared";
 import { Dialog, DialogContent } from "ui/components/ui/dialog";
 
 type AuthBaseButtonPropsType = {
@@ -7,13 +7,15 @@ type AuthBaseButtonPropsType = {
 	defaultState: AuthStatesType;
 };
 
+// TODO!
+
 type AuthStatesType = "register" | "login";
 
 const AuthBaseButton: FC<AuthBaseButtonPropsType> = ({
 	children,
-	defaultState,
+	// defaultState,
 }) => {
-	const [current, setCurrent] = useState<AuthStatesType>(defaultState);
+	// const [current, setCurrent] = useState<AuthStatesType>(defaultState);
 
 	return (
 		<Dialog>
@@ -22,7 +24,7 @@ const AuthBaseButton: FC<AuthBaseButtonPropsType> = ({
 				className="max-w-sm md:max-w-4xl p-0"
 				showCloseButton={false}
 			>
-				{current === "login" ? (
+				{/* {current === "login" ? (
 					<LoginForm
 						onClick={() => {
 							setCurrent("register");
@@ -34,7 +36,7 @@ const AuthBaseButton: FC<AuthBaseButtonPropsType> = ({
 							setCurrent("login");
 						}}
 					/>
-				)}
+				)} */}
 			</DialogContent>
 		</Dialog>
 	);

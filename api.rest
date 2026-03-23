@@ -1,7 +1,7 @@
 
 @base = http://localhost:8000/api/v1
-@access = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU2NDVmYmYxLWQzMjYtNGY3MC05YzI1LTJiNjdhMzQwZGUzZCIsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NzQyNDM1NjAsImV4cCI6MTc3NDI0NDQ2MH0.ds39BQWqKiGtlaTyp-vmzb3frKBpPjG12gsbL7q2pic
-@refresh = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU2NDVmYmYxLWQzMjYtNGY3MC05YzI1LTJiNjdhMzQwZGUzZCIsInR5cGUiOiJyZWZyZXNoIiwiaWF0IjoxNzc0MjQzNTI2LCJleHAiOjE3NzQ4NDgzMjZ9.ElWOi_vYYDvrDsro9kia9Tudx2BxXmHL24k8dJD8zeg
+@access = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImEwNzEzNWYxLWQ4Y2MtNGQzZS04MTZiLTVlMTIyYTVkMTBhNSIsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NzQyNTAyNzgsImV4cCI6MTc3NDI1MTE3OH0.1WXe50I35YyJW31M7xHQhDB6oUdK35bQbuyFYMUsSSg
+@refresh = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImEwNzEzNWYxLWQ4Y2MtNGQzZS04MTZiLTVlMTIyYTVkMTBhNSIsInR5cGUiOiJyZWZyZXNoIiwiaWF0IjoxNzc0MjQ4MDMwLCJleHAiOjE3NzQ4NTI4MzB9.FpOmEeEmMIU-t-Q_PUdi1-sJia7vL2ctPiEGluXv2JQ
 
 ## auth
 
@@ -22,7 +22,6 @@ POST {{base}}/auth/login
 content-type: application/json
 
 {
-    "name": "test",
     "email": "test@test.com",
     "password": "TEst@@1234"
 }
