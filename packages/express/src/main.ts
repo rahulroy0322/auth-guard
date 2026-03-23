@@ -1,7 +1,7 @@
 import { init as core } from "@auth-guard/backend";
 import { AuthServerError } from "@auth-guard/backend/error";
 import type { RequestHandler, Response } from "express";
-import { loginSchema, registerSchema } from "schema";
+import { loginSchema, registerSchema, verifieSchema } from "schema";
 import type { AuthExpressType, ResType } from "./types";
 
 const options = {
@@ -43,14 +43,25 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 	const register: RequestHandler = async (req, res) => {
 		const data = registerSchema.parse(req.body || {});
 
-		const { token, user } = await coreApi.register({
-			...data,
-			password: data.password,
-		});
+		const { id } = await coreApi.register(data);
+
+		res.status(201).json({
+			success: true,
+			data: {
+				id,
+				message: "Token is send",
+			},
+		} satisfies ResType);
+	};
+
+	const login: RequestHandler = async (req, res) => {
+		const data = loginSchema.parse(req.body || {});
+
+		const { token, user } = await coreApi.login(data);
 
 		setAuthCookie(res, token);
 
-		res.status(201).json({
+		res.status(200).json({
 			success: true,
 			data: {
 				user,
@@ -59,13 +70,31 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		} satisfies ResType);
 	};
 
-	const login: RequestHandler = async (req, res) => {
-		const data = loginSchema.parse(req.body || {});
+	const startVerification: RequestHandler = async (req, res) => {
+		const data = loginSchema
+			.pick({
+				email: true,
+			})
+			.parse(req.body || {});
 
-		const { token, user } = await coreApi.login({
-			...data,
-			password: data.password,
+		const { id } = await coreApi.startVerification(data);
+
+		res.status(201).json({
+			success: true,
+			data: {
+				id,
+				message: "Token is send",
+			},
+		} satisfies ResType);
+	};
+
+	const verifieAccount: RequestHandler = async (req, res) => {
+		const data = verifieSchema.parse({
+			...req.body,
+			...req.query,
 		});
+
+		const { token, user } = await coreApi.verifieAccount(data);
 
 		setAuthCookie(res, token);
 
@@ -120,7 +149,7 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		res.status(200).json({
 			success: true,
 			data: {
-				user: req.user
+				user: req.user,
 			},
 		} satisfies ResType);
 	};
@@ -145,6 +174,8 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		register,
 		logout,
 		me,
+		startVerification,
+		verifieAccount,
 		tokenRefresh,
 		checkAuth,
 		loginRequired,

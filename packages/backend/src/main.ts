@@ -1,11 +1,13 @@
 import type { UserType } from "base";
 import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
+import { nanoid } from "nanoid";
 import {
 	AuthBadError,
 	AuthConflictError,
 	AuthError,
 	AuthExpiredError,
 	AuthNoTokenError,
+	AuthNotVerifiedError,
 	AuthServerError,
 	AuthUnAuthenticatedError,
 	AuthWrongTokenError,
@@ -18,15 +20,18 @@ import type {
 	LogoutType,
 	LogType,
 	RegisterType,
+	StartVerificationType,
 	TokenRefreshType,
 	TokenType,
+	VerifieAccountType,
 } from "./types";
 import { hashPassword, validPassword } from "./utils/password";
 import { signToken, verifyToken } from "./utils/token";
 
 const init: AuthType = ({
-	User: { findById, findByEmail, create: createUser },
-	Cache: { set: setCache, get: getCache },
+	User: { findById, findByEmail, create: createUser, updateById },
+	Cache: { set: setCache, get: getCache, remove: removeCache },
+	Mail: { sendMail },
 	extractToken,
 	jwt,
 	logger,
@@ -82,6 +87,161 @@ const init: AuthType = ({
 		};
 	};
 
+	const sendCode = async ({
+		reqId,
+		userId,
+	}: {
+		userId: string;
+		reqId: string;
+	}) => {
+		logger.trace({ reqId }, "Generating Code");
+		const code = nanoid().slice(4, 4 + 6);
+
+		logger.trace({ reqId }, "Saving code");
+		await setCache(`code:${userId}`, code, 60 * 10);
+		logger.trace({ reqId }, "Code saved");
+
+		logger.trace({ reqId }, "Sending code");
+		await sendMail(code);
+		logger.trace({ reqId }, "Code send succefully!");
+	};
+
+	const startVerification: StartVerificationType = async ({ email }) => {
+		const reqId = genReqId();
+
+		logger.trace(
+			{
+				email,
+				reqId,
+			},
+			"Checking User For Starting verification!",
+		);
+
+		const user = await findByEmail(email);
+
+		logger.trace({ reqId, user }, "User fetched For Start verification");
+		if (!user) {
+			logError({
+				msg: "Failed to get User For Start verification",
+				who: "[SYSTEM]",
+				reqId,
+				userId: null,
+				extra: {
+					email,
+				},
+			});
+			throw new AuthBadError("Email is invalid!");
+		}
+
+		logger.trace({ reqId }, "Checking if user is already verified");
+		if (user.verifiedAt) {
+			logError({
+				msg: "User is already verified",
+				who: "[SYSTEM]",
+				reqId,
+				userId: user.id,
+			});
+			throw new AuthBadError("your account is already verified:)");
+		}
+
+		logger.trace({ reqId }, "Account is not verified,removing old code's");
+		await removeCache(`code:${user.id}`);
+
+		sendCode({
+			reqId,
+			userId: user.id,
+		});
+
+		return {
+			id: user.id,
+		};
+	};
+
+	const verifieAccount: VerifieAccountType = async ({ id, code }) => {
+		const reqId = genReqId();
+
+		logger.trace(
+			{
+				id,
+				reqId,
+			},
+			"Checking User For verify!",
+		);
+
+		logger.trace({ reqId }, "Checking for code");
+		const cachedCode = await getCache(`code:${id}`);
+
+		if (!cachedCode || cachedCode !== code) {
+			logError({
+				msg: "Code not matched",
+				who: "[SYSTEM]",
+				reqId,
+				userId: id,
+				extra: {
+					cachedCode,
+					code,
+				},
+			});
+			throw new AuthBadError("Invalid Code");
+		}
+
+		const user = await updateById(id, {
+			verifiedAt: new Date(),
+		});
+
+		logger.trace({ reqId, user }, "User fetched For verify");
+		if (!user) {
+			logError({
+				msg: "Failed to update User",
+				who: "[SYSTEM]",
+				reqId,
+				userId: null,
+				extra: {
+					id,
+				},
+			});
+			throw new AuthBadError("Invalid Code");
+		}
+
+		logger.trace({ reqId }, "Account is verified,removing all code's");
+		await removeCache(`code:${user.id}`);
+
+		const uptodatedUser = await findById(user.id);
+		if (!uptodatedUser) {
+			// ? this should never called
+			logError({
+				msg: "Failed to get User after delete",
+				who: "[SYSTEM]",
+				reqId,
+				userId: user.id,
+				extra: {
+					id,
+				},
+			});
+			throw new AuthServerError();
+		}
+
+		const { token } = signTokens({
+			reqId,
+			data: uptodatedUser,
+		});
+
+		log({
+			msg: "User Login Succesful:)",
+			userId: uptodatedUser.id,
+			who: uptodatedUser.name,
+			reqId,
+		});
+
+		// @ts-expect-error
+		delete uptodatedUser.password;
+
+		return {
+			token,
+			user: uptodatedUser,
+		};
+	};
+
 	const register: RegisterType = async ({ password: passwd, ...data }) => {
 		const reqId = genReqId();
 
@@ -92,6 +252,7 @@ const init: AuthType = ({
 			},
 			"Checking User For Register!",
 		);
+
 		const existingUser = (await findByEmail(data.email)) ?? null;
 
 		if (existingUser) {
@@ -126,10 +287,7 @@ const init: AuthType = ({
 			throw new AuthServerError(msg);
 		}
 
-		const { token } = signTokens({
-			reqId,
-			data: user,
-		});
+		sendCode({ userId: user.id, reqId });
 
 		log({
 			msg: "User Registretion Succesful:)",
@@ -138,17 +296,8 @@ const init: AuthType = ({
 			reqId,
 		});
 
-		// @ts-expect-error
-		delete user.password;
-
-		// TODO! add profiles and avaters
 		return {
-			token,
-			user: {
-				...user,
-				profiles: [],
-				avatar: null
-			},
+			id: user.id,
 		};
 	};
 
@@ -180,7 +329,15 @@ const init: AuthType = ({
 		}
 
 		logger.trace({ reqId }, "Checking if user is verified");
-		console.error('TODO!')
+		if (!user.verifiedAt) {
+			logError({
+				msg: "User Is not verified",
+				who: "[SYSTEM]",
+				reqId,
+				userId: user.id,
+			});
+			throw new AuthNotVerifiedError();
+		}
 
 		logger.trace({ reqId }, "Checking if user is banned");
 		if (user.isBaned) {
@@ -190,7 +347,7 @@ const init: AuthType = ({
 				reqId,
 				userId: user.id,
 			});
-			throw blocked
+			throw blocked;
 		}
 
 		logger.trace({ reqId }, "Chacking if registered or maybe social");
@@ -241,7 +398,7 @@ const init: AuthType = ({
 		// TODO! add profiles and avaters
 		return {
 			token,
-			user
+			user,
 		};
 	};
 
@@ -362,7 +519,7 @@ const init: AuthType = ({
 						token: _token,
 					},
 				});
-				throw blocked
+				throw blocked;
 			}
 
 			log({
@@ -483,6 +640,8 @@ const init: AuthType = ({
 		register,
 		login,
 		logout,
+		startVerification,
+		verifieAccount,
 		checkAuth,
 		loginRequired,
 		tokenRefresh,

@@ -3,7 +3,7 @@
   "extends": "ts-config/base",
   "compilerOptions": {
     "tsBuildInfoFile": "node_modules/.tsbuildinfo",
-	"noEmit": true
+    "noEmit": true
   },
   "include": [
     "src"

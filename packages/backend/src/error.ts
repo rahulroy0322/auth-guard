@@ -39,6 +39,12 @@ class AuthUnAuthenticatedError extends AuthError {
 	}
 }
 
+class AuthNotVerifiedError extends AuthError {
+	constructor(msg = "Your Account is not verified please verify to login") {
+		super(msg, 403);
+	}
+}
+
 // class ForbidenError extends AuthError {
 // 	constructor(msg = "You Don't Sufficient permition") {
 // 		super(msg, 403)
@@ -66,6 +72,7 @@ export {
 	AuthError,
 	AuthExpiredError,
 	AuthNoTokenError,
+	AuthNotVerifiedError,
 	// 5**
 	AuthServerError,
 	AuthUnAuthenticatedError,

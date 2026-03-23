@@ -20,6 +20,7 @@ type ResType = {
 				};
 		  }
 		| {
+				id?: string;
 				message: string;
 		  };
 };
@@ -31,7 +32,9 @@ type AuthExpressReturnType = Record<
 	| "loginRequired"
 	| "tokenRefresh"
 	| "me"
-	| "logout",
+	| "logout"
+	| "startVerification"
+	| "verifieAccount",
 	RequestHandler
 >;
 

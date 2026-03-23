@@ -1,14 +1,13 @@
 type RoleType = 'super' | 'admin' | 'moderator' | 'editor' | 'user' | 'geast'
 type ProviderType = 'google' | 'github' // TODO! add more
 
-
 type UserType = {
 	id: string
 	name: string
 	email: string
 	password: string | null
 	roles: RoleType[]
-	isVerified: boolean
+	verifiedAt: Date | null
 	isBaned: boolean
 
 	avatar: Pick<AvatarType, 'src'> | null
@@ -28,8 +27,4 @@ type AvatarType = {
 	userId: UserType['id']
 }
 
-export type {
-	AvatarType, RoleType, UserType,
-	ProfileType,
-	ProviderType
-}
+export type { AvatarType, ProfileType, ProviderType, RoleType, UserType }

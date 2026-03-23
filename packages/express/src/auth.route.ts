@@ -10,6 +10,9 @@ const authRouter = (props: AuthExpressReturnType) => {
 
 	authRouter.post("/refresh", props.tokenRefresh);
 
+	authRouter.post("/start-verification", props.startVerification);
+	authRouter.post("/verify", props.verifieAccount);
+
 	authRouter.get("/me", props.checkAuth, props.loginRequired, props.me);
 
 	authRouter.post("/logout", props.logout);

@@ -3,8 +3,8 @@ import type { UserType } from "base";
 import { eq, isNull, type SQL, type TableConfig } from "drizzle-orm";
 import type { PgTable } from "drizzle-orm/pg-core";
 import { db } from "../db/main";
-import { User } from "../db/schema/user";
 import { Avatar } from "../db/schema/avatar";
+import { User } from "../db/schema/user";
 
 type UserModelType = AuthPropsType["User"];
 
@@ -46,31 +46,31 @@ const findUsers = async ({
 			password: true,
 			roles: true,
 			isBaned: true,
-			isVerified: true,
+			verifiedAt: true,
 		},
 		with: {
 			profiles: {
 				columns: {
 					email: true,
 					provider: true,
-				}
+				},
 			},
 			avatars: {
 				limit: 1,
 				where: eq(Avatar.active, true),
 				columns: {
-					src: true
-				}
-			}
+					src: true,
+				},
+			},
 		},
 		limit,
 	});
 
 	return users.map((user) => ({
 		...user,
-		avatar: user.avatars.at(0) || null
-	}))
-}
+		avatar: user.avatars.at(0) || null,
+	}));
+};
 
 const findByEmail: UserModelType["findByEmail"] = async (email) => {
 	const [user = null] = await findUsers({
@@ -97,7 +97,17 @@ const findById: UserModelType["findById"] = async (id) => {
 const create: UserModelType["create"] = async (data) => {
 	const [user = null] = await db.insert(User).values(data).returning();
 
+	return user as unknown as UserType;
+};
+
+const updateById: UserModelType["updateById"] = async (id, data) => {
+	const [user = null] = await db
+		.update(User)
+		.set(data as Partial<UserType>)
+		.where(eq(User.id, id))
+		.returning();
+
 	return user;
 };
 
-export { create, findByEmail, findById };
+export { create, findByEmail, findById, updateById };

@@ -1,4 +1,4 @@
-import { type FC, type ReactNode } from "react";
+import type { FC, ReactNode } from "react";
 // import { LoginForm, RegisterForm } from "shared";
 import { Dialog, DialogContent } from "ui/components/ui/dialog";
 

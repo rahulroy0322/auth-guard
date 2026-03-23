@@ -22,7 +22,8 @@
 	"license": "MIT",
 	"dependencies": {
 		"bcrypt": "^6.0.0",
-		"jsonwebtoken": "^9.0.3"
+		"jsonwebtoken": "^9.0.3",
+		"nanoid": "^5.1.7"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.4.8",

@@ -1,7 +1,7 @@
 
 @base = http://localhost:8000/api/v1
-@access = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImEwNzEzNWYxLWQ4Y2MtNGQzZS04MTZiLTVlMTIyYTVkMTBhNSIsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NzQyNTAyNzgsImV4cCI6MTc3NDI1MTE3OH0.1WXe50I35YyJW31M7xHQhDB6oUdK35bQbuyFYMUsSSg
-@refresh = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImEwNzEzNWYxLWQ4Y2MtNGQzZS04MTZiLTVlMTIyYTVkMTBhNSIsInR5cGUiOiJyZWZyZXNoIiwiaWF0IjoxNzc0MjQ4MDMwLCJleHAiOjE3NzQ4NTI4MzB9.FpOmEeEmMIU-t-Q_PUdi1-sJia7vL2ctPiEGluXv2JQ
+@access = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY0ZDY4ZDhhLWEzN2QtNDFjNi1hMjg5LWYzMmIxNWVkNjM1NiIsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NzQyNzAzNjEsImV4cCI6MTc3NDI3MTI2MX0.ls7SAzcXptj9F7BO_JSVt5DLizJn65QDodax65Q3MlI
+@refresh = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY0ZDY4ZDhhLWEzN2QtNDFjNi1hMjg5LWYzMmIxNWVkNjM1NiIsInR5cGUiOiJyZWZyZXNoIiwiaWF0IjoxNzc0MjcwMzM3LCJleHAiOjE3NzQ4NzUxMzd9.p4EmzRLYBLIkAasLhkNkyONkF4RpPMgsbEjujZO2aqI
 
 ## auth
 
@@ -43,3 +43,24 @@ Authorization: Bearer {{access}}
 POST {{base}}/auth/logout
 content-type: application/json
 Authorization: Bearer {{refresh}}
+
+
+### verify
+
+POST {{base}}/auth/verify?id=f4d68d8a-a37d-41c6-a289-f32b15ed6356
+content-type: application/json
+Authorization: Bearer {{access}}
+
+{
+    "code":"McKWq4"
+}
+
+### start-verification
+
+POST {{base}}/auth/start-verification
+content-type: application/json
+Authorization: Bearer {{access}}
+
+{
+    "email": "test@test.com"
+}

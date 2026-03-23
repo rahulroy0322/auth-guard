@@ -6,7 +6,7 @@ type LogType = {
 	userId: UserType["id"] | null;
 	msg: Capitalize<string>;
 	reqId?: string;
-	extra?: Record<string, string>;
+	extra?: Record<string, unknown>;
 };
 
 type LoggerFnType = (
@@ -20,20 +20,33 @@ type LoggerType = {
 	trace: LoggerFnType;
 };
 
-type CacheKeyType = `token:${string}`;
+type CodeType = string;
+
+type CacheKeyType = `${"token" | "code"}:${string}`;
+
+type UserModelType = {
+	findById: (id: UserType["id"]) => Promise<UserType | null>;
+	findByEmail: (email: UserType["email"]) => Promise<UserType | null>;
+
+	create: (
+		data: Pick<UserType, "email" | "name" | "password" | "roles">,
+	) => Promise<Omit<UserType, "profiles" | "avatar"> | null>;
+
+	updateById: (
+		id: UserType["id"],
+		data: Partial<UserType>,
+	) => Promise<Omit<UserType, "avatar" | "profiles"> | null>;
+};
 
 type AuthPropsType = {
-	User: {
-		findById: (id: UserType["id"]) => Promise<UserType | null>;
-		findByEmail: (email: UserType["email"]) => Promise<UserType | null>;
-
-		create: (
-			data: Pick<UserType, "email" | "name" | "password" | "roles">,
-		) => Promise<Omit<UserType, 'profiles' | 'avatar'> | null>;
-	};
+	User: UserModelType;
 	Cache: {
 		set: (key: CacheKeyType, value: string, seconds: number) => Promise<void>;
 		get: (key: CacheKeyType) => Promise<string | null>;
+		remove: (key: CacheKeyType) => Promise<void>;
+	};
+	Mail: {
+		sendMail: (code: CodeType) => Promise<void>;
 	};
 	extractToken: {
 		access: (req: IncomingMessage) => string | null;
@@ -53,6 +66,8 @@ type AuthReturnType = {
 	login: LoginType;
 	register: RegisterType;
 	logout: LogoutType;
+	startVerification: StartVerificationType;
+	verifieAccount: VerifieAccountType;
 	checkAuth: CheckAuthType;
 	loginRequired: LoginRequiredType;
 	tokenRefresh: TokenRefreshType;
@@ -64,13 +79,7 @@ type RegisterPropsType = Pick<UserType, "email" | "name"> & {
 	password: string;
 };
 
-type RegisterReturnType = {
-	user: Omit<UserType, "password">;
-	token: {
-		refresh: string;
-		access: string;
-	};
-};
+type RegisterReturnType = Pick<UserType, "id">;
 
 type RegisterType = (data: RegisterPropsType) => Promise<RegisterReturnType>;
 
@@ -78,7 +87,15 @@ type LoginPropsType = Pick<UserType, "email"> & {
 	password: string;
 };
 
-type LoginType = (data: LoginPropsType) => Promise<RegisterReturnType>;
+type LoginReturnType = {
+	user: Omit<UserType, "password">;
+	token: {
+		refresh: string;
+		access: string;
+	};
+};
+
+type LoginType = (data: LoginPropsType) => Promise<LoginReturnType>;
 
 type CheckAuthReturnType = {
 	user: Omit<UserType, "password"> | null;
@@ -89,15 +106,30 @@ type CheckAuthType = (
 	reqId?: string,
 ) => Promise<CheckAuthReturnType>;
 
-type LoginRequiredReturnType = Pick<RegisterReturnType, 'user'>;
+type LoginRequiredReturnType = Pick<LoginReturnType, "user">;
 
 type LoginRequiredType = (
 	req: IncomingMessage,
 ) => Promise<LoginRequiredReturnType>;
 
-type TokenRefreshType = (req: IncomingMessage) => Promise<RegisterReturnType>;
+type TokenRefreshType = (req: IncomingMessage) => Promise<LoginReturnType>;
 
 type LogoutType = (req: IncomingMessage) => Promise<void>;
+
+type StartVerificationPropsType = Pick<UserType, "email">;
+
+type StartVerificationType = (
+	data: StartVerificationPropsType,
+) => Promise<RegisterReturnType>;
+
+type VerifieAccountPropsType = {
+	id: UserType["id"];
+	code: CodeType;
+};
+
+type VerifieAccountType = (
+	data: VerifieAccountPropsType,
+) => Promise<LoginReturnType>;
 
 type TokenType = Pick<UserType, "id"> & {
 	type: "refresh" | "access";
@@ -114,6 +146,8 @@ export type {
 	LogType,
 	RegisterPropsType,
 	RegisterType,
+	StartVerificationType,
 	TokenRefreshType,
 	TokenType,
+	VerifieAccountType,
 };

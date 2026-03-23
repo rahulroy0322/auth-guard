@@ -17,7 +17,7 @@ const registerFrontendSchema = registerSchema
 		path: ["confirm"],
 	});
 
-type RegisterSchemaType = Pick<UserType, 'email' | 'password' | 'name'> & {
+type RegisterSchemaType = Pick<UserType, "email" | "password" | "name"> & {
 	confirm: string;
 	password: string;
 };

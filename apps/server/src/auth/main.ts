@@ -44,6 +44,14 @@ const guard = auth({
 			) as unknown as Promise<void>,
 
 		get: (key) => redis.get(key),
+
+		remove: (key) => redis.del(key) as unknown as Promise<void>,
+	},
+	Mail: {
+		sendMail: async (code) => {
+			// TODO! temp not prod ready
+			logger.error({ code }, "TODO");
+		},
 	},
 });
 
