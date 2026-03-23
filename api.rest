@@ -1,7 +1,7 @@
 
 @base = http://localhost:8000/api/v1
-@access = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU2NDVmYmYxLWQzMjYtNGY3MC05YzI1LTJiNjdhMzQwZGUzZCIsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NzQxOTc0MDMsImV4cCI6MTc3NDE5ODMwM30.IVw5j0BPiwq7U5hDqfoW-_i2Nlbc3Y9DFT5VhDxXP9E
-@refresh =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU2NDVmYmYxLWQzMjYtNGY3MC05YzI1LTJiNjdhMzQwZGUzZCIsInR5cGUiOiJyZWZyZXNoIiwiaWF0IjoxNzc0MTYzODA1LCJleHAiOjE3NzQ3Njg2MDV9.E1uYfuNbi1y1FzJDGBUmbV8ertGJiWZZ7TCoce8TFis
+@access = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU2NDVmYmYxLWQzMjYtNGY3MC05YzI1LTJiNjdhMzQwZGUzZCIsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NzQyNDE3MTYsImV4cCI6MTc3NDI0MjYxNn0.EDm_qnhPASKfayMe4a6DKo6yNygsZYSJXVXpPs5MRng
+@refresh =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU2NDVmYmYxLWQzMjYtNGY3MC05YzI1LTJiNjdhMzQwZGUzZCIsInR5cGUiOiJyZWZyZXNoIiwiaWF0IjoxNzc0MjQxNjcwLCJleHAiOjE3NzQ4NDY0NzB9.i7bkZXD1KYG1fPx9O411tpuaXwowZRbJdz0X-qWsmEs
 
 ## auth
 
@@ -43,4 +43,4 @@ Authorization: Bearer {{access}}
 
 POST {{base}}/auth/logout
 content-type: application/json
-Authorization: Bearer {{access}}
+Authorization: Bearer {{refresh}}

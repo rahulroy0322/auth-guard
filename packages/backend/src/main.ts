@@ -25,7 +25,7 @@ import { signToken, verifyToken } from "./utils/token";
 
 const init: AuthType = ({
 	User: { findById, findByEmail, create: createUser },
-	Cache: { set: setCache }, //get: getCache,  },
+	Cache: { set: setCache, get: getCache },
 	extractToken,
 	jwt,
 	logger,
@@ -171,6 +171,8 @@ const init: AuthType = ({
 			throw new AuthBadError("Email or Password is invalid!");
 		}
 
+		// ? TODO user ban check
+
 		logger.trace({ reqId }, "Chacking if registered or maybe social");
 		if (!user.password) {
 			// social login
@@ -259,7 +261,21 @@ const init: AuthType = ({
 			}
 
 			logger.trace({ reqId, token }, "Checking For token Baned");
-			console.error("TODO!");
+
+			const baned = await getCache(`token:${token}`);
+
+			if (baned) {
+				logError({
+					msg: "Banned Access Token Found",
+					who: "[SYSTEM]",
+					reqId,
+					userId: id,
+					extra: {
+						token,
+					},
+				});
+				throw new AuthBadError("You Have loged out previously");
+			}
 
 			logger.trace(
 				{
@@ -362,7 +378,20 @@ const init: AuthType = ({
 			}
 
 			logger.trace({ reqId, _token }, "Checking For token Baned");
-			console.error("TODO!");
+			const baned = await getCache(`token:${_token}`);
+
+			if (baned) {
+				logError({
+					msg: "Banned Access Token Found",
+					who: "[SYSTEM]",
+					reqId,
+					userId: id,
+					extra: {
+						_token,
+					},
+				});
+				throw new AuthBadError("You Have loged out previously");
+			}
 
 			logger.trace(
 				{
