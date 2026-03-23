@@ -150,4 +150,6 @@ const useGuard = () => {
 	return context;
 };
 
+export type { GuardUserType };
+
 export { GuardProvider, useGuard };

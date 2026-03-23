@@ -50,143 +50,150 @@ import {
 } from "ui/components/ui/tabs";
 import { useGuard } from "../provider";
 
-// biome-ignore lint/complexity/noBannedTypes: temp
-type SecurityPropsType = {};
+const Security: FC = () => {
+	const { user, loading } = useGuard();
 
-const Security: FC<SecurityPropsType> = () => (
-	<TabsContent value="security">
-		<DialogHeader className="p-2">
-			<DialogTitle className="flex items-center gap-1">
-				<RiShieldCheckFill size={20} className="size-4" />
-				Security
-			</DialogTitle>
-			<DialogDescription>
-				Manage your account security in one place.
-			</DialogDescription>
-		</DialogHeader>
-		<Separator />
+	if (!user) {
+		throw new Error("some event dosn't handled properly! for <Security>");
+	}
 
-		<div className="grid grid-cols-3 p-2 py-4">
-			<b>Password</b>
-			<span>{"*".repeat(8)}</span>
-			<Button variant="outline">Update Password</Button>
-		</div>
+	return (
+		<TabsContent value="security">
+			<DialogHeader className="p-2">
+				<DialogTitle className="flex items-center gap-1">
+					<RiShieldCheckFill size={20} className="size-4" />
+					Security
+				</DialogTitle>
+				<DialogDescription>
+					Manage your account security in one place.
+				</DialogDescription>
+			</DialogHeader>
+			<Separator />
 
-		<Separator />
-
-		<div className="grid grid-cols-3 p-2 py-4">
-			<b>Active devices</b>
-			<span className="bg-destructive/10 text-destructive hover:bg-destructive/20 p-1 col-span-2">
-				TODO Coming soon
-			</span>
-		</div>
-
-		<Separator />
-
-		<div className="grid grid-cols-3 p-2 py-4">
-			<b>Delete account</b>
-			<AlertDialog>
-				<AlertDialogTrigger render={<Button variant="destructive" />}>
-					Delete account
-				</AlertDialogTrigger>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-						<AlertDialogDescription>
-							This action cannot be undone. This will permanently delete your
-							account from our servers.
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogCancel>Cancel</AlertDialogCancel>
-						<AlertDialogAction variant="destructive">
-							Continue
-						</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
-		</div>
-	</TabsContent>
-);
-
-// biome-ignore lint/complexity/noBannedTypes: temp
-type ProfilePropsType = {};
-
-const Profile: FC<ProfilePropsType> = () => (
-	<TabsContent value="profile">
-		<DialogHeader className="p-2">
-			<DialogTitle className="flex items-center gap-1">
-				<RiUser2Line className="size-4" size={20} />
-				Profile
-			</DialogTitle>
-			<DialogDescription>Manage your profile in one place.</DialogDescription>
-		</DialogHeader>
-		<Separator />
-
-		<div className="grid grid-cols-3 p-2 py-4">
-			<b>Profile</b>
-			<div className="flex items-center">
-				<Avatar name={"Jhon Dow"} src={"/user.png"} />
-				<span>Jhon Dow</span>
+			<div className="grid grid-cols-3 p-2 py-4">
+				<b>Password</b>
+				<span>{"*".repeat(8)}</span>
+				<Button variant="outline">Update Password</Button>
 			</div>
-			<Button variant="outline">Update profile</Button>
-		</div>
 
-		<Separator />
+			<Separator />
 
-		<div className="grid grid-cols-3 p-2 py-4">
-			<b>Email addresses</b>
-			<div className="col-span-2">
-				<p>jhon@dow.com</p>
-				<p>jhon@dow.com</p>
+			<div className="grid grid-cols-3 p-2 py-4">
+				<b>Active devices</b>
+				<span className="bg-destructive/10 text-destructive hover:bg-destructive/20 p-1 col-span-2">
+					TODO Coming soon
+				</span>
 			</div>
-		</div>
-	</TabsContent>
-);
 
+			<Separator />
+
+			<div className="grid grid-cols-3 p-2 py-4">
+				<b>Delete account</b>
+				<AlertDialog>
+					<AlertDialogTrigger render={<Button variant="destructive" />}>
+						Delete account
+					</AlertDialogTrigger>
+					<AlertDialogContent>
+						<AlertDialogHeader>
+							<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+							<AlertDialogDescription>
+								This action cannot be undone. This will permanently delete your
+								account from our servers.
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel disabled={loading} variant={"default"}>
+								Cancel
+							</AlertDialogCancel>
+							<AlertDialogAction variant="destructive" disabled={loading}>
+								Continue
+							</AlertDialogAction>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
+			</div>
+		</TabsContent>
+	);
+};
+
+const Profile: FC = () => {
+	const { user, loading } = useGuard();
+
+	if (!user) {
+		throw new Error("some event dosn't handled properly! for <Profile>");
+	}
+
+	return (
+		<TabsContent value="profile">
+			<DialogHeader className="p-2">
+				<DialogTitle className="flex items-center gap-1">
+					<RiUser2Line className="size-4" size={20} />
+					Profile
+				</DialogTitle>
+				<DialogDescription>Manage your profile in one place.</DialogDescription>
+			</DialogHeader>
+			<Separator />
+
+			<div className="grid grid-cols-3 p-2 py-4">
+				<b>Profile</b>
+				<div className="flex items-center">
+					<Avatar src={user.avatar?.src} name={user.name} />
+					<span>{user.name}</span>
+				</div>
+				<Button variant="outline" disabled={!user.avatar || loading}>
+					Update profile
+				</Button>
+			</div>
+
+			<Separator />
+
+			<div className="grid grid-cols-3 p-2 py-4">
+				<b>Email addresses</b>
+				<div className="col-span-2">
+					<p>{user.email}</p>
+				</div>
+			</div>
+		</TabsContent>
+	);
+};
 type UserManagemantPropsType = {
 	children: ReactNode;
 };
 
-const UserManagemant: FC<UserManagemantPropsType> = ({ children }) => {
-	return (
-		<Dialog>
-			{children}
-			<DialogContent
-				className="max-w-sm md:max-w-4xl p-0"
-				showCloseButton={false}
-			>
-				<Card>
-					<CardHeader>
-						<CardTitle>Account</CardTitle>
-						<CardDescription>Manage your account info.</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<Tabs>
-							<TabsList className="w-full">
-								<TabsTrigger value="profile">
-									<RiUser2Line size={20} />
-									Profile
-								</TabsTrigger>
-								<TabsTrigger value="security">
-									<RiShieldCheckFill size={20} />
-									Security
-								</TabsTrigger>
-							</TabsList>
-							<Security />
-							<Profile />
-						</Tabs>
-					</CardContent>
-				</Card>
-			</DialogContent>
-		</Dialog>
-	);
-};
+const UserManagemant: FC<UserManagemantPropsType> = ({ children }) => (
+	<Dialog>
+		{children}
+		<DialogContent
+			className="max-w-sm md:max-w-4xl p-0"
+			showCloseButton={false}
+		>
+			<Card>
+				<CardHeader>
+					<CardTitle>Account</CardTitle>
+					<CardDescription>Manage your account info.</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<Tabs>
+						<TabsList className="w-full">
+							<TabsTrigger value="profile">
+								<RiUser2Line size={20} />
+								Profile
+							</TabsTrigger>
+							<TabsTrigger value="security">
+								<RiShieldCheckFill size={20} />
+								Security
+							</TabsTrigger>
+						</TabsList>
+						<Security />
+						<Profile />
+					</Tabs>
+				</CardContent>
+			</Card>
+		</DialogContent>
+	</Dialog>
+);
 
-// biome-ignore lint/complexity/noBannedTypes: temp
-type ProfileButtonPropsType = {};
-
-const ProfileButton: FC<ProfileButtonPropsType> = () => {
+const ProfileButton: FC = () => {
 	const { user, loading, logout } = useGuard();
 
 	if (loading || !user) {
@@ -197,18 +204,12 @@ const ProfileButton: FC<ProfileButtonPropsType> = () => {
 		<UserManagemant>
 			<DropdownMenu>
 				<DropdownMenuTrigger>
-					<Avatar
-						src={user.avatar?.src}
-						name={user.name.at(0)?.toUpperCase()}
-					/>
+					<Avatar src={user.avatar?.src} name={user.name} />
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className="min-w-80 p-0">
 					<DropdownMenuGroup className="*:p-2 *:rounded-none">
 						<DropdownMenuItem className="bg-transparent!">
-							<Avatar
-								src={user.avatar?.src}
-								name={user.name.at(0)?.toUpperCase()}
-							/>
+							<Avatar src={user.avatar?.src} name={user.name} />
 							<div>
 								<h2 className="font-bold">{user.name}</h2>
 								<DropdownMenuLabel className="text-left p-0">
