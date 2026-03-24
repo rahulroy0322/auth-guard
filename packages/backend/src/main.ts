@@ -601,7 +601,7 @@ const init: AuthType = ({
 		logger.info({
 			reqId,
 			msg: "Password changed successful:)",
-			user: user,
+			user,
 		});
 
 		return {
