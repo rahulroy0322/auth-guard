@@ -1,7 +1,7 @@
 
 @base = http://localhost:8000/api/v1
-@access = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY0ZDY4ZDhhLWEzN2QtNDFjNi1hMjg5LWYzMmIxNWVkNjM1NiIsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NzQyNzAzNjEsImV4cCI6MTc3NDI3MTI2MX0.ls7SAzcXptj9F7BO_JSVt5DLizJn65QDodax65Q3MlI
-@refresh = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY0ZDY4ZDhhLWEzN2QtNDFjNi1hMjg5LWYzMmIxNWVkNjM1NiIsInR5cGUiOiJyZWZyZXNoIiwiaWF0IjoxNzc0MjcwMzM3LCJleHAiOjE3NzQ4NzUxMzd9.p4EmzRLYBLIkAasLhkNkyONkF4RpPMgsbEjujZO2aqI
+@access = <your Access Token>
+@refresh = <your Refrsh Token>
 
 ## auth
 
@@ -47,12 +47,13 @@ Authorization: Bearer {{refresh}}
 
 ### verify
 
-PATCH {{base}}/auth/verify?id=f4d68d8a-a37d-41c6-a289-f32b15ed6356
+PATCH {{base}}/auth/verify
 content-type: application/json
 Authorization: Bearer {{access}}
 
 {
-    "code":"McKWq4"
+    "id":"<Your account id>",
+    "code":"<Code>"
 }
 
 ### start-verification
@@ -78,11 +79,11 @@ Authorization: Bearer {{access}}
 
 ### reset-password
 
-PATCH {{base}}/auth/reset-password?id=f4d68d8a-a37d-41c6-a289-f32b15ed6356
+PATCH {{base}}/auth/reset-password?id=<Your account id>
 content-type: application/json
 Authorization: Bearer {{access}}
 
 {
-    "code":"ZJA0Fh",
-    "password": "TEst@@1234"
+    "code":"<code>",
+    "password": "<new Password>"
 }
