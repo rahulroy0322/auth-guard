@@ -1,0 +1,2 @@
+npm run check:fix
+pnpm commitlint --edit $1
