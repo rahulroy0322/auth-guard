@@ -1,17 +1,21 @@
 import type { UserType } from "base";
 import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { AuthError, AuthExpiredError, AuthWrongTokenError } from "../error";
-import type { JwtConfigType, LoggerType, TokenType } from "../types";
+import type { JwtConfigType, TokenType } from "../types";
+import type { SmartLogger } from "./smart-logger";
 import { signToken, verifyToken } from "./token";
 
 class TokenHelper {
 	constructor(
-		private jwt: JwtConfigType,
-		private logger: LoggerType,
+		private readonly jwt: JwtConfigType,
+		private readonly logger: SmartLogger,
 	) {}
 
-	signTokens(user: Pick<UserType, "id" | "name">, reqId: string) {
-		this.logger.trace({ reqId, userId: user.id }, "Creating tokens");
+	signTokens(user: Pick<UserType, "id">, reqId: string) {
+		this.logger.trace({
+			reqId,
+			msg: "Creating tokens",
+		});
 
 		const refresh = signToken(
 			{ id: user.id, type: "refresh" },
@@ -23,10 +27,10 @@ class TokenHelper {
 			expiresIn: this.jwt.expires.access,
 		});
 
-		this.logger.trace(
-			{ reqId, userId: user.id },
-			"Tokens created successfully",
-		);
+		this.logger.trace({
+			reqId,
+			msg: "Tokens created successfully",
+		});
 
 		return {
 			refresh,
@@ -44,28 +48,31 @@ class TokenHelper {
 		reqId: string;
 	}) {
 		try {
-			this.logger.trace({ reqId }, "Verifying token");
+			this.logger.trace({
+				reqId,
+				msg: "Verifying token",
+			});
 
 			const decoded = verifyToken(token, this.jwt.secret);
 
 			if (decoded.type !== expectedType) {
-				this.logger.error(
-					{
-						msg: "Wrong token type provided",
-						who: "[SYSTEM]",
-						reqId,
-						userId: decoded.id,
-						extra: { expected: expectedType, got: decoded.type },
+				this.logger.error({
+					msg: "Wrong token type provided",
+					reqId,
+					user: {
+						id: decoded.id,
+						email: "Unknown",
+						name: "Unknown",
 					},
-					"Token type mismatch",
-				);
+					extra: { expected: expectedType, got: decoded.type },
+				});
 				throw new AuthWrongTokenError();
 			}
 
-			this.logger.trace(
-				{ reqId, userId: decoded.id },
-				"Token verified successfully",
-			);
+			this.logger.trace({
+				reqId,
+				msg: "Token verified successfully",
+			});
 
 			return decoded;
 		} catch (e) {
