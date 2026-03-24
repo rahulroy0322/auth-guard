@@ -40,3 +40,6 @@ yarn-error.log*
 
 # extra
 routeTree.gen.ts
+*.http
+*.rest
+!sample*
