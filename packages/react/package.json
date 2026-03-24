@@ -14,7 +14,7 @@
 		"dist"
 	],
 	"scripts": {
-		"build": "tsup",
+		"build": "tsc -b && tsup",
 		"check": "biome check",
 		"check:fix": "biome check --fix",
 		"dev": "tsup --watch"

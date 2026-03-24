@@ -12,8 +12,7 @@
 	"scripts": {
 		"build": "tsc -b",
 		"check": "biome check",
-		"check:fix": "biome check --fix",
-		"dev": "tsup --watch"
+		"check:fix": "biome check --fix"
 	},
 	"author": "Rahul Roy",
 	"license": "MIT",

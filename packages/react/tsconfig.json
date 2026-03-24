@@ -3,8 +3,7 @@
 	"extends": "ts-config/react",
 	"compilerOptions": {
 		"tsBuildInfoFile": "node_modules/.tsbuildinfo",
-		"rootDir": "src",
-		"outDir": "dist"
+		"rootDir": "src"
 	},
 	"include": ["src"],
 	"exclude": ["dist", "node_modules", "tsup.config.ts"]
