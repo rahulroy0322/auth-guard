@@ -1,15 +1,10 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
-	"extends": "ts-config/base",
+	"extends": "ts-config/react",
 	"compilerOptions": {
 		"tsBuildInfoFile": "node_modules/.tsbuildinfo",
-		"resolveJsonModule": true,
-		"target": "esnext",
-		"module": "nodenext",
-		"rootDir": "src",
-		"outDir": "dist",
-		"jsx": "react-jsx"
+		"rootDir": "src"
 	},
 	"include": ["src"],
-	"exclude": ["dist", "node_modules", "tsup.config.ts"]
+	"exclude": ["dist", "node_modules"]
 }
