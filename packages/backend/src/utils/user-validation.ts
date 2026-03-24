@@ -4,64 +4,106 @@ import {
 	AuthNotVerifiedError,
 	AuthUnAuthenticatedError,
 } from "../error";
+import type { LogType } from "../types";
+import type { SmartLogger } from "./smart-logger";
 
-// biome-ignore lint/complexity/noStaticOnlyClass: ts error
+type PropsType = Pick<LogType, "extra" | "reqId">;
+
 class UserValidator {
-	static validateExists(
+	constructor(private readonly logger: SmartLogger) {}
+
+	validateExists(
 		user: UserType | null,
+		props: PropsType,
 		errorMessage = "User not found",
-	): asserts user is UserType {
+	): UserType {
 		if (!user) {
+			this.logger.error({
+				msg: "User validation failed - user not found",
+				user,
+				...props,
+			});
 			throw new AuthBadError(errorMessage);
 		}
+		return user;
 	}
 
-	static validateVerified(user: UserType): void {
+	validateVerified(user: UserType, props: PropsType): void {
 		if (!user.verifiedAt) {
+			this.logger.error({
+				msg: "User validation failed - account not verified",
+				user,
+				...props,
+			});
 			throw new AuthNotVerifiedError();
 		}
 	}
 
-	static validateNotBanned(user: UserType): void {
+	validateNotBanned(user: UserType, props: PropsType): void {
 		if (user.isBaned) {
+			this.logger.error({
+				msg: "User validation failed - account is banned",
+				user,
+				...props,
+			});
 			throw new AuthUnAuthenticatedError("Your account has been banned");
 		}
 	}
 
-	static validateHasPassword(user: UserType): void {
+	validateHasPassword(user: UserType, props: PropsType): void {
 		if (!user.password) {
+			this.logger.error({
+				msg: "User validation failed - no password set (social login account)",
+				user,
+				...props,
+			});
 			throw new AuthBadError(
 				"This account uses social login. Please login with your social provider.",
 			);
 		}
 	}
 
-	static validateForAuthentication(
+	validateForAuthentication(
 		user: UserType | null,
-	): asserts user is UserType {
-		UserValidator.validateExists(user, "Invalid email or password");
-		UserValidator.validateVerified(user);
-		UserValidator.validateNotBanned(user);
+		props: PropsType,
+		errorMessage: "Invalid email or password",
+	): UserType {
+		const verifiedUser = this.validateExists(user, props, errorMessage);
+		this.validateVerified(verifiedUser, props);
+		this.validateNotBanned(verifiedUser, props);
+		return verifiedUser;
 	}
 
-	static validateForPasswordAuth(
+	validateForPasswordAuth(
 		user: UserType | null,
-		msg: string = "Invalid email or password",
-	): asserts user is UserType {
-		UserValidator.validateExists(user, msg);
-		UserValidator.validateVerified(user);
-		UserValidator.validateNotBanned(user);
-		UserValidator.validateHasPassword(user);
+		props: PropsType,
+		errorMessage = "Invalid email or password",
+	): UserType {
+		const verifiedUser = this.validateExists(user, props, errorMessage);
+
+		this.validateVerified(verifiedUser, props);
+		this.validateNotBanned(verifiedUser, props);
+		this.validateHasPassword(verifiedUser, props);
+		return verifiedUser;
 	}
 
-	static validateForVerification(
+	validateForVerification(
 		user: UserType | null,
-	): asserts user is UserType {
-		UserValidator.validateExists(user, "Invalid user");
+		props: PropsType,
+		errorMessage = "Invalid user",
+	): UserType {
+		const verifiedUser = this.validateExists(user, props, errorMessage);
 
-		if (user.verifiedAt) {
+		if (verifiedUser.verifiedAt) {
+			this.logger.error({
+				msg: "User validation failed - account already verified",
+				user,
+				...props,
+			});
 			throw new AuthBadError("Your account is already verified");
 		}
+
+		return verifiedUser;
 	}
 }
 

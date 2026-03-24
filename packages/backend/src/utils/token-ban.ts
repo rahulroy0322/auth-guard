@@ -1,10 +1,11 @@
-import type { CacheConfigType, LoggerType } from "../types";
+import type { CacheConfigType } from "../types";
 import { keys } from "./cache";
+import type { SmartLogger } from "./smart-logger";
 
 class TokenBanManager {
 	constructor(
-		private cache: Pick<CacheConfigType, "get" | "set">,
-		private logger: LoggerType,
+		private readonly cache: Pick<CacheConfigType, "get" | "set">,
+		private readonly logger: SmartLogger,
 	) {}
 
 	async ban({
@@ -16,13 +17,22 @@ class TokenBanManager {
 		expirySeconds: number;
 		reqId: string;
 	}): Promise<void> {
-		this.logger.trace({ reqId }, "Banning token");
+		this.logger.trace({
+			reqId,
+			msg: "Banning token",
+		});
 		await this.cache.set(keys.token(token), token, expirySeconds);
-		this.logger.trace({ reqId }, "Token banned successfully");
+		this.logger.trace({
+			reqId,
+			msg: "Token banned successfully",
+		});
 	}
 
 	async isBanned(token: string, reqId: string): Promise<boolean> {
-		this.logger.trace({ reqId }, "Checking if token is banned");
+		this.logger.trace({
+			reqId,
+			msg: "Checking if token is banned",
+		});
 		const banned = await this.cache.get(keys.token(token));
 		return !!banned;
 	}
@@ -33,10 +43,13 @@ class TokenBanManager {
 	): Promise<void> {
 		if (tokens.length === 0) return;
 
-		this.logger.trace(
-			{ reqId, count: tokens.length },
-			"Banning multiple tokens",
-		);
+		this.logger.trace({
+			reqId,
+			msg: "Banning multiple tokens",
+			extra: {
+				count: tokens.length,
+			},
+		});
 
 		await Promise.all(
 			tokens.map(({ token, expirySeconds }) =>
@@ -44,7 +57,13 @@ class TokenBanManager {
 			),
 		);
 
-		this.logger.trace({ reqId }, "All tokens banned successfully");
+		this.logger.trace({
+			reqId,
+			msg: "All tokens banned successfully",
+			extra: {
+				count: tokens.length,
+			},
+		});
 	}
 }
 
