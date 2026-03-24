@@ -77,6 +77,7 @@ type AuthReturnType = {
 	forgotPassword: ForgotPasswordType;
 	resetPassword: ResetPasswordType;
 	tokenRefresh: TokenRefreshType;
+	changePassword: ChangePasswordType
 };
 
 type AuthType = (props: AuthPropsType) => AuthReturnType;
@@ -151,6 +152,8 @@ type ResetPasswordType = (
 	data: ResetPasswordPropsType,
 ) => Promise<LoginReturnType>;
 
+type ChangePasswordType = (req: IncomingMessage, password: string) => Promise<LoginReturnType>;
+
 type TokenType = Pick<UserType, "id"> & {
 	type: "refresh" | "access";
 };
@@ -176,4 +179,5 @@ export type {
 	TokenRefreshType,
 	TokenType,
 	VerifieAccountType,
+	ChangePasswordType,
 };
