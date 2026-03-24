@@ -7,6 +7,7 @@ import {
 } from "./error";
 import type {
 	AuthType,
+	ChangePasswordType,
 	CheckAuthType,
 	ForgotPasswordType,
 	LoginRequiredType,
@@ -574,6 +575,41 @@ const init: AuthType = ({
 		});
 	};
 
+	const changePassword: ChangePasswordType = async (req, passwd) => {
+		const reqId = genReqId();
+
+		logger.trace({ reqId, msg: "Starting change password" });
+
+		const { user } = await loginRequired(req);
+
+		logger.trace({
+			reqId,
+			msg: "Hashing new Password",
+			extra: { userId: user.id },
+		});
+		const password = await hashPassword(passwd);
+
+		logger.trace({ reqId, msg: "Changing user Password" });
+
+		// let update don't check
+		await updateById(user.id, { password });
+
+		// TODO! clear session
+
+		const token = tokenHelper.signTokens(user, reqId);
+
+		logger.info({
+			reqId,
+			msg: "Password changed successful:)",
+			user,
+		});
+
+		return {
+			token,
+			user: UserSanitizer.removePassword(user),
+		};
+	};
+
 	return {
 		register,
 		login,
@@ -585,6 +621,7 @@ const init: AuthType = ({
 		checkAuth,
 		loginRequired,
 		tokenRefresh,
+		changePassword,
 	};
 };
 

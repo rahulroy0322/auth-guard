@@ -6,7 +6,7 @@ type SmartLogData = Omit<LogType, "who" | "userId"> & {
 };
 
 class SmartLogger {
-	constructor(private readonly logger: LoggerType) { }
+	constructor(private readonly logger: LoggerType) {}
 
 	private determineWho({ user }: Pick<SmartLogData, "user">): LogType["who"] {
 		if (user) {

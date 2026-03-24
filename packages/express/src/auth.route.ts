@@ -10,10 +10,14 @@ const authRouter = (props: AuthExpressReturnType) => {
 	authRouter.post("/refresh", props.tokenRefresh);
 
 	authRouter.post("/start-verification", props.startVerification);
-	authRouter.patch("/verify", props.verifieAccount);
+	authRouter
+		.route("/verify")
+		.patch(props.verifieAccount)
+		.get(props.verifieAccount);
 
 	authRouter.post("/forgot-password", props.forgotPassword);
 	authRouter.patch("/reset-password", props.resetPassword);
+	authRouter.patch("/change-password", props.changePassword);
 
 	authRouter.get("/me", props.checkAuth, props.loginRequired, props.me);
 

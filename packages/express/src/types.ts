@@ -36,7 +36,8 @@ type AuthExpressReturnType = Record<
 	| "startVerification"
 	| "verifieAccount"
 	| "forgotPassword"
-	| "resetPassword",
+	| "resetPassword"
+	| "changePassword",
 	RequestHandler
 >;
 
