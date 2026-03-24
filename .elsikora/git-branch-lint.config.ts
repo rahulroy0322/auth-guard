@@ -5,7 +5,6 @@ export default {
         feat: { title: "Feature", description: "New functionality" },
         bug: { title: "Bugfix", description: "Bug fixes" },
         hot: { title: "Hotfix", description: "Urgent fixes" },
-
     },
     ignore: ['dev'],
     rules: {
