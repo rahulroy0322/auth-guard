@@ -10,6 +10,7 @@
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
+    "@elsikora/git-branch-lint": "^1.2.2",
     "turbo": "^2.8.19"
   },
   "packageManager": "pnpm@9.0.0",
