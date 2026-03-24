@@ -212,9 +212,11 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 	};
 
 	const changePassword: RequestHandler = async (req, res) => {
-		const data = loginSchema.pick({
-			password: true
-		}).parse(req.body || {});
+		const data = loginSchema
+			.pick({
+				password: true,
+			})
+			.parse(req.body || {});
 
 		const { token, user } = await coreApi.changePassword(req, data.password);
 
@@ -241,7 +243,7 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		tokenRefresh,
 		checkAuth,
 		loginRequired,
-		changePassword
+		changePassword,
 	};
 };
 

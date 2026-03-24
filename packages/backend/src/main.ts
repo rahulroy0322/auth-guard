@@ -580,9 +580,13 @@ const init: AuthType = ({
 
 		logger.trace({ reqId, msg: "Starting change password" });
 
-		const { user } = await loginRequired(req)
+		const { user } = await loginRequired(req);
 
-		logger.trace({ reqId, msg: "Hashing new Password", extra: { userId: user.id } });
+		logger.trace({
+			reqId,
+			msg: "Hashing new Password",
+			extra: { userId: user.id },
+		});
 		const password = await hashPassword(passwd);
 
 		logger.trace({ reqId, msg: "Changing user Password" });

@@ -12,17 +12,17 @@ type AuthExpressPropsType = AuthPropsType & {
 type ResType = {
 	success: true;
 	data:
-	| {
-		user: Omit<UserType, "password">;
-		token?: {
-			refresh?: string;
-			access: string;
-		};
-	}
-	| {
-		id?: string;
-		message: string;
-	};
+		| {
+				user: Omit<UserType, "password">;
+				token?: {
+					refresh?: string;
+					access: string;
+				};
+		  }
+		| {
+				id?: string;
+				message: string;
+		  };
 };
 
 type AuthExpressReturnType = Record<
