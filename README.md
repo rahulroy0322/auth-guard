@@ -1,3 +1,6 @@
+
+use `pnpm new` to create new branch
+
 # Turborepo starter
 
 This Turborepo starter is maintained by the Turborepo core team.

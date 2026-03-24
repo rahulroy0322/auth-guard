@@ -4,13 +4,15 @@
   "scripts": {
     "build": "turbo run build",
     "check": "turbo run check",
+    "check:branch": "git-branch-lint",
     "check:fix": "turbo run check:fix",
     "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "check-types": "turbo run check-types"
+    "new": "git-branch-lint -b",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@elsikora/git-branch-lint": "^1.2.2",
+    "husky": "^9.1.7",
     "turbo": "^2.8.19"
   },
   "packageManager": "pnpm@9.0.0",
