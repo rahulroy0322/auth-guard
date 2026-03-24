@@ -1,8 +1,11 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
-	"extends": "ts-config/react",
+	"extends": "ts-config/base",
 	"compilerOptions": {
-		"tsBuildInfoFile": "node_modules/.tsbuildinfo"
+		"tsBuildInfoFile": "node_modules/.tsbuildinfo",
+		"module": "esnext", // ← Add explicitly for isomorphic use
+		"moduleResolution": "bundler",
+		"noEmit": true
 	},
 	"include": ["src"],
 	"exclude": ["dist", "node_modules"]
