@@ -38,13 +38,23 @@ type UserModelType = {
 	) => Promise<Omit<UserType, "avatar" | "profiles"> | null>;
 };
 
+type JwtConfigType = {
+	expires: {
+		access: number;
+		refresh: number;
+	};
+	secret: string;
+};
+
+type CacheConfigType = {
+	set: (key: CacheKeyType, value: string, seconds: number) => Promise<void>;
+	get: (key: CacheKeyType) => Promise<string | null>;
+	remove: (key: CacheKeyType) => Promise<void>;
+};
+
 type AuthPropsType = {
 	User: UserModelType;
-	Cache: {
-		set: (key: CacheKeyType, value: string, seconds: number) => Promise<void>;
-		get: (key: CacheKeyType) => Promise<string | null>;
-		remove: (key: CacheKeyType) => Promise<void>;
-	};
+	Cache: CacheConfigType;
 	Mail: {
 		sendMail: (code: CodeType) => Promise<void>;
 	};
@@ -52,13 +62,7 @@ type AuthPropsType = {
 		access: (req: IncomingMessage) => string | null;
 		refresh: (req: IncomingMessage) => string | null;
 	};
-	jwt: {
-		expires: {
-			access: number;
-			refresh: number;
-		};
-		secret: string;
-	};
+	jwt: JwtConfigType;
 	logger: LoggerType;
 };
 
@@ -154,8 +158,12 @@ type TokenType = Pick<UserType, "id"> & {
 export type {
 	AuthPropsType,
 	AuthType,
+	CacheConfigType,
+	CacheKeyType,
 	CheckAuthType,
 	ForgotPasswordType,
+	JwtConfigType,
+	LoggerType,
 	LoginPropsType,
 	LoginRequiredType,
 	LoginType,

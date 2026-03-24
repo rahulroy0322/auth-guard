@@ -42,4 +42,4 @@ yarn-error.log*
 routeTree.gen.ts
 *.http
 *.rest
-!sample*
+!sample.api.rest
