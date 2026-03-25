@@ -7,12 +7,12 @@ import type {
 } from "../types";
 import { genReqId } from "../utils/request-id";
 import { UserSanitizer } from "../utils/user-sanitizer";
-import { BaseService } from "./base.service";
+import { UserService } from "./user.service";
 
-class VerificationService extends BaseService {
-	public async startVerification({
+class VerificationService extends UserService {
+	public startVerification = async ({
 		email,
-	}: StartVerificationPropsType): Promise<StartVerificationReturnType> {
+	}: StartVerificationPropsType): Promise<StartVerificationReturnType> => {
 		const reqId = genReqId();
 
 		this.logger.trace({
@@ -42,12 +42,12 @@ class VerificationService extends BaseService {
 		});
 
 		return { id: verifiedUser.id };
-	}
+	};
 
-	public async verifieAccount({
+	public verifieAccount = async ({
 		id,
 		code,
-	}: VerifieAccountPropsType): Promise<VerifieAccountReturnType> {
+	}: VerifieAccountPropsType): Promise<VerifieAccountReturnType> => {
 		const reqId = genReqId();
 
 		this.logger.trace({
@@ -107,7 +107,7 @@ class VerificationService extends BaseService {
 			token,
 			user: UserSanitizer.removePassword(verifiedUser),
 		};
-	}
+	};
 }
 
 export { VerificationService };

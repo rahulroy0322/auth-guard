@@ -2,27 +2,62 @@ import type { IncomingMessage } from "node:http";
 import type { UserType } from "base";
 import { AuthBadError, AuthNoTokenError } from "../error";
 import type {
+	ChangePasswordReturnType,
+	ChangePasswordType,
 	CheckAuthType,
 	JwtConfigType,
 	LoginRequiredReturnType,
+	TokenConfigType,
 	TokenRefreshReturnType,
+	UserModelType,
 } from "../types";
+import { hashPassword } from "../utils/password";
 import { genReqId } from "../utils/request-id";
+import type { SmartLogger } from "../utils/smart-logger";
+import type { TokenBanManager } from "../utils/token-ban";
 import type { TokenHelper } from "../utils/token-helpers";
 import { UserSanitizer } from "../utils/user-sanitizer";
-import { BaseService, type BaseServicePropsType } from "./base.service";
+import type { UserValidator } from "../utils/user-validation";
+import { BaseService } from "./base.service";
 
 class SessionService extends BaseService {
-	private readonly JWTConfig: JwtConfigType;
-	constructor(props: BaseServicePropsType, JWTConfig: JwtConfigType) {
-		super(props);
-		this.JWTConfig = JWTConfig;
+	private readonly User: UserModelType;
+	private readonly Validator: UserValidator;
+	private readonly Helper: TokenHelper;
+	private readonly Token: TokenConfigType;
+	private readonly BanManager: TokenBanManager;
+
+	constructor(
+		private readonly JWTConfig: JwtConfigType,
+		{
+			logger,
+			User,
+			Validator,
+			Helper,
+			Token,
+			BanManager,
+		}: {
+			logger: SmartLogger;
+			User: UserModelType;
+			Validator: UserValidator;
+			Helper: TokenHelper;
+			Token: TokenConfigType;
+			BanManager: TokenBanManager;
+		},
+	) {
+		super(logger);
+
+		this.User = User;
+		this.Validator = Validator;
+		this.Helper = Helper;
+		this.Token = Token;
+		this.BanManager = BanManager;
 	}
 
-	public async checkAuth(
+	public checkAuth = async (
 		req: Parameters<CheckAuthType>[0],
-		reqId: Parameters<CheckAuthType>[1],
-	): ReturnType<CheckAuthType> {
+		reqId?: Parameters<CheckAuthType>[1],
+	): ReturnType<CheckAuthType> => {
 		if (!reqId) {
 			reqId = genReqId();
 		}
@@ -48,11 +83,11 @@ class SessionService extends BaseService {
 		});
 
 		return { user: UserSanitizer.removePassword(user) };
-	}
+	};
 
-	public async loginRequired(
+	public loginRequired = async (
 		req: IncomingMessage,
-	): Promise<LoginRequiredReturnType> {
+	): Promise<LoginRequiredReturnType> => {
 		const reqId = genReqId();
 
 		const { user } = await this.checkAuth(req, reqId);
@@ -67,11 +102,11 @@ class SessionService extends BaseService {
 		}
 
 		return { user };
-	}
+	};
 
-	public async tokenRefresh(
+	public tokenRefresh = async (
 		req: IncomingMessage,
-	): Promise<TokenRefreshReturnType> {
+	): Promise<TokenRefreshReturnType> => {
 		const reqId = genReqId();
 
 		this.logger.trace({ reqId, msg: "Starting token refresh" });
@@ -120,9 +155,9 @@ class SessionService extends BaseService {
 			token: newTokens,
 			user: UserSanitizer.removePassword(user),
 		};
-	}
+	};
 
-	public async logout(req: IncomingMessage): Promise<void> {
+	public logout = async (req: IncomingMessage): Promise<void> => {
 		const reqId = genReqId();
 
 		this.logger.trace({ reqId, msg: "Processing logout" });
@@ -164,12 +199,50 @@ class SessionService extends BaseService {
 			msg: "Logout successful",
 			user: null,
 		});
-	}
+	};
 
-	private async findUserAndCheckBan(
+	public changePassword = async (
+		req: Parameters<ChangePasswordType>[0],
+		passwd: Parameters<ChangePasswordType>[1],
+	): Promise<ChangePasswordReturnType> => {
+		const reqId = genReqId();
+
+		this.logger.trace({ reqId, msg: "Starting change password" });
+
+		const { user } = await this.loginRequired(req);
+
+		this.logger.trace({
+			reqId,
+			msg: "Hashing new Password",
+			extra: { userId: user.id },
+		});
+		const password = await hashPassword(passwd);
+
+		this.logger.trace({ reqId, msg: "Changing user Password" });
+
+		// let update don't check
+		await this.User.updateById(user.id, { password });
+
+		// TODO! clear session
+
+		const token = this.Helper.signTokens(user, reqId);
+
+		this.logger.info({
+			reqId,
+			msg: "Password changed successful:)",
+			user,
+		});
+
+		return {
+			token,
+			user: UserSanitizer.removePassword(user),
+		};
+	};
+
+	private findUserAndCheckBan = async (
 		userId: string,
 		reqId: string,
-	): Promise<UserType> {
+	): Promise<UserType> => {
 		this.logger.trace({ reqId, extra: { userId }, msg: "Fetching user" });
 
 		const user = await this.User.findById(userId);
@@ -179,9 +252,9 @@ class SessionService extends BaseService {
 		this.Validator.validateNotBanned(verifiedUser, { reqId });
 
 		return verifiedUser;
-	}
+	};
 
-	private async verifyAndCheckBan({
+	private verifyAndCheckBan = async ({
 		token: _token,
 		type: reqType,
 		reqId,
@@ -192,7 +265,7 @@ class SessionService extends BaseService {
 	}): Promise<{
 		user: UserType;
 		token: ReturnType<TokenHelper["verifyAndDecode"]>;
-	}> {
+	}> => {
 		const token = this.Helper.verifyAndDecode({
 			reqId,
 			token: _token,
@@ -227,7 +300,7 @@ class SessionService extends BaseService {
 		});
 
 		return { user, token };
-	}
+	};
 }
 
 export { SessionService };

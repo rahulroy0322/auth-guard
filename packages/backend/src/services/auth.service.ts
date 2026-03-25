@@ -8,13 +8,13 @@ import type {
 import { hashPassword, validPassword } from "../utils/password";
 import { genReqId } from "../utils/request-id";
 import { UserSanitizer } from "../utils/user-sanitizer";
-import { BaseService } from "./base.service";
+import { UserService } from "./user.service";
 
-class AuthService extends BaseService {
-	public async register({
+class AuthService extends UserService {
+	public register = async ({
 		password: passwd,
 		...data
-	}: RegisterPropsType): Promise<RegisterReturnType> {
+	}: RegisterPropsType): Promise<RegisterReturnType> => {
 		const reqId = genReqId();
 
 		this.logger.trace({
@@ -68,12 +68,12 @@ class AuthService extends BaseService {
 		});
 
 		return { id: user.id };
-	}
+	};
 
-	public async login({
+	public login = async ({
 		password: passwd,
 		email,
-	}: LoginPropsType): Promise<LoginReturnType> {
+	}: LoginPropsType): Promise<LoginReturnType> => {
 		const reqId = genReqId();
 
 		this.logger.trace({
@@ -122,7 +122,7 @@ class AuthService extends BaseService {
 			token,
 			user: UserSanitizer.removePassword(verifiedUser),
 		};
-	}
+	};
 }
 
 export { AuthService };

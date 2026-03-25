@@ -19,5 +19,6 @@ export default {
   rules: {
     'type-enum': [errorCode, 'always', typeEnum],
     'scope-max-length': [errorCode, 'always', scopeMax],
+    "body-max-line-length": [0]
   },
 } satisfies UserConfig

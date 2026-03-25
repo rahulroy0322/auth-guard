@@ -8,12 +8,12 @@ import type {
 import { hashPassword } from "../utils/password";
 import { genReqId } from "../utils/request-id";
 import { UserSanitizer } from "../utils/user-sanitizer";
-import { BaseService } from "./base.service";
+import { UserService } from "./user.service";
 
-class PasswordService extends BaseService {
-	public async forgotPassword({
+class PasswordService extends UserService {
+	public forgotPassword = async ({
 		email,
-	}: ForgotPasswordPropsType): Promise<ForgotPasswordReturnType> {
+	}: ForgotPasswordPropsType): Promise<ForgotPasswordReturnType> => {
 		const reqId = genReqId();
 
 		this.logger.trace({
@@ -55,13 +55,13 @@ class PasswordService extends BaseService {
 		});
 
 		return { id: verifiedUser.id };
-	}
+	};
 
-	public async resetPassword({
+	public resetPassword = async ({
 		id,
 		password: passwd,
 		code,
-	}: ResetPasswordPropsType): Promise<ResetPasswordReturnType> {
+	}: ResetPasswordPropsType): Promise<ResetPasswordReturnType> => {
 		const reqId = genReqId();
 
 		this.logger.trace({ reqId, msg: "Starting password reset", extra: { id } });
@@ -121,7 +121,7 @@ class PasswordService extends BaseService {
 			token,
 			user: UserSanitizer.removePassword(verifiedUser),
 		};
-	}
+	};
 }
 
 export { PasswordService };

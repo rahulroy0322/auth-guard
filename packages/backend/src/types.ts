@@ -157,6 +157,7 @@ type ResetPasswordType = (
 	data: ResetPasswordPropsType,
 ) => Promise<ResetPasswordReturnType>;
 
+type ChangePasswordReturnType = LoginReturnType;
 type ChangePasswordType = (
 	req: IncomingMessage,
 	password: string,
@@ -171,6 +172,7 @@ export type {
 	AuthType,
 	CacheConfigType,
 	CacheKeyType,
+	ChangePasswordReturnType,
 	ChangePasswordType,
 	CheckAuthType,
 	ForgotPasswordPropsType,
