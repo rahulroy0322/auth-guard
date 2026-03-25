@@ -52,16 +52,20 @@ type CacheConfigType = {
 	remove: (key: CacheKeyType) => Promise<void>;
 };
 
+type MailConfigType = {
+	sendMail: (code: CodeType) => Promise<void>;
+};
+
+type TokenConfigType = {
+	access: (req: IncomingMessage) => string | null;
+	refresh: (req: IncomingMessage) => string | null;
+};
+
 type AuthPropsType = {
 	User: UserModelType;
 	Cache: CacheConfigType;
-	Mail: {
-		sendMail: (code: CodeType) => Promise<void>;
-	};
-	extractToken: {
-		access: (req: IncomingMessage) => string | null;
-		refresh: (req: IncomingMessage) => string | null;
-	};
+	Mail: MailConfigType;
+	extractToken: TokenConfigType;
 	jwt: JwtConfigType;
 	logger: LoggerType;
 };
@@ -107,51 +111,53 @@ type LoginType = (data: LoginPropsType) => Promise<LoginReturnType>;
 type CheckAuthReturnType = {
 	user: Omit<UserType, "password"> | null;
 };
-
 type CheckAuthType = (
 	req: IncomingMessage,
 	reqId?: string,
 ) => Promise<CheckAuthReturnType>;
 
 type LoginRequiredReturnType = Pick<LoginReturnType, "user">;
-
 type LoginRequiredType = (
 	req: IncomingMessage,
 ) => Promise<LoginRequiredReturnType>;
 
-type TokenRefreshType = (req: IncomingMessage) => Promise<LoginReturnType>;
+type TokenRefreshReturnType = LoginReturnType;
+type TokenRefreshType = (
+	req: IncomingMessage,
+) => Promise<TokenRefreshReturnType>;
 
 type LogoutType = (req: IncomingMessage) => Promise<void>;
 
 type StartVerificationPropsType = Pick<UserType, "email">;
-
+type StartVerificationReturnType = RegisterReturnType;
 type StartVerificationType = (
 	data: StartVerificationPropsType,
-) => Promise<RegisterReturnType>;
+) => Promise<StartVerificationReturnType>;
 
 type VerifieAccountPropsType = {
 	id: UserType["id"];
 	code: CodeType;
 };
-
+type VerifieAccountReturnType = LoginReturnType;
 type VerifieAccountType = (
 	data: VerifieAccountPropsType,
 ) => Promise<LoginReturnType>;
 
 type ForgotPasswordPropsType = Pick<UserType, "email">;
-
+type ForgotPasswordReturnType = RegisterReturnType;
 type ForgotPasswordType = (
 	data: ForgotPasswordPropsType,
-) => Promise<RegisterReturnType>;
+) => Promise<ForgotPasswordReturnType>;
 
 type ResetPasswordPropsType = VerifieAccountPropsType & {
 	password: string;
 };
-
+type ResetPasswordReturnType = LoginReturnType;
 type ResetPasswordType = (
 	data: ResetPasswordPropsType,
-) => Promise<LoginReturnType>;
+) => Promise<ResetPasswordReturnType>;
 
+type ChangePasswordReturnType = LoginReturnType;
 type ChangePasswordType = (
 	req: IncomingMessage,
 	password: string,
@@ -166,21 +172,37 @@ export type {
 	AuthType,
 	CacheConfigType,
 	CacheKeyType,
+	ChangePasswordReturnType,
 	ChangePasswordType,
 	CheckAuthType,
+	ForgotPasswordPropsType,
+	ForgotPasswordReturnType,
 	ForgotPasswordType,
 	JwtConfigType,
 	LoggerType,
 	LoginPropsType,
+	LoginRequiredReturnType,
 	LoginRequiredType,
+	LoginReturnType,
 	LoginType,
 	LogoutType,
 	LogType,
+	MailConfigType,
 	RegisterPropsType,
+	RegisterReturnType,
 	RegisterType,
+	ResetPasswordPropsType,
+	ResetPasswordReturnType,
 	ResetPasswordType,
+	StartVerificationPropsType,
+	StartVerificationReturnType,
 	StartVerificationType,
+	TokenConfigType,
+	TokenRefreshReturnType,
 	TokenRefreshType,
 	TokenType,
+	UserModelType,
+	VerifieAccountPropsType,
+	VerifieAccountReturnType,
 	VerifieAccountType,
 };
