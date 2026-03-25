@@ -69,6 +69,7 @@ const init: AuthType = ({
 		});
 	};
 
+	// * done
 	const findUserAndCheckBan = async (
 		userId: string,
 		reqId: string,
@@ -84,6 +85,7 @@ const init: AuthType = ({
 		return verifiedUser;
 	};
 
+	// * done
 	const verifyAndCheckBan = async ({
 		token: _token,
 		type: reqType,
@@ -444,6 +446,7 @@ const init: AuthType = ({
 		};
 	};
 
+	// * done
 	const checkAuth: CheckAuthType = async (req, reqId) => {
 		if (!reqId) {
 			reqId = genReqId();
@@ -472,6 +475,7 @@ const init: AuthType = ({
 		return { user: UserSanitizer.removePassword(user) };
 	};
 
+	// * done
 	const loginRequired: LoginRequiredType = async (req) => {
 		const reqId = genReqId();
 
@@ -489,6 +493,7 @@ const init: AuthType = ({
 		return { user };
 	};
 
+	// * done
 	const tokenRefresh: TokenRefreshType = async (req) => {
 		const reqId = genReqId();
 
@@ -538,6 +543,7 @@ const init: AuthType = ({
 		};
 	};
 
+	// * done
 	const logout: LogoutType = async (req) => {
 		const reqId = genReqId();
 

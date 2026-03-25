@@ -56,14 +56,16 @@ type MailConfigType = {
 	sendMail: (code: CodeType) => Promise<void>;
 };
 
+type TokenConfigType = {
+	access: (req: IncomingMessage) => string | null;
+	refresh: (req: IncomingMessage) => string | null;
+};
+
 type AuthPropsType = {
 	User: UserModelType;
 	Cache: CacheConfigType;
 	Mail: MailConfigType;
-	extractToken: {
-		access: (req: IncomingMessage) => string | null;
-		refresh: (req: IncomingMessage) => string | null;
-	};
+	extractToken: TokenConfigType;
 	jwt: JwtConfigType;
 	logger: LoggerType;
 };
@@ -109,19 +111,20 @@ type LoginType = (data: LoginPropsType) => Promise<LoginReturnType>;
 type CheckAuthReturnType = {
 	user: Omit<UserType, "password"> | null;
 };
-
 type CheckAuthType = (
 	req: IncomingMessage,
 	reqId?: string,
 ) => Promise<CheckAuthReturnType>;
 
 type LoginRequiredReturnType = Pick<LoginReturnType, "user">;
-
 type LoginRequiredType = (
 	req: IncomingMessage,
 ) => Promise<LoginRequiredReturnType>;
 
-type TokenRefreshType = (req: IncomingMessage) => Promise<LoginReturnType>;
+type TokenRefreshReturnType = LoginReturnType;
+type TokenRefreshType = (
+	req: IncomingMessage,
+) => Promise<TokenRefreshReturnType>;
 
 type LogoutType = (req: IncomingMessage) => Promise<void>;
 
@@ -176,6 +179,7 @@ export type {
 	JwtConfigType,
 	LoggerType,
 	LoginPropsType,
+	LoginRequiredReturnType,
 	LoginRequiredType,
 	LoginReturnType,
 	LoginType,
@@ -191,6 +195,8 @@ export type {
 	StartVerificationPropsType,
 	StartVerificationReturnType,
 	StartVerificationType,
+	TokenConfigType,
+	TokenRefreshReturnType,
 	TokenRefreshType,
 	TokenType,
 	UserModelType,
