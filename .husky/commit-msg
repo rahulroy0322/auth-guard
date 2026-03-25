@@ -1,2 +1,4 @@
-npm run check:fix
+# npm run check:fix
+# this is not working 
+# have to get so other way
 pnpm commitlint --edit $1

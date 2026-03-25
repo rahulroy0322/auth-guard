@@ -52,12 +52,14 @@ type CacheConfigType = {
 	remove: (key: CacheKeyType) => Promise<void>;
 };
 
+type MailConfigType = {
+	sendMail: (code: CodeType) => Promise<void>;
+};
+
 type AuthPropsType = {
 	User: UserModelType;
 	Cache: CacheConfigType;
-	Mail: {
-		sendMail: (code: CodeType) => Promise<void>;
-	};
+	Mail: MailConfigType;
 	extractToken: {
 		access: (req: IncomingMessage) => string | null;
 		refresh: (req: IncomingMessage) => string | null;
@@ -173,14 +175,18 @@ export type {
 	LoggerType,
 	LoginPropsType,
 	LoginRequiredType,
+	LoginReturnType,
 	LoginType,
 	LogoutType,
 	LogType,
+	MailConfigType,
 	RegisterPropsType,
+	RegisterReturnType,
 	RegisterType,
 	ResetPasswordType,
 	StartVerificationType,
 	TokenRefreshType,
 	TokenType,
+	UserModelType,
 	VerifieAccountType,
 };
