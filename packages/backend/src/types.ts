@@ -126,16 +126,16 @@ type TokenRefreshType = (req: IncomingMessage) => Promise<LoginReturnType>;
 type LogoutType = (req: IncomingMessage) => Promise<void>;
 
 type StartVerificationPropsType = Pick<UserType, "email">;
-
+type StartVerificationReturnType = RegisterReturnType;
 type StartVerificationType = (
 	data: StartVerificationPropsType,
-) => Promise<RegisterReturnType>;
+) => Promise<StartVerificationReturnType>;
 
 type VerifieAccountPropsType = {
 	id: UserType["id"];
 	code: CodeType;
 };
-
+type VerifieAccountReturnType = LoginReturnType;
 type VerifieAccountType = (
 	data: VerifieAccountPropsType,
 ) => Promise<LoginReturnType>;
@@ -184,9 +184,13 @@ export type {
 	RegisterReturnType,
 	RegisterType,
 	ResetPasswordType,
+	StartVerificationPropsType,
+	StartVerificationReturnType,
 	StartVerificationType,
 	TokenRefreshType,
 	TokenType,
 	UserModelType,
+	VerifieAccountPropsType,
+	VerifieAccountReturnType,
 	VerifieAccountType,
 };

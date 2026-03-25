@@ -44,6 +44,7 @@ const init: AuthType = ({
 
 	const userValidator = new UserValidator(logger);
 
+	// * done
 	const sendCode = async (props: Parameters<CodeManager["generate"]>[0]) => {
 		const {
 			reqId,
@@ -131,6 +132,7 @@ const init: AuthType = ({
 		return { user, token };
 	};
 
+	// * done
 	const register: RegisterType = async ({ password: passwd, ...data }) => {
 		const reqId = genReqId();
 
@@ -188,6 +190,7 @@ const init: AuthType = ({
 		return { id: user.id };
 	};
 
+	// * done
 	const login: LoginType = async ({ password: passwd, email }) => {
 		const reqId = genReqId();
 
@@ -239,6 +242,7 @@ const init: AuthType = ({
 		};
 	};
 
+	// * done
 	const startVerification: StartVerificationType = async ({ email }) => {
 		const reqId = genReqId();
 
@@ -269,6 +273,7 @@ const init: AuthType = ({
 		return { id: verifiedUser.id };
 	};
 
+	// * done
 	const verifieAccount: VerifieAccountType = async ({ id, code }) => {
 		const reqId = genReqId();
 
