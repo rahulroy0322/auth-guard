@@ -336,6 +336,7 @@ const init: AuthType = ({
 		};
 	};
 
+	// * done
 	const forgotPassword: ForgotPasswordType = async ({ email }) => {
 		const reqId = genReqId();
 
@@ -380,6 +381,7 @@ const init: AuthType = ({
 		return { id: verifiedUser.id };
 	};
 
+	// * done
 	const resetPassword: ResetPasswordType = async ({
 		id,
 		password: passwd,

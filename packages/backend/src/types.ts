@@ -141,18 +141,18 @@ type VerifieAccountType = (
 ) => Promise<LoginReturnType>;
 
 type ForgotPasswordPropsType = Pick<UserType, "email">;
-
+type ForgotPasswordReturnType = RegisterReturnType;
 type ForgotPasswordType = (
 	data: ForgotPasswordPropsType,
-) => Promise<RegisterReturnType>;
+) => Promise<ForgotPasswordReturnType>;
 
 type ResetPasswordPropsType = VerifieAccountPropsType & {
 	password: string;
 };
-
+type ResetPasswordReturnType = LoginReturnType;
 type ResetPasswordType = (
 	data: ResetPasswordPropsType,
-) => Promise<LoginReturnType>;
+) => Promise<ResetPasswordReturnType>;
 
 type ChangePasswordType = (
 	req: IncomingMessage,
@@ -170,6 +170,8 @@ export type {
 	CacheKeyType,
 	ChangePasswordType,
 	CheckAuthType,
+	ForgotPasswordPropsType,
+	ForgotPasswordReturnType,
 	ForgotPasswordType,
 	JwtConfigType,
 	LoggerType,
@@ -183,6 +185,8 @@ export type {
 	RegisterPropsType,
 	RegisterReturnType,
 	RegisterType,
+	ResetPasswordPropsType,
+	ResetPasswordReturnType,
 	ResetPasswordType,
 	StartVerificationPropsType,
 	StartVerificationReturnType,
