@@ -98,9 +98,9 @@ class ProfileService extends BaseService {
 			throw new AuthBadError("Name change failed");
 		}
 
-		const updatedUser = {
+const updatedUser = {
 			...user,
-			name: updated.name,
+			...updated,
 		};
 
 		const token = this.Helper.signTokens(updatedUser, reqId);
