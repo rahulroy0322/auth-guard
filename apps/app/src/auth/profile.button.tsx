@@ -250,7 +250,7 @@ const Profile: FC = () => {
 					/>
 				) : (
 					<>
-						<div className={cn("flex items-center")}>
+						<div className="flex items-center">
 							<Avatar src={user.avatar?.src} name={user.name} />
 							<span>{user.name}</span>
 						</div>
