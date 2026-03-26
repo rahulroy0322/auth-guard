@@ -4,7 +4,7 @@ import {
 	RiShieldCheckFill,
 	RiUser2Line,
 } from "@remixicon/react";
-import type { FC, ReactNode } from "react";
+import { type FC, type ReactNode, useMemo, useState } from "react";
 import { Avatar } from "ui/components/avatar";
 import {
 	AlertDialog,
@@ -22,6 +22,7 @@ import {
 	Card,
 	CardContent,
 	CardDescription,
+	CardFooter,
 	CardHeader,
 	CardTitle,
 } from "ui/components/ui/card";
@@ -41,6 +42,8 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuTrigger,
 } from "ui/components/ui/dropdown-menu";
+import { Field, FieldContent, FieldLabel } from "ui/components/ui/field";
+import { Input } from "ui/components/ui/input";
 import { Separator } from "ui/components/ui/separator";
 import {
 	Tabs,
@@ -48,6 +51,7 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "ui/components/ui/tabs";
+import { cn } from "ui/lib/utils";
 import { useGuard } from "../provider";
 
 const Security: FC = () => {
@@ -116,12 +120,113 @@ const Security: FC = () => {
 	);
 };
 
+type UploadProfilePropsType = {
+	name: string;
+	url: string | null;
+	closeModel: () => void;
+};
+
+const UploadProfile: FC<UploadProfilePropsType> = ({
+	name: prevName,
+	url,
+	closeModel,
+}) => {
+	const [name, setName] = useState(prevName);
+	const [avatarFile, setAvatarFile] = useState<File | null>(null);
+
+	const [fileUrl, setFileUrl] = useState(url || "");
+
+	useEffect(() => {
+		if (avatarFile) {
+			const objectUrl = URL.createObjectURL(avatarFile);
+			setFileUrl(objectUrl);
+
+			return () => URL.revokeObjectURL(objectUrl);
+		}
+		setFileUrl(url || "");
+	}, [avatarFile, url]);
+
+	const handleSave = () => {
+		closeModel();
+	};
+
+	return (
+		<Card className="p-4 shadow-lg col-span-2">
+			<CardHeader className="p-0 pb-3">
+				<CardTitle className="text-sm">Edit Profile</CardTitle>
+				<CardDescription>Update your name and avatar</CardDescription>
+			</CardHeader>
+			<CardContent className="p-0 space-y-3">
+				<Field className="grid grid-cols-3">
+					<FieldContent>
+						<FieldLabel>
+							<Avatar name={prevName} src={fileUrl} />
+						</FieldLabel>
+					</FieldContent>
+					<Button
+						variant={"outline"}
+						nativeButton={false}
+						render={
+							<label>
+								Upload
+								<input
+									type="file"
+									accept="image/*"
+									hidden
+									onChange={(e) => {
+										setAvatarFile(e.target.files?.[0] ?? null);
+									}}
+								/>
+							</label>
+						}
+					/>
+					<Button
+						variant="destructive"
+						disabled={!avatarFile}
+						// TODO!
+						onClick={() => setAvatarFile(null)}
+					>
+						Remove
+					</Button>
+				</Field>
+				<Field>
+					<FieldContent>
+						<FieldLabel>Name</FieldLabel>
+					</FieldContent>
+					<Input
+						onChange={(e) => {
+							setName(e.target.value);
+						}}
+						value={name}
+					/>
+				</Field>
+			</CardContent>
+			<CardFooter className="flex items-center gap-2 justify-end">
+				<Button
+					onClick={handleSave}
+					disabled={(prevName === name && !avatarFile) || !name}
+				>
+					Save
+				</Button>
+				<Button onClick={closeModel} variant="outline">
+					Cancel
+				</Button>
+			</CardFooter>
+		</Card>
+	);
+};
+
 const Profile: FC = () => {
-	const { user, loading } = useGuard();
+	const { user } = useGuard();
+	const [isEditing, setIsEditing] = useState(false);
 
 	if (!user) {
 		throw new Error("some event dosn't handled properly! for <Profile>");
 	}
+
+	const closeModel = () => {
+		setIsEditing(false);
+	};
 
 	return (
 		<TabsContent value="profile">
@@ -136,13 +241,27 @@ const Profile: FC = () => {
 
 			<div className="grid grid-cols-3 p-2 py-4">
 				<b>Profile</b>
-				<div className="flex items-center">
-					<Avatar src={user.avatar?.src} name={user.name} />
-					<span>{user.name}</span>
-				</div>
-				<Button variant="outline" disabled={!user.avatar || loading}>
-					Update profile
-				</Button>
+
+				{isEditing ? (
+					<UploadProfile
+						name={user.name}
+						url={user.avatar?.src ?? null}
+						closeModel={closeModel}
+					/>
+				) : (
+					<>
+						<div className="flex items-center">
+							<Avatar src={user.avatar?.src} name={user.name} />
+							<span>{user.name}</span>
+						</div>
+						<Button
+							variant="outline"
+							onClick={() => setIsEditing((prev) => !prev)}
+						>
+							Update profile
+						</Button>
+					</>
+				)}
 			</div>
 
 			<Separator />
@@ -156,6 +275,7 @@ const Profile: FC = () => {
 		</TabsContent>
 	);
 };
+
 type UserManagemantPropsType = {
 	children: ReactNode;
 };
