@@ -2,8 +2,6 @@ import type { IncomingMessage } from "node:http";
 import type { UserType } from "base";
 import { AuthBadError, AuthNoTokenError } from "../error";
 import type {
-	ChangePasswordReturnType,
-	ChangePasswordType,
 	CheckAuthType,
 	JwtConfigType,
 	LoginRequiredReturnType,
@@ -11,7 +9,6 @@ import type {
 	TokenRefreshReturnType,
 	UserModelType,
 } from "../types";
-import { hashPassword } from "../utils/password";
 import { genReqId } from "../utils/request-id";
 import type { SmartLogger } from "../utils/smart-logger";
 import type { TokenBanManager } from "../utils/token-ban";
@@ -199,44 +196,6 @@ class SessionService extends BaseService {
 			msg: "Logout successful",
 			user: null,
 		});
-	};
-
-	public changePassword = async (
-		req: Parameters<ChangePasswordType>[0],
-		passwd: Parameters<ChangePasswordType>[1],
-	): Promise<ChangePasswordReturnType> => {
-		const reqId = genReqId();
-
-		this.logger.trace({ reqId, msg: "Starting change password" });
-
-		const { user } = await this.loginRequired(req);
-
-		this.logger.trace({
-			reqId,
-			msg: "Hashing new Password",
-			extra: { userId: user.id },
-		});
-		const password = await hashPassword(passwd);
-
-		this.logger.trace({ reqId, msg: "Changing user Password" });
-
-		// let update don't check
-		await this.User.updateById(user.id, { password });
-
-		// TODO! clear session
-
-		const token = this.Helper.signTokens(user, reqId);
-
-		this.logger.info({
-			reqId,
-			msg: "Password changed successful:)",
-			user,
-		});
-
-		return {
-			token,
-			user: UserSanitizer.removePassword(user),
-		};
 	};
 
 	private findUserAndCheckBan = async (
