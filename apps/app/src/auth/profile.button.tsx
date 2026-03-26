@@ -134,11 +134,16 @@ const UploadProfile: FC<UploadProfilePropsType> = ({
 	const [name, setName] = useState(prevName);
 	const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
-	const fileUrl = useMemo(() => {
-		if (!avatarFile) {
-			return url || "";
+	const [fileUrl, setFileUrl] = useState(url || "");
+
+	useEffect(() => {
+		if (avatarFile) {
+			const objectUrl = URL.createObjectURL(avatarFile);
+			setFileUrl(objectUrl);
+
+			return () => URL.revokeObjectURL(objectUrl);
 		}
-		return URL.createObjectURL(avatarFile);
+		setFileUrl(url || "");
 	}, [avatarFile, url]);
 
 	const handleSave = () => {
