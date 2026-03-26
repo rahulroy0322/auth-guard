@@ -100,7 +100,7 @@ class ProfileService extends BaseService {
 
 		const updatedUser = {
 			...user,
-			name: user.name,
+			name: updated.name,
 		};
 
 		const token = this.Helper.signTokens(updatedUser, reqId);
