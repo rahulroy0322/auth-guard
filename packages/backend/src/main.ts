@@ -1,5 +1,6 @@
 import { AuthService } from "./services/auth.service";
 import { PasswordService } from "./services/password.service";
+import { ProfileService } from "./services/profile.service";
 import { SessionService } from "./services/session.service";
 import { VerificationService } from "./services/verification.service";
 import type { AuthType } from "./types";
@@ -19,46 +20,53 @@ const init: AuthType = ({
 }) => {
 	const logger = new SmartLogger(mainLogger);
 
-	const Validator = new UserValidator(logger);
-	const Code = new CodeManager(Cache, logger);
+	const validator = new UserValidator(logger);
+	const code = new CodeManager(Cache, logger);
 
-	const Helper = new TokenHelper(jwt, logger);
-	const BanManager = new TokenBanManager(Cache, logger);
+	const helper = new TokenHelper(jwt, logger);
+	const banManager = new TokenBanManager(Cache, logger);
 
 	const authService = new AuthService({
 		logger,
-		Helper,
-		Code,
+		Helper: helper,
+		Code: code,
 		Mail,
 		User,
-		Validator,
+		Validator: validator,
 	});
 
 	const verificationService = new VerificationService({
 		logger,
-		Helper,
-		Code,
+		Helper: helper,
+		Code: code,
 		Mail,
 		User,
-		Validator,
+		Validator: validator,
 	});
 
 	const passwordService = new PasswordService({
 		logger,
-		Helper,
-		Code,
+		Helper: helper,
+		Code: code,
 		Mail,
 		User,
-		Validator,
+		Validator: validator,
 	});
 
 	const sessionService = new SessionService(jwt, {
 		logger,
-		Helper,
+		Helper: helper,
 		User,
-		Validator,
-		BanManager,
+		Validator: validator,
+		BanManager: banManager,
 		Token: extractToken,
+	});
+
+	const profileService = new ProfileService({
+		logger,
+		Helper: helper,
+		User,
+		Session: sessionService,
 	});
 
 	return {
@@ -66,7 +74,8 @@ const init: AuthType = ({
 		register: authService.register,
 		login: authService.login,
 		logout: sessionService.logout,
-		changePassword: sessionService.changePassword,
+		changePassword: profileService.changePassword,
+		changeName: profileService.changeName,
 
 		// register
 		startVerification: verificationService.startVerification,
