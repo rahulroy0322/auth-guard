@@ -98,7 +98,7 @@ class ProfileService extends BaseService {
 			throw new AuthBadError("Name change failed");
 		}
 
-const updatedUser = {
+		const updatedUser = {
 			...user,
 			...updated,
 		};

@@ -4,7 +4,7 @@ import {
 	RiShieldCheckFill,
 	RiUser2Line,
 } from "@remixicon/react";
-import { type FC, type ReactNode, useMemo, useState } from "react";
+import { type FC, type ReactNode, useEffect, useState } from "react";
 import { Avatar } from "ui/components/avatar";
 import {
 	AlertDialog,
@@ -51,7 +51,6 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "ui/components/ui/tabs";
-import { cn } from "ui/lib/utils";
 import { useGuard } from "../provider";
 
 const Security: FC = () => {
@@ -144,6 +143,7 @@ const UploadProfile: FC<UploadProfilePropsType> = ({
 			return () => URL.revokeObjectURL(objectUrl);
 		}
 		setFileUrl(url || "");
+		return () => {};
 	}, [avatarFile, url]);
 
 	const handleSave = () => {
