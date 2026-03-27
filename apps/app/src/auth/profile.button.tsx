@@ -6,7 +6,7 @@ import {
 } from "@remixicon/react";
 import { useAppForm } from "form";
 import { type FC, type ReactNode, useEffect, useState } from "react";
-import { updatePasswordSchema } from "schema";
+import { type UpdatePasswordSchemaType, updatePasswordSchema } from "schema";
 import { Avatar } from "ui/components/avatar";
 import {
 	AlertDialog,
@@ -67,17 +67,16 @@ const UpdatePassword: FC<UpdatePasswordPropsType> = ({ closeModal }) => {
 	const { reqWithToken, fetching, refreshToken } = useGuard();
 	const [updating, setUpdating] = useState(false);
 
-	const handleUpdatePassword = async (passwordData: {
-		password: string;
-		confirm: string;
-	}) => {
+	const handleUpdatePassword = async ({
+		password,
+	}: Pick<UpdatePasswordSchemaType, "password">) => {
 		setUpdating(true);
 		try {
 			await reqWithToken(async (token) =>
 				patch({
 					base: config.base,
 					url: "change-password",
-					body: { password: passwordData.password },
+					body: { password },
 					headers: {
 						Authorization: `Bearer ${token}`,
 					},
@@ -100,7 +99,7 @@ const UpdatePassword: FC<UpdatePasswordPropsType> = ({ closeModal }) => {
 		defaultValues: {
 			password: "",
 			confirm: "",
-		},
+		} satisfies UpdatePasswordSchemaType as UpdatePasswordSchemaType,
 		validators: {
 			onSubmit: updatePasswordSchema,
 		},

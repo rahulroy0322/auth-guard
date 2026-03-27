@@ -42,6 +42,10 @@ const updatePasswordSchema = z
 		path: ["confirm"],
 	});
 
+type UpdatePasswordSchemaType = z.infer<typeof updatePasswordSchema>;
+
+export type { UpdatePasswordSchemaType };
+
 export {
 	loginSchema,
 	passwordSchema,
