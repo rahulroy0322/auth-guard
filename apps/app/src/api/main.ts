@@ -23,7 +23,7 @@ type ReqGetType = ReqDefType & {
 };
 
 type ReqPostType = ReqDefType & {
-	method: "POST";
+	method: "POST" | "PATCH";
 	body: Record<string, unknown>;
 };
 
@@ -81,10 +81,16 @@ const post = <T>(params: Omit<ReqPostType, "method">) =>
 		...params,
 	});
 
+const patch = <T>(params: Omit<ReqPostType, "method">) =>
+	req<T>({
+		method: "PATCH",
+		...params,
+	});
+
 type AuthResType = {
 	user: SafeUserType;
 };
 
 export type { AuthResType, AuthStatusReturnType };
 
-export { get, post };
+export { get, patch, post };
