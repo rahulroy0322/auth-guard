@@ -4,7 +4,9 @@ import {
 	RiShieldCheckFill,
 	RiUser2Line,
 } from "@remixicon/react";
+import { useAppForm } from "form";
 import { type FC, type ReactNode, useEffect, useState } from "react";
+import { updatePasswordSchema } from "schema";
 import { Avatar } from "ui/components/avatar";
 import {
 	AlertDialog,
@@ -53,12 +55,67 @@ import {
 } from "ui/components/ui/tabs";
 import { useGuard } from "../provider";
 
+type UpdatePasswordPropsType = {
+	closeModal: () => void;
+};
+
+const UpdatePassword: FC<UpdatePasswordPropsType> = ({ closeModal }) => {
+	const { AppField, handleSubmit: submit } = useAppForm({
+		defaultValues: {
+			password: "",
+			confirm: "",
+		},
+		validators: {
+			onSubmit: updatePasswordSchema,
+		},
+		onSubmit: ({ value }) => {
+			// TODO!
+			console.log(value);
+		},
+	});
+
+	return (
+		<form
+			className="col-span-2"
+			onSubmit={(e) => {
+				e.preventDefault();
+				submit();
+			}}
+		>
+			<Card className="p-4 shadow-lg">
+				<CardHeader className="p-0 pb-3">
+					<CardTitle className="text-sm">Update Password</CardTitle>
+				</CardHeader>
+				<CardContent className="p-0 space-y-3">
+					<AppField name="password">
+						{({ Password }) => <Password label="New Password" />}
+					</AppField>
+					<AppField name="confirm">
+						{({ Password }) => <Password label="Confirm Password" />}
+					</AppField>
+				</CardContent>
+				<CardFooter className="flex items-center gap-2 justify-end">
+					<Button type="submit">Save</Button>
+					<Button type="button" onClick={closeModal} variant="outline">
+						Cancel
+					</Button>
+				</CardFooter>
+			</Card>
+		</form>
+	);
+};
+
 const Security: FC = () => {
 	const { user, loading } = useGuard();
+	const [isEditing, setIsEditing] = useState(false);
 
 	if (!user) {
-		throw new Error("some event dosn't handled properly! for <Security>");
+		throw new Error("some event doesn't handled properly! for <Security>");
 	}
+
+	const closeModal = () => {
+		setIsEditing(false);
+	};
 
 	return (
 		<TabsContent value="security">
@@ -75,8 +132,21 @@ const Security: FC = () => {
 
 			<div className="grid grid-cols-3 p-2 py-4">
 				<b>Password</b>
-				<span>{"*".repeat(8)}</span>
-				<Button variant="outline">Update Password</Button>
+
+				{isEditing ? (
+					<UpdatePassword closeModal={closeModal} />
+				) : (
+					<>
+						<span>{"*".repeat(8)}</span>
+
+						<Button
+							variant="outline"
+							onClick={() => setIsEditing((prev) => !prev)}
+						>
+							Update Password
+						</Button>
+					</>
+				)}
 			</div>
 
 			<Separator />
@@ -119,16 +189,16 @@ const Security: FC = () => {
 	);
 };
 
-type UploadProfilePropsType = {
+type UpdateProfilePropsType = {
 	name: string;
 	url: string | null;
-	closeModel: () => void;
+	closeModal: () => void;
 };
 
-const UploadProfile: FC<UploadProfilePropsType> = ({
+const UpdateProfile: FC<UpdateProfilePropsType> = ({
 	name: prevName,
 	url,
-	closeModel,
+	closeModal,
 }) => {
 	const [name, setName] = useState(prevName);
 	const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -147,7 +217,8 @@ const UploadProfile: FC<UploadProfilePropsType> = ({
 	}, [avatarFile, url]);
 
 	const handleSave = () => {
-		closeModel();
+		// TODO!
+		closeModal();
 	};
 
 	return (
@@ -160,7 +231,7 @@ const UploadProfile: FC<UploadProfilePropsType> = ({
 				<Field className="grid grid-cols-3">
 					<FieldContent>
 						<FieldLabel>
-							<Avatar name={prevName} src={fileUrl} />
+							<Avatar name={name} src={fileUrl} />
 						</FieldLabel>
 					</FieldContent>
 					<Button
@@ -208,7 +279,7 @@ const UploadProfile: FC<UploadProfilePropsType> = ({
 				>
 					Save
 				</Button>
-				<Button onClick={closeModel} variant="outline">
+				<Button onClick={closeModal} variant="outline">
 					Cancel
 				</Button>
 			</CardFooter>
@@ -221,10 +292,10 @@ const Profile: FC = () => {
 	const [isEditing, setIsEditing] = useState(false);
 
 	if (!user) {
-		throw new Error("some event dosn't handled properly! for <Profile>");
+		throw new Error("some event doesn't handled properly! for <Profile>");
 	}
 
-	const closeModel = () => {
+	const closeModal = () => {
 		setIsEditing(false);
 	};
 
@@ -243,10 +314,10 @@ const Profile: FC = () => {
 				<b>Profile</b>
 
 				{isEditing ? (
-					<UploadProfile
+					<UpdateProfile
 						name={user.name}
 						url={user.avatar?.src ?? null}
-						closeModel={closeModel}
+						closeModal={closeModal}
 					/>
 				) : (
 					<>
