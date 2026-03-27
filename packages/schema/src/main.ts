@@ -32,10 +32,21 @@ const resetPasswordSchema = verifieSchema.extend({
 	password: passwordSchema,
 });
 
+const updatePasswordSchema = z
+	.object({
+		password: passwordSchema,
+		confirm: passwordSchema,
+	})
+	.refine((data) => data.password === data.confirm, {
+		message: "Password don't match",
+		path: ["confirm"],
+	});
+
 export {
 	loginSchema,
 	passwordSchema,
 	registerSchema,
 	resetPasswordSchema,
+	updatePasswordSchema,
 	verifieSchema,
 };
