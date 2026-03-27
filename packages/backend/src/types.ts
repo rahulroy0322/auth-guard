@@ -83,6 +83,7 @@ type AuthReturnType = {
 	tokenRefresh: TokenRefreshType;
 	changePassword: ChangePasswordType;
 	changeName: ChangeNameType;
+	authStatus: AuthStatusType;
 };
 
 type AuthType = (props: AuthPropsType) => AuthReturnType;
@@ -122,7 +123,12 @@ type LoginRequiredType = (
 	req: IncomingMessage,
 ) => Promise<LoginRequiredReturnType>;
 
-type TokenRefreshReturnType = LoginReturnType;
+type TokenRefreshReturnType = Pick<LoginReturnType, "user"> & {
+	token: {
+		refresh?: string;
+		access: string;
+	};
+};
 type TokenRefreshType = (
 	req: IncomingMessage,
 ) => Promise<TokenRefreshReturnType>;
@@ -170,12 +176,21 @@ type ChangeNameType = (
 	name: string,
 ) => Promise<ChangeNameReturnType>;
 
+type AuthStatusReturnType =
+	| LoginReturnType
+	| {
+			user: false;
+	  };
+type AuthStatusType = (req: IncomingMessage) => Promise<AuthStatusReturnType>;
+
 type TokenType = Pick<UserType, "id"> & {
 	type: "refresh" | "access";
 };
 
 export type {
 	AuthPropsType,
+	AuthStatusReturnType,
+	AuthStatusType,
 	AuthType,
 	CacheConfigType,
 	CacheKeyType,

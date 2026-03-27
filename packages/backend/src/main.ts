@@ -76,6 +76,7 @@ const init: AuthType = ({
 		logout: sessionService.logout,
 		changePassword: profileService.changePassword,
 		changeName: profileService.changeName,
+		authStatus: sessionService.authStatus,
 
 		// register
 		startVerification: verificationService.startVerification,

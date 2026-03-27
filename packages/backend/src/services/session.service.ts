@@ -2,6 +2,7 @@ import type { IncomingMessage } from "node:http";
 import type { UserType } from "base";
 import { AuthBadError, AuthNoTokenError } from "../error";
 import type {
+	AuthStatusReturnType,
 	CheckAuthType,
 	JwtConfigType,
 	LoginRequiredReturnType,
@@ -145,6 +146,56 @@ class SessionService extends BaseService {
 		this.logger.info({
 			reqId,
 			msg: "Token refresh successful:)",
+			user,
+		});
+
+		return {
+			token: newTokens,
+			user: UserSanitizer.removePassword(user),
+		};
+	};
+
+	public authStatus = async (
+		req: IncomingMessage,
+	): Promise<AuthStatusReturnType> => {
+		const reqId = genReqId();
+
+		this.logger.trace({ reqId, msg: "Starting Auth Status" });
+
+		const [, token] = (this.Token.refresh(req) || "").split(" ");
+
+		if (!token) {
+			return {
+				user: false,
+			};
+		}
+
+		const {
+			token: { exp },
+			user,
+		} = await this.verifyAndCheckBan({
+			reqId,
+			token,
+			type: "refresh",
+		});
+
+		const newTokens = this.Helper.signTokens(user, reqId);
+
+		const shouldRotate = this.Helper.shouldRotateRefreshToken(exp);
+
+		if (!shouldRotate) {
+			delete (newTokens as Partial<typeof newTokens>).refresh;
+			this.logger.trace({
+				reqId,
+				msg: "Refresh token still valid, not rotating",
+			});
+		} else {
+			this.logger.trace({ reqId, msg: "Rotating refresh token" });
+		}
+
+		this.logger.info({
+			reqId,
+			msg: "Auth status successful:)",
 			user,
 		});
 

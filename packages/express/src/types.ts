@@ -13,15 +13,21 @@ type ResType = {
 	success: true;
 	data:
 		| {
-				user: Omit<UserType, "password">;
-				token?: {
-					refresh?: string;
-					access: string;
-				};
+				user?: Omit<UserType, "password">;
+				token?: string;
 		  }
 		| {
 				id?: string;
 				message: string;
+		  }
+		| {
+				authenticated: true;
+				token: string;
+				user: Omit<UserType, "password">;
+		  }
+		| {
+				authenticated: false;
+				user: null;
 		  };
 };
 
@@ -38,7 +44,8 @@ type AuthExpressReturnType = Record<
 	| "forgotPassword"
 	| "resetPassword"
 	| "changePassword"
-	| "changeName",
+	| "changeName"
+	| "authStatus",
 	RequestHandler
 >;
 
