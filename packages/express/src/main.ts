@@ -273,7 +273,19 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		}
 	};
 
+	const removeAvatar: RequestHandler = async (req, res) => {
+		const { user } = await coreApi.removeAvatar(req);
+
+		res.status(200).json({
+			success: true,
+			data: {
+				user,
+			},
+		} satisfies ResType);
+	};
+
 	return {
+		removeAvatar,
 		login,
 		register,
 		logout,

@@ -1,9 +1,10 @@
 import { AuthService } from "./services/auth.service";
+import { AvaterService } from "./services/avatar.service";
 import { PasswordService } from "./services/password.service";
 import { ProfileService } from "./services/profile.service";
 import { SessionService } from "./services/session.service";
 import { VerificationService } from "./services/verification.service";
-import type { AuthType } from "./types";
+import type { AuthReturnType, AuthType } from "./types";
 import { SmartLogger } from "./utils/smart-logger";
 import { TokenBanManager } from "./utils/token-ban";
 import { TokenHelper } from "./utils/token-helpers";
@@ -12,6 +13,7 @@ import { CodeManager } from "./utils/verification-code";
 
 const init: AuthType = ({
 	User,
+	Avatar,
 	Cache,
 	Mail,
 	extractToken,
@@ -71,14 +73,24 @@ const init: AuthType = ({
 		token: extractToken,
 	});
 
+	const avaterService = new AvaterService({
+		logger,
+		avatar: Avatar,
+		session: sessionService,
+	});
+
 	return {
 		// auth
 		register: authService.register,
 		login: authService.login,
 		logout: sessionService.logout,
+
+		// loged-in
 		changePassword: profileService.changePassword,
 		changeName: profileService.changeName,
 		authStatus: sessionService.authStatus,
+		newAvatar: avaterService.newAvatar,
+		removeAvatar: avaterService.removeAvatar,
 
 		// register
 		startVerification: verificationService.startVerification,
@@ -92,7 +104,7 @@ const init: AuthType = ({
 		checkAuth: sessionService.checkAuth,
 		loginRequired: sessionService.loginRequired,
 		tokenRefresh: sessionService.tokenRefresh,
-	};
+	} satisfies AuthReturnType as AuthReturnType;
 };
 
 const auth = init;
