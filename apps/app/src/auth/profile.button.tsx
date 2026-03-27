@@ -56,10 +56,10 @@ import {
 import { useGuard } from "../provider";
 
 type UpdatePasswordPropsType = {
-	closeModel: () => void;
+	closeModal: () => void;
 };
 
-const UpdatePassword: FC<UpdatePasswordPropsType> = ({ closeModel }) => {
+const UpdatePassword: FC<UpdatePasswordPropsType> = ({ closeModal }) => {
 	const { AppField, handleSubmit: submit } = useAppForm({
 		defaultValues: {
 			password: "",
@@ -96,7 +96,7 @@ const UpdatePassword: FC<UpdatePasswordPropsType> = ({ closeModel }) => {
 				</CardContent>
 				<CardFooter className="flex items-center gap-2 justify-end">
 					<Button type="submit">Save</Button>
-					<Button type="button" onClick={closeModel} variant="outline">
+					<Button type="button" onClick={closeModal} variant="outline">
 						Cancel
 					</Button>
 				</CardFooter>
@@ -110,10 +110,10 @@ const Security: FC = () => {
 	const [isEditing, setIsEditing] = useState(false);
 
 	if (!user) {
-		throw new Error("some event dosn't handled properly! for <Security>");
+		throw new Error("some event doesn't handled properly! for <Security>");
 	}
 
-	const closeModel = () => {
+	const closeModal = () => {
 		setIsEditing(false);
 	};
 
@@ -134,7 +134,7 @@ const Security: FC = () => {
 				<b>Password</b>
 
 				{isEditing ? (
-					<UpdatePassword closeModel={closeModel} />
+					<UpdatePassword closeModal={closeModal} />
 				) : (
 					<>
 						<span>{"*".repeat(8)}</span>
@@ -192,13 +192,13 @@ const Security: FC = () => {
 type UpdateProfilePropsType = {
 	name: string;
 	url: string | null;
-	closeModel: () => void;
+	closeModal: () => void;
 };
 
 const UpdateProfile: FC<UpdateProfilePropsType> = ({
 	name: prevName,
 	url,
-	closeModel,
+	closeModal,
 }) => {
 	const [name, setName] = useState(prevName);
 	const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -218,7 +218,7 @@ const UpdateProfile: FC<UpdateProfilePropsType> = ({
 
 	const handleSave = () => {
 		// TODO!
-		closeModel();
+		closeModal();
 	};
 
 	return (
@@ -279,7 +279,7 @@ const UpdateProfile: FC<UpdateProfilePropsType> = ({
 				>
 					Save
 				</Button>
-				<Button onClick={closeModel} variant="outline">
+				<Button onClick={closeModal} variant="outline">
 					Cancel
 				</Button>
 			</CardFooter>
@@ -292,10 +292,10 @@ const Profile: FC = () => {
 	const [isEditing, setIsEditing] = useState(false);
 
 	if (!user) {
-		throw new Error("some event dosn't handled properly! for <Profile>");
+		throw new Error("some event doesn't handled properly! for <Profile>");
 	}
 
-	const closeModel = () => {
+	const closeModal = () => {
 		setIsEditing(false);
 	};
 
@@ -317,7 +317,7 @@ const Profile: FC = () => {
 					<UpdateProfile
 						name={user.name}
 						url={user.avatar?.src ?? null}
-						closeModel={closeModel}
+						closeModal={closeModal}
 					/>
 				) : (
 					<>
