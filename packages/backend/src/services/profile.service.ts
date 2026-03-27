@@ -103,8 +103,6 @@ class ProfileService extends BaseService {
 			...updated,
 		};
 
-		const token = this.Helper.signTokens(updatedUser, reqId);
-
 		this.logger.info({
 			reqId,
 			msg: "Name changed successful:)",
@@ -112,7 +110,6 @@ class ProfileService extends BaseService {
 		});
 
 		return {
-			token,
 			user: UserSanitizer.removePassword(updatedUser),
 		};
 	};

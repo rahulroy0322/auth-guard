@@ -231,6 +231,23 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		} satisfies ResType);
 	};
 
+	const changeName: RequestHandler = async (req, res) => {
+		const data = registerSchema
+			.pick({
+				name: true,
+			})
+			.parse(req.body || {});
+
+		const { user } = await coreApi.changeName(req, data.name);
+
+		res.status(200).json({
+			success: true,
+			data: {
+				user,
+			},
+		} satisfies ResType);
+	};
+
 	return {
 		login,
 		register,
@@ -244,6 +261,7 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		checkAuth,
 		loginRequired,
 		changePassword,
+		changeName,
 	};
 };
 

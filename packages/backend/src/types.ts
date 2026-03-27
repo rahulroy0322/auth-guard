@@ -164,11 +164,11 @@ type ChangePasswordType = (
 	password: string,
 ) => Promise<LoginReturnType>;
 
-type ChangeNameReturnType = LoginReturnType;
+type ChangeNameReturnType = Omit<LoginReturnType, "token">;
 type ChangeNameType = (
 	req: IncomingMessage,
 	name: string,
-) => Promise<LoginReturnType>;
+) => Promise<ChangeNameReturnType>;
 
 type TokenType = Pick<UserType, "id"> & {
 	type: "refresh" | "access";
