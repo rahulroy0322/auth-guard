@@ -47,12 +47,16 @@ import {
 import { Field, FieldContent, FieldLabel } from "ui/components/ui/field";
 import { Input } from "ui/components/ui/input";
 import { Separator } from "ui/components/ui/separator";
+import { toast } from "ui/components/ui/sonner";
 import {
 	Tabs,
 	TabsContent,
 	TabsList,
 	TabsTrigger,
 } from "ui/components/ui/tabs";
+
+import { patch } from "../api/main";
+import { config } from "../config";
 import { useGuard } from "../provider";
 
 type UpdatePasswordPropsType = {
@@ -60,6 +64,38 @@ type UpdatePasswordPropsType = {
 };
 
 const UpdatePassword: FC<UpdatePasswordPropsType> = ({ closeModal }) => {
+	const { reqWithToken, fetching, refreshToken } = useGuard();
+	const [updating, setUpdating] = useState(false);
+
+	const handleUpdatePassword = async (passwordData: {
+		password: string;
+		confirm: string;
+	}) => {
+		setUpdating(true);
+		try {
+			await reqWithToken(async (token) =>
+				patch({
+					base: config.base,
+					url: "change-password",
+					body: { password: passwordData.password },
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}),
+			);
+			// just to resfresh accecc token
+			await refreshToken();
+			closeModal();
+		} catch (error) {
+			console.error("Failed to update password:", error);
+			toast.error((error as Error).name, {
+				description: (error as Error).message,
+			});
+		} finally {
+			setUpdating(false);
+		}
+	};
+
 	const { AppField, handleSubmit: submit } = useAppForm({
 		defaultValues: {
 			password: "",
@@ -69,8 +105,7 @@ const UpdatePassword: FC<UpdatePasswordPropsType> = ({ closeModal }) => {
 			onSubmit: updatePasswordSchema,
 		},
 		onSubmit: ({ value }) => {
-			// TODO!
-			console.log(value);
+			handleUpdatePassword(value);
 		},
 	});
 
@@ -95,8 +130,15 @@ const UpdatePassword: FC<UpdatePasswordPropsType> = ({ closeModal }) => {
 					</AppField>
 				</CardContent>
 				<CardFooter className="flex items-center gap-2 justify-end">
-					<Button type="submit">Save</Button>
-					<Button type="button" onClick={closeModal} variant="outline">
+					<Button type="submit" disabled={updating || fetching}>
+						Save
+					</Button>
+					<Button
+						type="button"
+						onClick={closeModal}
+						variant="outline"
+						disabled={updating || fetching}
+					>
 						Cancel
 					</Button>
 				</CardFooter>
