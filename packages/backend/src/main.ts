@@ -62,11 +62,13 @@ const init: AuthType = ({
 		Token: extractToken,
 	});
 
-	const profileService = new ProfileService({
+	const profileService = new ProfileService(jwt, {
 		logger,
 		Helper: helper,
 		User,
 		Session: sessionService,
+		banManager,
+		token: extractToken,
 	});
 
 	return {
