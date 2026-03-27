@@ -8,11 +8,12 @@ import {
 	useEffect,
 	useState,
 } from "react";
+
 import {
 	type AuthResType,
-	getWithAccessToken,
+	type AuthStatusReturnType,
+	get,
 	post,
-	saveToken,
 } from "./api/main";
 import { PathProvider } from "./auth/provider";
 import { config } from "./config";
@@ -25,13 +26,24 @@ type RegisterSchemaType = Pick<UserType, "name" | "email"> & {
 
 type LoginSchemaType = Omit<RegisterSchemaType, "name">;
 
+const isError = (value: unknown): value is Error =>
+	value instanceof Error ||
+	(!!value &&
+		typeof value === "object" &&
+		"message" in value &&
+		"name" in value);
+
 type GuardContextType = {
 	user: GuardUserType | null;
+	token: string | null;
 	error: Error | null;
 	loading: boolean;
+	fetching: boolean;
 	login: (data: LoginSchemaType) => Promise<void>;
 	register: (data: RegisterSchemaType) => Promise<void>;
 	logout: () => Promise<void>;
+	refreshToken: () => Promise<{ token: string }>;
+	reqWithToken: <T>(cb: (token: string) => Promise<T>) => Promise<T>;
 };
 
 const GuardContext = createContext<GuardContextType | null>(null);
@@ -42,51 +54,128 @@ type GuardProviderPropsType = {
 
 const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 	const [user, setUser] = useState<GuardContextType["user"]>(null);
+	const [token, setToken] = useState<GuardContextType["token"]>(null);
 	const [loading, setLoading] = useState(false);
+	const [fetching, setFetching] = useState(false);
 	const [error, setError] = useState<Error | null>(null);
 
-	const req = useCallback(async (cb: () => Promise<AuthResType>) => {
-		setLoading(true);
+	useEffect(() => {
+		const checkAuth = async () => {
+			setLoading(true);
+			try {
+				const status = await get<AuthStatusReturnType>({
+					base: config.base,
+					url: "status",
+				});
+
+				if (status.authenticated) {
+					setToken(status.token);
+					setUser(status.user);
+				}
+			} catch (e) {
+				console.error("Auth check failed:", e);
+				setUser(null);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		checkAuth();
+	}, []);
+
+	const refreshToken = useCallback(async () => {
+		setFetching(true);
 		setError(null);
 
 		try {
-			const { user, token } = await cb();
-
-			saveToken(token);
-			setUser(user);
+			const { token } = await get<{
+				token: string;
+			}>({
+				base: config.base,
+				url: "refresh",
+			});
+			setToken(token);
+			return {
+				token,
+			};
 		} catch (e) {
-			if (e && typeof e === "object" && "message" in e && "name" in e) {
-				setError(e as Error);
+			if (isError(e)) {
+				setError(e);
 			}
 			throw e;
 		} finally {
-			setLoading(false);
+			setFetching(false);
 		}
 	}, []);
 
-	const login = useCallback(
-		async (data: LoginSchemaType) => {
-			req(async () => {
-				return await post<AuthResType>({
-					body: data,
-					base: "http://localhost:8000",
-					url: "login",
-				});
-			});
+	const req = useCallback(async (cb: () => Promise<AuthResType>) => {
+		setFetching(true);
+		setError(null);
+
+		try {
+			const { user } = await cb();
+			setUser(user);
+		} catch (e) {
+			if (isError(e)) {
+				setError(e);
+			} else {
+				throw e;
+			}
+		} finally {
+			setFetching(false);
+		}
+	}, []);
+
+	const reqWithToken = useCallback(
+		async <T,>(cb: (token: string) => Promise<T>) => {
+			setFetching(true);
+			setError(null);
+
+			try {
+				let currenToken = token;
+				if (!currenToken) {
+					currenToken = (await refreshToken()).token;
+				}
+				return await cb(currenToken);
+			} catch (e) {
+				if (!isError(e)) {
+					throw e;
+				}
+
+				if (e.name !== "AuthExpiredError") {
+					throw e;
+				}
+
+				const { token: newToken } = await refreshToken();
+				return await cb(newToken);
+			} finally {
+				setFetching(false);
+			}
 		},
+		[token, refreshToken],
+	);
+
+	const login = useCallback(
+		(data: LoginSchemaType) =>
+			req(async () =>
+				post<AuthResType>({
+					body: data,
+					base: config.base,
+					url: "login",
+				}),
+			),
 		[req],
 	);
 
 	const register = useCallback(
-		async (data: RegisterSchemaType) => {
-			req(async () => {
-				return await post<AuthResType>({
+		(data: RegisterSchemaType) =>
+			req(async () =>
+				post<AuthResType>({
 					body: data,
-					base: "http://localhost:8000",
+					base: config.base,
 					url: "register",
-				});
-			});
-		},
+				}),
+			),
 		[req],
 	);
 
@@ -106,27 +195,19 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 		}
 	}, []);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: on init only
-	useEffect(() => {
-		if (localStorage.getItem(config.refresh)) {
-			req(() =>
-				getWithAccessToken<AuthResType>({
-					base: "http://localhost:8000",
-					url: "me",
-				}),
-			);
-		}
-	}, []);
-
 	return (
 		<GuardContext
 			value={{
 				user,
+				token,
 				error,
 				loading,
+				fetching,
 				login,
 				register,
 				logout,
+				refreshToken,
+				reqWithToken,
 			}}
 		>
 			{children}

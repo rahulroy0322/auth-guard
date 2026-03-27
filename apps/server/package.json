@@ -19,6 +19,7 @@
 	"dependencies": {
 		"@auth-guard/express": "workspace:^",
 		"biome-config": "workspace:^",
+		"cookie-parser": "^1.4.7",
 		"cors": "^2.8.6",
 		"dotenv": "^17.3.1",
 		"drizzle-orm": "^0.45.1",
@@ -32,6 +33,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.4.8",
+		"@types/cookie-parser": "^1.4.10",
 		"@types/cors": "^2.8.19",
 		"@types/express": "^5.0.6",
 		"@types/pg": "^8.18.0",

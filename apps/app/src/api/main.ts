@@ -1,5 +1,4 @@
 import type { UserType } from "base";
-import { config } from "../config";
 
 type SuccessType<T> = {
 	success: true;
@@ -42,6 +41,7 @@ const req = async <T>({
 			"content-type": "application/json",
 			...(headers || {}),
 		},
+		credentials: "include",
 		method,
 		body: (props as ReqPostType).body
 			? JSON.stringify((props as ReqPostType).body)
@@ -56,6 +56,19 @@ const req = async <T>({
 	return data.data;
 };
 
+type SafeUserType = Omit<UserType, "password">;
+
+type AuthStatusReturnType =
+	| {
+			authenticated: true;
+			token: string;
+			user: SafeUserType;
+	  }
+	| {
+			authenticated: false;
+			user: null;
+	  };
+
 const get = <T>(params: Omit<ReqGetType, "method">) =>
 	req<T>({
 		method: "GET",
@@ -68,81 +81,10 @@ const post = <T>(params: Omit<ReqPostType, "method">) =>
 		...params,
 	});
 
-const reqWithAccessToken = async <T>(params: Parameters<typeof req>[0]) => {
-	try {
-		return await req<T>({
-			...params,
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem(config.access)}`,
-				...params.headers,
-			},
-		});
-	} catch (e) {
-		if (
-			e &&
-			typeof e === "object" &&
-			"name" in e &&
-			e.name === "AuthExpiredError"
-		) {
-			const { token } = await req<AuthResType>({
-				base: params.base,
-				url: "refresh",
-				body: {},
-				method: "POST",
-				headers: {
-					Authorization: `Bearer ${localStorage.getItem(config.refresh)}`,
-				},
-			});
-
-			saveToken(token);
-
-			return await req<T>({
-				...params,
-				headers: {
-					Authorization: `Bearer ${localStorage.getItem(config.access)}`,
-					...params.headers,
-				},
-			});
-		}
-		throw e;
-	}
-
-	// 	try {
-	// 		console.log(
-	// 			params
-	// 		);
-
-	// 		return await req<T>({
-
-	// 		})
-	// 	} catch (e) {
-
-	// }
-};
-const getWithAccessToken = <T>(params: Omit<ReqGetType, "method">) =>
-	reqWithAccessToken<T>({
-		method: "GET",
-		...params,
-	});
-
 type AuthResType = {
-	user: Omit<UserType, "password">;
-	token?: TokenType;
+	user: SafeUserType;
 };
 
-type TokenType = {
-	refresh?: string;
-	access: string;
-};
+export type { AuthResType, AuthStatusReturnType };
 
-const saveToken = (token: Partial<TokenType> | undefined) => {
-	if (token?.refresh) {
-		localStorage.setItem(config.refresh, token.refresh);
-	}
-	if (token?.access) {
-		localStorage.setItem(config.access, token.access);
-	}
-};
-
-export type { AuthResType };
-export { get, getWithAccessToken, post, req, saveToken };
+export { get, post };

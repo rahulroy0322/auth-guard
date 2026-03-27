@@ -4,10 +4,12 @@ import type { AuthExpressReturnType } from "./types";
 const authRouter = (props: AuthExpressReturnType) => {
 	const authRouter: Router = Router();
 
+	authRouter.get("/status", props.authStatus);
+
 	authRouter.post("/register", props.register);
 	authRouter.post("/login", props.login);
 
-	authRouter.post("/refresh", props.tokenRefresh);
+	authRouter.get("/refresh", props.tokenRefresh);
 
 	authRouter.post("/start-verification", props.startVerification);
 	authRouter

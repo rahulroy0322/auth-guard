@@ -19,30 +19,14 @@ const options = {
 const init: AuthExpressType = ({ cookie, ...props }) => {
 	const coreApi = core(props);
 
-	const setAuthCookie = (
-		res: Response,
-		{
-			access,
-			refresh,
-		}: {
-			refresh?: string;
-			access: string;
-		},
-	) => {
-		res.cookie(cookie.access, access, {
+	const setAuthCookie = (res: Response, refreshToken: string) => {
+		res.cookie(cookie.refresh, refreshToken, {
 			...options,
-			expires: new Date(Date.now() + 1000 * props.jwt.expires.access),
+			expires: new Date(Date.now() + 1000 * props.jwt.expires.refresh),
 		});
-		if (refresh) {
-			res.cookie(cookie.refresh, refresh, {
-				...options,
-				expires: new Date(Date.now() + 1000 * props.jwt.expires.refresh),
-			});
-		}
 	};
 	const clearAuthCookie = (res: Response) => {
-		res.clearCookie(cookie.access);
-		res.clearCookie(cookie.access);
+		res.clearCookie(cookie.refresh);
 	};
 
 	const register: RequestHandler = async (req, res) => {
@@ -62,15 +46,18 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 	const login: RequestHandler = async (req, res) => {
 		const data = loginSchema.parse(req.body || {});
 
-		const { token, user } = await coreApi.login(data);
+		const {
+			token: { access, refresh },
+			user,
+		} = await coreApi.login(data);
 
-		setAuthCookie(res, token);
+		setAuthCookie(res, refresh);
 
 		res.status(200).json({
 			success: true,
 			data: {
 				user,
-				token,
+				token: access,
 			},
 		} satisfies ResType);
 	};
@@ -99,29 +86,35 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 			...req.query,
 		});
 
-		const { token, user } = await coreApi.verifieAccount(data);
+		const {
+			token: { access, refresh },
+			user,
+		} = await coreApi.verifieAccount(data);
 
-		setAuthCookie(res, token);
+		setAuthCookie(res, refresh);
 
 		res.status(200).json({
 			success: true,
 			data: {
 				user,
-				token,
+				token: access,
 			},
 		} satisfies ResType);
 	};
 
 	const tokenRefresh: RequestHandler = async (req, res) => {
-		const { token, user } = await coreApi.tokenRefresh(req);
+		const {
+			token: { access, refresh },
+		} = await coreApi.tokenRefresh(req);
 
-		setAuthCookie(res, token);
+		if (refresh) {
+			setAuthCookie(res, refresh);
+		}
 
 		res.status(200).json({
 			success: true,
 			data: {
-				user,
-				token,
+				token: access,
 			},
 		} satisfies ResType);
 	};
@@ -198,15 +191,18 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 			...req.query,
 		});
 
-		const { token, user } = await coreApi.resetPassword(data);
+		const {
+			token: { access, refresh },
+			user,
+		} = await coreApi.resetPassword(data);
 
-		setAuthCookie(res, token);
+		setAuthCookie(res, refresh);
 
 		res.status(200).json({
 			success: true,
 			data: {
 				user,
-				token,
+				token: access,
 			},
 		} satisfies ResType);
 	};
@@ -218,15 +214,18 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 			})
 			.parse(req.body || {});
 
-		const { token, user } = await coreApi.changePassword(req, data.password);
+		const {
+			token: { access, refresh },
+			user,
+		} = await coreApi.changePassword(req, data.password);
 
-		setAuthCookie(res, token);
+		setAuthCookie(res, refresh);
 
 		res.status(200).json({
 			success: true,
 			data: {
 				user,
-				token,
+				token: access,
 			},
 		} satisfies ResType);
 	};
@@ -248,6 +247,32 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		} satisfies ResType);
 	};
 
+	const authStatus: RequestHandler = async (req, res) => {
+		const status = await coreApi.authStatus(req);
+
+		if (status.user) {
+			if (status.token.refresh) {
+				setAuthCookie(res, status.token.refresh);
+			}
+			res.status(200).json({
+				success: true,
+				data: {
+					authenticated: true,
+					token: status.token.access,
+					user: status.user,
+				},
+			} satisfies ResType);
+		} else {
+			res.status(200).json({
+				success: true,
+				data: {
+					authenticated: false,
+					user: null,
+				},
+			} satisfies ResType);
+		}
+	};
+
 	return {
 		login,
 		register,
@@ -262,6 +287,7 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		loginRequired,
 		changePassword,
 		changeName,
+		authStatus,
 	};
 };
 

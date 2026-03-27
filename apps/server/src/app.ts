@@ -1,3 +1,4 @@
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { type Express, json, urlencoded } from "express";
 import ENV from "./config/env.config";
@@ -10,8 +11,11 @@ const app: Express = express();
 app.use(
 	cors({
 		origin: ENV.FRONTEND_URLS,
+		credentials: true,
 	}),
 );
+app.use(cookieParser());
+
 app.use(json());
 app.use(
 	urlencoded({

@@ -1,6 +1,5 @@
 const config = {
-	refresh: "REFRESH_TOKEN",
-	access: "ACCESS_TOKEN",
+	base: "http://localhost:8000",
 };
 
 window.config = config;

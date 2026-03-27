@@ -6,16 +6,17 @@ import { logger } from "../logger/pino";
 import * as User from "../services/user.service";
 
 const extractAccessToken = (req: Request) =>
-	req.cookies?.["auth-access"] ||
-	req.headers.authorization ||
-	(req.headers.token as string) ||
-	null;
+	req.headers.authorization || (req.headers.token as string) || null;
 
-const extractRefreshToken = (req: Request) =>
-	req.cookies?.["auth-refresh"] ||
-	req.headers.authorization ||
-	(req.headers.token as string) ||
-	null;
+const extractRefreshToken = (req: Request) => {
+	const token: string | null = req.cookies?.["auth-refresh"];
+
+	if (!token) {
+		return null;
+	}
+
+	return `Bearer ${token}`;
+};
 
 const guard = auth({
 	cookie: {
