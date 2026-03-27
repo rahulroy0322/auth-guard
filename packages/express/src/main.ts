@@ -250,8 +250,6 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 	const authStatus: RequestHandler = async (req, res) => {
 		const status = await coreApi.authStatus(req);
 
-		console.log(status);
-
 		if (status.user) {
 			if (status.token.refresh) {
 				setAuthCookie(res, status.token.refresh);

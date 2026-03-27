@@ -138,24 +138,16 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 				}
 				return await cb(currenToken);
 			} catch (e) {
-				if (isError(e) && e.name === "AuthExpiredError") {
-					try {
-						const { token: newToken } = await refreshToken();
-						return await cb(newToken);
-					} catch (retryError) {
-						if (isError(retryError)) {
-							setError(retryError);
-						}
-
-						throw retryError;
-					}
+				if (!isError(e)) {
+					throw e;
 				}
 
-				if (isError(e)) {
-					setError(e);
+				if (e.name !== "AuthExpiredError") {
+					throw e;
 				}
 
-				throw e;
+				const { token: newToken } = await refreshToken();
+				return await cb(newToken);
 			} finally {
 				setFetching(false);
 			}

@@ -9,10 +9,7 @@ const extractAccessToken = (req: Request) =>
 	req.headers.authorization || (req.headers.token as string) || null;
 
 const extractRefreshToken = (req: Request) => {
-	const token: string =
-		req.cookies?.["auth-refresh"] ||
-		req.headers.authorization ||
-		(req.headers.token as string);
+	const token: string | null = req.cookies?.["auth-refresh"];
 
 	if (!token) {
 		return null;

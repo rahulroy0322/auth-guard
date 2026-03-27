@@ -177,7 +177,7 @@ type ChangeNameType = (
 ) => Promise<ChangeNameReturnType>;
 
 type AuthStatusReturnType =
-	| LoginReturnType
+	| TokenRefreshReturnType
 	| {
 			user: false;
 	  };
