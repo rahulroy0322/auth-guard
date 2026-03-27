@@ -164,28 +164,26 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 	);
 
 	const login = useCallback(
-		async (data: LoginSchemaType) => {
-			await req(async () => {
-				return await post<AuthResType>({
+		(data: LoginSchemaType) =>
+			req(async () =>
+				post<AuthResType>({
 					body: data,
 					base: config.base,
 					url: "login",
-				});
-			});
-		},
+				}),
+			),
 		[req],
 	);
 
 	const register = useCallback(
-		async (data: RegisterSchemaType) => {
-			await req(async () => {
-				return await post<AuthResType>({
+		(data: RegisterSchemaType) =>
+			req(async () =>
+				post<AuthResType>({
 					body: data,
 					base: config.base,
 					url: "register",
-				});
-			});
-		},
+				}),
+			),
 		[req],
 	);
 
