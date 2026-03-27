@@ -38,7 +38,7 @@ const updatePasswordSchema = z
 		confirm: passwordSchema,
 	})
 	.refine((data) => data.password === data.confirm, {
-		message: "Password don't match",
+		message: "Passwords don't match",
 		path: ["confirm"],
 	});
 
