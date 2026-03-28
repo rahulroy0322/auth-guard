@@ -21,6 +21,7 @@ const authRouter = (props: AuthExpressReturnType) => {
 	authRouter.patch("/reset-password", props.resetPassword);
 	authRouter.patch("/change-password", props.changePassword);
 	authRouter.patch("/change-name", props.changeName);
+	authRouter.patch("/remove-avatar", props.removeAvatar);
 
 	authRouter.get("/me", props.checkAuth, props.loginRequired, props.me);
 

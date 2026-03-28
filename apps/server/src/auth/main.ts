@@ -3,6 +3,7 @@ import type { Request } from "express";
 import { redis } from "../cache/main";
 import ENV from "../config/env.config";
 import { logger } from "../logger/pino";
+import * as Avatar from "../services/avatar.service";
 import * as User from "../services/user.service";
 
 const extractAccessToken = (req: Request) =>
@@ -48,6 +49,7 @@ const guard = auth({
 
 		remove: (key) => redis.del(key) as unknown as Promise<void>,
 	},
+	Avatar,
 	Mail: {
 		sendMail: async (code) => {
 			// TODO! temp not prod ready

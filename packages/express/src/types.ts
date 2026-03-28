@@ -1,4 +1,4 @@
-import type { AuthPropsType } from "@auth-guard/backend/types";
+import type { AuthPropsType } from "@auth-guard/backend/types/index";
 import type { UserType } from "base";
 import type { RequestHandler } from "express";
 
@@ -45,7 +45,8 @@ type AuthExpressReturnType = Record<
 	| "resetPassword"
 	| "changePassword"
 	| "changeName"
-	| "authStatus",
+	| "authStatus"
+	| "removeAvatar",
 	RequestHandler
 >;
 
@@ -59,5 +60,5 @@ declare global {
 	}
 }
 
-export type * from "@auth-guard/backend/types";
+export type * from "@auth-guard/backend/types/index";
 export type { AuthExpressReturnType, AuthExpressType, ResType };

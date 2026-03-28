@@ -1,14 +1,13 @@
 import type { UserType } from "base";
-
-type SafeUser = Omit<UserType, "password">;
+import type { SafeUserType } from "../types";
 
 // biome-ignore lint/complexity/noStaticOnlyClass: ts error
 class UserSanitizer {
 	static removePassword(
-		user: Omit<UserType, "password"> & {
+		user: SafeUserType & {
 			password?: UserType["password"];
 		},
-	): SafeUser {
+	): SafeUserType {
 		const { password, ...safeUser } = user;
 		return safeUser;
 	}

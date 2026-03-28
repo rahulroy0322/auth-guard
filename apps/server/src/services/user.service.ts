@@ -1,34 +1,12 @@
 import type { AuthPropsType } from "@auth-guard/express/types";
 import type { UserType } from "base";
-import { eq, isNull, type SQL, type TableConfig } from "drizzle-orm";
-import type { PgTable } from "drizzle-orm/pg-core";
+import { eq, type SQL } from "drizzle-orm";
 import { db } from "../db/main";
 import { Avatar } from "../db/schema/avatar";
 import { User } from "../db/schema/user";
+import { checkNull } from "./utils";
 
 type UserModelType = AuthPropsType["User"];
-
-const checkNull = <T extends PgTable<TableConfig>>({
-	data,
-	key,
-	Table,
-}: {
-	data: null | unknown;
-	key: keyof T;
-	Table: T;
-}) => {
-	if (!data) {
-		return isNull(
-			// @ts-expect-error
-			Table[key],
-		);
-	}
-	return eq(
-		// @ts-expect-error
-		Table[key],
-		data,
-	);
-};
 
 const findUsers = async ({
 	filter = undefined,
@@ -77,8 +55,7 @@ const findByEmail: UserModelType["findByEmail"] = async (email) => {
 		limit: 1,
 		filter: checkNull({
 			data: email,
-			key: "email",
-			Table: User,
+			key: User.email,
 		}),
 	});
 
