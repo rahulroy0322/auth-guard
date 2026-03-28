@@ -2,7 +2,7 @@ import type { IncomingMessage } from "node:http";
 import type { AvatarType } from "base";
 import type { SafeUserType } from "./auth";
 
-type AvaterModelType = {
+type AvatarModelType = {
 	findActiveByUserId: (
 		userId: AvatarType["userId"],
 	) => Promise<AvatarType | null>;
@@ -28,10 +28,8 @@ type RemoveAvatarType = (
 	req: IncomingMessage,
 ) => Promise<RemoveAvatarReturnType>;
 
-// Loged-in
-// Model
 export type {
-	AvaterModelType,
+	AvatarModelType,
 	NewAvatarReturnType,
 	NewAvatarType,
 	RemoveAvatarReturnType,

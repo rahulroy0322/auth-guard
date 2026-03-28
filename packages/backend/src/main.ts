@@ -73,7 +73,7 @@ const init: AuthType = ({
 		token: extractToken,
 	});
 
-	const avaterService = new AvatarService({
+	const avatarService = new AvatarService({
 		logger,
 		avatar: Avatar,
 		session: sessionService,
@@ -85,12 +85,12 @@ const init: AuthType = ({
 		login: authService.login,
 		logout: sessionService.logout,
 
-		// loged-in
+		// logged-in
 		changePassword: profileService.changePassword,
 		changeName: profileService.changeName,
 		authStatus: sessionService.authStatus,
-		newAvatar: avaterService.newAvatar,
-		removeAvatar: avaterService.removeAvatar,
+		newAvatar: avatarService.newAvatar,
+		removeAvatar: avatarService.removeAvatar,
 
 		// register
 		startVerification: verificationService.startVerification,

@@ -1,6 +1,6 @@
 import { AuthBadError } from "../error";
 import type {
-	AvaterModelType,
+	AvatarModelType,
 	NewAvatarReturnType,
 	NewAvatarType,
 	RemoveAvatarReturnType,
@@ -13,7 +13,7 @@ import { BaseService } from "./base.service";
 import type { SessionService } from "./session.service";
 
 class AvatarService extends BaseService {
-	private readonly avatar: AvaterModelType;
+	private readonly avatar: AvatarModelType;
 	private readonly session: SessionService;
 	constructor({
 		logger,
@@ -21,7 +21,7 @@ class AvatarService extends BaseService {
 		session,
 	}: {
 		logger: SmartLogger;
-		avatar: AvaterModelType;
+		avatar: AvatarModelType;
 		session: SessionService;
 	}) {
 		super(logger);
@@ -57,7 +57,7 @@ class AvatarService extends BaseService {
 
 		this.logger.trace({
 			reqId,
-			msg: "Createing new avatar",
+			msg: "Creating new avatar",
 		});
 		const avatar = await this.avatar.create({
 			active: true,
@@ -97,7 +97,7 @@ class AvatarService extends BaseService {
 
 		this.logger.trace({
 			reqId,
-			msg: "Checking Avatar exist",
+			msg: "Checking Avatar exists",
 		});
 		const avatar = await this.avatar.findActiveByUserId(user.id);
 
@@ -114,7 +114,7 @@ class AvatarService extends BaseService {
 			) {
 				this.logger.trace({
 					reqId,
-					msg: "Avatar  remove successful",
+					msg: "Avatar remove successful",
 				});
 			}
 		}

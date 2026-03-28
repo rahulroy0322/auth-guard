@@ -13,7 +13,7 @@ import type {
 	VerifieAccountType,
 } from "./auth";
 import type {
-	AvaterModelType,
+	AvatarModelType,
 	NewAvatarType,
 	RemoveAvatarType,
 } from "./avater";
@@ -30,7 +30,7 @@ import type { TokenConfigType } from "./token";
 
 type AuthPropsType = {
 	User: UserModelType;
-	Avatar: AvaterModelType;
+	Avatar: AvatarModelType;
 	Cache: CacheConfigType;
 	Mail: MailConfigType;
 	extractToken: TokenConfigType;
@@ -51,7 +51,7 @@ type AuthReturnType = {
 	// auth state
 	checkAuth: CheckAuthType;
 	loginRequired: LoginRequiredType;
-	// loged-in
+	// logged-in
 	logout: LogoutType;
 	tokenRefresh: TokenRefreshType;
 	changeName: ChangeNameType;

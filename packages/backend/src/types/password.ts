@@ -26,8 +26,6 @@ type ChangePasswordType = (
 	password: string,
 ) => Promise<ChangePasswordReturnType>;
 
-// Loged-in
-// Auth
 export type {
 	ChangePasswordReturnType,
 	ChangePasswordType,
