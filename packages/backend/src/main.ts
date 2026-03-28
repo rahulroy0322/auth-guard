@@ -1,5 +1,5 @@
 import { AuthService } from "./services/auth.service";
-import { AvaterService } from "./services/avatar.service";
+import { AvatarService } from "./services/avatar.service";
 import { PasswordService } from "./services/password.service";
 import { ProfileService } from "./services/profile.service";
 import { SessionService } from "./services/session.service";
@@ -73,7 +73,7 @@ const init: AuthType = ({
 		token: extractToken,
 	});
 
-	const avaterService = new AvaterService({
+	const avaterService = new AvatarService({
 		logger,
 		avatar: Avatar,
 		session: sessionService,
@@ -104,7 +104,7 @@ const init: AuthType = ({
 		checkAuth: sessionService.checkAuth,
 		loginRequired: sessionService.loginRequired,
 		tokenRefresh: sessionService.tokenRefresh,
-	} satisfies AuthReturnType as AuthReturnType;
+	} satisfies AuthReturnType;
 };
 
 const auth = init;

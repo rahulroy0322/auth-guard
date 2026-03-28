@@ -1,35 +1,13 @@
 import type { AuthPropsType } from "@auth-guard/express/types";
 import type { AvatarType } from "base";
-import { and, eq, isNull, type SQL, type TableConfig } from "drizzle-orm";
-import type { PgTable } from "drizzle-orm/pg-core";
+import { and, eq, type SQL } from "drizzle-orm";
 import { db } from "../db/main";
 import { Avatar } from "../db/schema/avatar";
+import { checkNull } from "./utils";
 
 type AvatarModelType = AuthPropsType["Avatar"];
 
-const checkNull = <T extends PgTable<TableConfig>>({
-	data,
-	key,
-	Table,
-}: {
-	data: null | unknown;
-	key: keyof T;
-	Table: T;
-}) => {
-	if (!data) {
-		return isNull(
-			// @ts-expect-error
-			Table[key],
-		);
-	}
-	return eq(
-		// @ts-expect-error
-		Table[key],
-		data,
-	);
-};
-
-const findUsers = async ({
+const findAvatars = async ({
 	filter = undefined,
 	limit = undefined,
 }: {
@@ -50,35 +28,34 @@ const findUsers = async ({
 const findActiveByUserId: AvatarModelType["findActiveByUserId"] = async (
 	userId,
 ) => {
-	const [user = null] = await findUsers({
+	const [avatar = null] = await findAvatars({
 		limit: 1,
 		filter: and(
 			checkNull({
 				data: userId,
-				key: "userId",
-				Table: Avatar,
+				key: Avatar.userId,
 			}),
 			eq(Avatar.active, true),
 		),
 	});
 
-	return user;
+	return avatar;
 };
 
 const create: AvatarModelType["create"] = async (data) => {
-	const [user = null] = await db.insert(Avatar).values(data).returning();
+	const [avatar = null] = await db.insert(Avatar).values(data).returning();
 
-	return user;
+	return avatar;
 };
 
 const updateById: AvatarModelType["updateById"] = async (id, data) => {
-	const [user = null] = await db
+	const [avatar = null] = await db
 		.update(Avatar)
 		.set(data)
 		.where(eq(Avatar.id, id))
 		.returning();
 
-	return user;
+	return avatar;
 };
 
 export { create, findActiveByUserId, updateById };

@@ -1,3 +1,4 @@
+import { AuthBadError } from "../error";
 import type {
 	AvaterModelType,
 	NewAvatarReturnType,
@@ -11,7 +12,7 @@ import { UserSanitizer } from "../utils/user-sanitizer";
 import { BaseService } from "./base.service";
 import type { SessionService } from "./session.service";
 
-class AvaterService extends BaseService {
+class AvatarService extends BaseService {
 	private readonly avatar: AvaterModelType;
 	private readonly session: SessionService;
 	constructor({
@@ -63,6 +64,14 @@ class AvaterService extends BaseService {
 			src: url,
 			userId: user.id,
 		});
+		if (!avatar) {
+			this.logger.error({
+				msg: "Failed to create avatar",
+				reqId,
+				user,
+			});
+			throw new AuthBadError("Failed to create avatar");
+		}
 
 		this.logger.info({
 			reqId,
@@ -113,10 +122,10 @@ class AvaterService extends BaseService {
 		return {
 			user: UserSanitizer.removePassword({
 				...user,
-				avatar,
+				avatar: null,
 			}),
 		};
 	};
 }
 
-export { AvaterService };
+export { AvatarService };
