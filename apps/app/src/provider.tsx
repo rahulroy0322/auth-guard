@@ -130,27 +130,39 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 		async <T,>(cb: (token: string) => Promise<T>) => {
 			setFetching(true);
 			setError(null);
-
+			let data: T | null = null
 			try {
 				let currenToken = token;
 				if (!currenToken) {
 					currenToken = (await refreshToken()).token;
 				}
-				return await cb(currenToken);
+				data = await cb(currenToken);
 			} catch (e) {
 				if (!isError(e)) {
 					throw e;
 				}
 
-				if (e.name !== "AuthExpiredError") {
+				if (e?.name !== "AuthExpiredError") {
 					throw e;
 				}
 
 				const { token: newToken } = await refreshToken();
-				return await cb(newToken);
+				data = await cb(newToken);
 			} finally {
 				setFetching(false);
 			}
+
+			if (data) {
+				if (typeof data === 'object') {
+					if ('user' in data) {
+						setUser(data.user as UserType)
+					}
+					if ('token' in data) {
+						setToken(data.token as string)
+					}
+				}
+			}
+			return data
 		},
 		[token, refreshToken],
 	);

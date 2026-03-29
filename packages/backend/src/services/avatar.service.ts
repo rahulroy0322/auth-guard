@@ -1,8 +1,8 @@
 import { AuthBadError } from "../error";
 import type {
 	AvatarModelType,
+	NewAvatarPropsType,
 	NewAvatarReturnType,
-	NewAvatarType,
 	RemoveAvatarReturnType,
 	RemoveAvatarType,
 } from "../types";
@@ -30,14 +30,9 @@ class AvatarService extends BaseService {
 	}
 
 	public newAvatar = async (
-		req: Parameters<NewAvatarType>[0],
-		{ url }: Parameters<NewAvatarType>[1],
+		{ url, reqId, user }: NewAvatarPropsType,
 	): Promise<NewAvatarReturnType> => {
-		const reqId = genReqId();
-
 		this.logger.trace({ reqId, msg: "Starting new avatar" });
-
-		const { user } = await this.session.loginRequired(req);
 
 		this.logger.trace({
 			reqId,

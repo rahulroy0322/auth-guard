@@ -1,11 +1,10 @@
 import { AuthBadError } from "../error";
 import type {
-	ChangeNameReturnType,
-	ChangeNameType,
 	ChangePasswordReturnType,
 	ChangePasswordType,
 	JwtConfigType,
 	TokenConfigType,
+	UpdateProfileType,
 	UserModelType,
 } from "../types";
 import { hashPassword } from "../utils/password";
@@ -16,35 +15,41 @@ import type { TokenHelper } from "../utils/token-helpers";
 import { UserSanitizer } from "../utils/user-sanitizer";
 import { BaseService } from "./base.service";
 import type { SessionService } from "./session.service";
+import { AvatarService } from "./avatar.service";
 
 class ProfileService extends BaseService {
-	private readonly User: UserModelType;
-	private readonly Helper: TokenHelper;
-	private readonly Session: SessionService;
+	private readonly user: UserModelType;
+	private readonly helper: TokenHelper;
+	private readonly session: SessionService;
+	private readonly avatar: AvatarService;
+
 	private readonly banManager: TokenBanManager;
 	private readonly token: TokenConfigType;
 	constructor(
 		private readonly jwtConfig: JwtConfigType,
 		{
 			logger,
-			User,
-			Helper,
-			Session,
+			user,
+			helper,
+			session,
+			avatar,
 			banManager,
 			token,
 		}: {
 			logger: SmartLogger;
-			User: UserModelType;
-			Helper: TokenHelper;
-			Session: SessionService;
+			user: UserModelType;
+			helper: TokenHelper;
+			session: SessionService;
+			avatar: AvatarService;
 			banManager: TokenBanManager;
 			token: TokenConfigType;
 		},
 	) {
 		super(logger);
-		this.User = User;
-		this.Helper = Helper;
-		this.Session = Session;
+		this.user = user;
+		this.helper = helper;
+		this.session = session;
+		this.avatar = avatar
 		this.banManager = banManager;
 		this.token = token;
 	}
@@ -57,7 +62,7 @@ class ProfileService extends BaseService {
 
 		this.logger.trace({ reqId, msg: "Starting change password" });
 
-		const { user } = await this.Session.loginRequired(req);
+		const { user } = await this.session.loginRequired(req);
 
 		this.logger.trace({
 			reqId,
@@ -68,7 +73,7 @@ class ProfileService extends BaseService {
 
 		this.logger.trace({ reqId, msg: "Changing user Password" });
 
-		await this.User.updateById(user.id, { password });
+		await this.user.updateById(user.id, { password });
 
 		this.logger.trace({ reqId, msg: "Extracting tokens to ban" });
 		const [, accessToken] = (this.token.access(req) || "").split(" ");
@@ -94,7 +99,7 @@ class ProfileService extends BaseService {
 
 		this.banManager.banMultiple(tokensToBan, reqId);
 
-		const token = this.Helper.signTokens(user, reqId);
+		const token = this.helper.signTokens(user, reqId);
 
 		this.logger.info({
 			reqId,
@@ -108,48 +113,46 @@ class ProfileService extends BaseService {
 		};
 	};
 
-	public changeName = async (
-		req: Parameters<ChangeNameType>[0],
-		name: Parameters<ChangeNameType>[1],
-	): Promise<ChangeNameReturnType> => {
-		const reqId = genReqId();
+	public updateProfile = async (req: Parameters<UpdateProfileType>[0], { name, url, id }: Parameters<UpdateProfileType>[1]) => {
+		const reqId = genReqId()
 
-		this.logger.trace({ reqId, msg: "Starting change name" });
+		this.logger.trace({ reqId, msg: "Starting update profile" });
 
-		const { user } = await this.Session.loginRequired(req);
-
-		this.logger.trace({
-			reqId,
-			msg: "Updating user name",
-			extra: { userId: user.id, newName: name },
-		});
-
-		const updated = await this.User.updateById(user.id, { name });
-
-		if (!updated) {
-			this.logger.error({
-				reqId,
-				msg: "Failed to update user name",
-				user,
-			});
-			throw new AuthBadError("Name change failed");
+		if (!name && !id && !url) {
+			throw new AuthBadError('Give Something to update')
 		}
 
-		const updatedUser = {
-			...user,
-			...updated,
-		};
+		const { user } = await this.session.loginRequired(req, { reqId });
+
+		let avatar = user.avatar
+
+		if (url) {
+			avatar = (await this.avatar.newAvatar({
+				url, reqId, user
+			})).user.avatar
+		}
+		// ! impl else if(id){}
+
+		if (name) {
+			this.logger.trace({ reqId, msg: "Update name" });
+			await this.user.updateById(user.id, {
+				name
+			})
+		}
 
 		this.logger.info({
 			reqId,
-			msg: "Name changed successful:)",
-			user: updatedUser,
+			msg: "Profile Update successful",
+			user: user,
 		});
 
 		return {
-			user: UserSanitizer.removePassword(updatedUser),
-		};
-	};
+			user: UserSanitizer.removePassword({
+				...user,
+				avatar
+			})
+		}
+	}
 }
 
 export { ProfileService };

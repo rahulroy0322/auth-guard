@@ -6,7 +6,7 @@ import {
 } from "@remixicon/react";
 import { useAppForm } from "form";
 import { type FC, type ReactNode, useEffect, useState } from "react";
-import { type UpdatePasswordSchemaType, updatePasswordSchema } from "schema";
+import { type UpdatePasswordSchemaType, updatePasswordSchema, updateProfileSchema } from "schema";
 import { Avatar } from "ui/components/avatar";
 import {
 	AlertDialog,
@@ -55,16 +55,17 @@ import {
 	TabsTrigger,
 } from "ui/components/ui/tabs";
 
-import { patch } from "../api/main";
+import { patch, patchMultiPart } from "../api/main";
 import { config } from "../config";
 import { useGuard } from "../provider";
+import { ProfileAvatar } from "./avatar";
 
 type UpdatePasswordPropsType = {
 	closeModal: () => void;
 };
 
 const UpdatePassword: FC<UpdatePasswordPropsType> = ({ closeModal }) => {
-	const { reqWithToken, fetching, refreshToken } = useGuard();
+	const { reqWithToken, fetching } = useGuard();
 	const [updating, setUpdating] = useState(false);
 
 	const handleUpdatePassword = async ({
@@ -82,8 +83,6 @@ const UpdatePassword: FC<UpdatePasswordPropsType> = ({ closeModal }) => {
 					},
 				}),
 			);
-			// just to resfresh accecc token
-			await refreshToken();
 			closeModal();
 		} catch (error) {
 			console.error("Failed to update password:", error);
@@ -241,6 +240,7 @@ const UpdateProfile: FC<UpdateProfilePropsType> = ({
 	url,
 	closeModal,
 }) => {
+	const { reqWithToken, fetching } = useGuard();
 	const [name, setName] = useState(prevName);
 	const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
@@ -254,12 +254,64 @@ const UpdateProfile: FC<UpdateProfilePropsType> = ({
 			return () => URL.revokeObjectURL(objectUrl);
 		}
 		setFileUrl(url || "");
-		return () => {};
+		return () => { };
 	}, [avatarFile, url]);
 
-	const handleSave = () => {
-		// TODO!
-		closeModal();
+	const handleSave = async () => {
+		if (avatarFile) {
+			if (!(avatarFile instanceof File)) {
+				toast.error('Invalid Avatar')
+				return
+			}
+
+			const { success, error } = updateProfileSchema.safeParse({
+				name: name,
+				profileImage: {
+					originalname: avatarFile.name,
+					mimetype: avatarFile.type,
+					size: avatarFile.size,
+				}
+			})
+
+			if (!success) {
+				toast.error(error.name, {
+					description: error.issues.reduce((acc, val) => {
+
+						acc.push(`"${val.path.join('.')}"-${val.message}`)
+
+						return acc
+					}, [] as string[]).join(',')
+				})
+				return
+			}
+		}
+
+		const formData = new FormData()
+
+		if (avatarFile) {
+			formData.set('profileImage', avatarFile)
+		}
+		if (name !== prevName) {
+			formData.set('name', name)
+		}
+
+		try {
+			await reqWithToken((token) => patchMultiPart({
+				base: config.base,
+				url: "profile",
+				body: formData,
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}));
+			toast.success('Profile Updated Succesfully')
+			closeModal();
+		} catch (error) {
+			console.error("Failed to update profile:", error);
+			toast.error((error as Error).name, {
+				description: (error as Error).message,
+			});
+		}
 	};
 
 	return (
@@ -276,6 +328,7 @@ const UpdateProfile: FC<UpdateProfilePropsType> = ({
 						</FieldLabel>
 					</FieldContent>
 					<Button
+						disabled={fetching}
 						variant={"outline"}
 						nativeButton={false}
 						render={
@@ -310,17 +363,19 @@ const UpdateProfile: FC<UpdateProfilePropsType> = ({
 							setName(e.target.value);
 						}}
 						value={name}
+						disabled={fetching}
 					/>
 				</Field>
 			</CardContent>
 			<CardFooter className="flex items-center gap-2 justify-end">
 				<Button
 					onClick={handleSave}
-					disabled={(prevName === name && !avatarFile) || !name}
+					disabled={fetching || (prevName === name && !avatarFile) || !name}
 				>
 					Save
 				</Button>
-				<Button onClick={closeModal} variant="outline">
+				<Button onClick={closeModal}
+					disabled={fetching} variant="outline">
 					Cancel
 				</Button>
 			</CardFooter>
@@ -363,7 +418,7 @@ const Profile: FC = () => {
 				) : (
 					<>
 						<div className="flex items-center">
-							<Avatar src={user.avatar?.src} name={user.name} />
+							<ProfileAvatar user={user} />
 							<span>{user.name}</span>
 						</div>
 						<Button
@@ -436,12 +491,12 @@ const ProfileButton: FC = () => {
 		<UserManagemant>
 			<DropdownMenu>
 				<DropdownMenuTrigger>
-					<Avatar src={user.avatar?.src} name={user.name} />
+					<ProfileAvatar user={user}/>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className="min-w-80 p-0">
 					<DropdownMenuGroup className="*:p-2 *:rounded-none">
 						<DropdownMenuItem className="bg-transparent!">
-							<Avatar src={user.avatar?.src} name={user.name} />
+							<ProfileAvatar user={user} />
 							<div>
 								<h2 className="font-bold">{user.name}</h2>
 								<DropdownMenuLabel className="text-left p-0">

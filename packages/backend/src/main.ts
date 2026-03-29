@@ -4,7 +4,7 @@ import { PasswordService } from "./services/password.service";
 import { ProfileService } from "./services/profile.service";
 import { SessionService } from "./services/session.service";
 import { VerificationService } from "./services/verification.service";
-import type { AuthReturnType, AuthType } from "./types";
+import type { AuthReturnType, AuthType } from "./types/index";
 import { SmartLogger } from "./utils/smart-logger";
 import { TokenBanManager } from "./utils/token-ban";
 import { TokenHelper } from "./utils/token-helpers";
@@ -19,7 +19,7 @@ const init: AuthType = ({
 	extractToken,
 	jwt,
 	logger: mainLogger,
-}) => {
+}): AuthReturnType => {
 	const logger = new SmartLogger(mainLogger);
 
 	const validator = new UserValidator(logger);
@@ -64,19 +64,20 @@ const init: AuthType = ({
 		Token: extractToken,
 	});
 
-	const profileService = new ProfileService(jwt, {
-		logger,
-		Helper: helper,
-		User,
-		Session: sessionService,
-		banManager,
-		token: extractToken,
-	});
-
 	const avatarService = new AvatarService({
 		logger,
 		avatar: Avatar,
 		session: sessionService,
+	});
+
+	const profileService = new ProfileService(jwt, {
+		logger,
+		helper,
+		user: User,
+		session: sessionService,
+		avatar: avatarService,
+		banManager,
+		token: extractToken,
 	});
 
 	return {
@@ -87,10 +88,9 @@ const init: AuthType = ({
 
 		// logged-in
 		changePassword: profileService.changePassword,
-		changeName: profileService.changeName,
 		authStatus: sessionService.authStatus,
-		newAvatar: avatarService.newAvatar,
 		removeAvatar: avatarService.removeAvatar,
+		updateProfile: profileService.updateProfile,
 
 		// register
 		startVerification: verificationService.startVerification,

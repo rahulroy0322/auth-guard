@@ -1,9 +1,7 @@
 import type { AvatarType } from "base";
-import { eq } from "drizzle-orm";
 import {
 	boolean,
 	pgTable,
-	uniqueIndex,
 	uuid,
 	varchar,
 } from "drizzle-orm/pg-core";
@@ -23,11 +21,6 @@ const Avatar = pgTable(
 			.notNull(),
 		...defaults,
 	},
-	(table) => [
-		uniqueIndex("one_active_avatar_per_user")
-			.on(table.userId)
-			.where(eq(table.active, true)),
-	],
 ) satisfies { $inferSelect: AvatarType };
 
 export { Avatar };

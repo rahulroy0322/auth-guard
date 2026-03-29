@@ -5,9 +5,11 @@ import {
 	loginSchema,
 	registerSchema,
 	resetPasswordSchema,
+	updateProfileSchema,
 	verifieSchema,
 } from "schema";
-import type { AuthExpressType, ResType } from "./types";
+import type { AuthExpressType, ResType, UpdateProfileType } from "./types";
+import { unlink } from "node:fs/promises";
 
 const options = {
 	sameSite: "strict",
@@ -230,14 +232,36 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		} satisfies ResType);
 	};
 
-	const changeName: RequestHandler = async (req, res) => {
-		const data = registerSchema
-			.pick({
-				name: true,
-			})
-			.parse(req.body || {});
+	const updateProfile: RequestHandler = async (req, res) => {
+		const { data, success, error } = updateProfileSchema.safeParse({
+			profileImage: req.file,
+			name: req.body.name,
+		});
 
-		const { user } = await coreApi.changeName(req, data.name);
+		if (!success) {
+			if (req.file?.path) {
+				await unlink(req.file.path);
+			}
+
+			throw error
+		}
+
+		const _data = {} as Parameters<UpdateProfileType>[1]
+
+		if (data.name) {
+			_data.name = data.name
+		}
+
+		if (data.profileImage) {
+			_data.url = `/avatar/${req.file?.filename}`
+		}
+
+		console.log({
+			_data
+		});
+
+
+		const { user } = await coreApi.updateProfile(req, _data);
 
 		res.status(200).json({
 			success: true,
@@ -298,7 +322,7 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		checkAuth,
 		loginRequired,
 		changePassword,
-		changeName,
+		updateProfile,
 		authStatus,
 	};
 };

@@ -1,6 +1,5 @@
 import type {
 	AuthStatusType,
-	ChangeNameType,
 	CheckAuthType,
 	LoginRequiredType,
 	LoginType,
@@ -9,12 +8,12 @@ import type {
 	SafeUserType,
 	StartVerificationType,
 	TokenRefreshType,
+	UpdateProfileType,
 	UserModelType,
 	VerifieAccountType,
 } from "./auth";
 import type {
 	AvatarModelType,
-	NewAvatarType,
 	RemoveAvatarType,
 } from "./avater";
 import type { CacheConfigType } from "./cache";
@@ -54,11 +53,11 @@ type AuthReturnType = {
 	// logged-in
 	logout: LogoutType;
 	tokenRefresh: TokenRefreshType;
-	changeName: ChangeNameType;
 	authStatus: AuthStatusType;
 	// avatar
-	newAvatar: NewAvatarType;
 	removeAvatar: RemoveAvatarType;
+	// profile
+	updateProfile: UpdateProfileType
 };
 type AuthType = (props: AuthPropsType) => AuthReturnType;
 

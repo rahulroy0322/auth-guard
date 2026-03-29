@@ -47,6 +47,7 @@ type CheckAuthType = (
 type LoginRequiredReturnType = Pick<LoginReturnType, "user">;
 type LoginRequiredType = (
 	req: IncomingMessage,
+	extra?: { reqId?: string }
 ) => Promise<LoginRequiredReturnType>;
 
 type TokenRefreshReturnType = Pick<LoginReturnType, "user"> & {
@@ -76,24 +77,26 @@ type VerifieAccountType = (
 	data: VerifieAccountPropsType,
 ) => Promise<LoginReturnType>;
 
-type ChangeNameReturnType = Omit<LoginReturnType, "token">;
-type ChangeNameType = (
+type UpdateProfileReturnType = Omit<LoginReturnType, "token">;
+type UpdateProfileType = (
 	req: IncomingMessage,
-	name: string,
-) => Promise<ChangeNameReturnType>;
+	data: Partial<{
+		name: string,
+		url: string
+		id: string
+	}>,
+) => Promise<UpdateProfileReturnType>;
 
 type AuthStatusReturnType =
 	| TokenRefreshReturnType
 	| {
-			user: false;
-	  };
+		user: false;
+	};
 type AuthStatusType = (req: IncomingMessage) => Promise<AuthStatusReturnType>;
 
 export type {
 	AuthStatusReturnType,
 	AuthStatusType,
-	ChangeNameReturnType,
-	ChangeNameType,
 	CheckAuthReturnType,
 	CheckAuthType,
 	LoginPropsType,
@@ -115,4 +118,6 @@ export type {
 	VerifieAccountPropsType,
 	VerifieAccountReturnType,
 	VerifieAccountType,
+	UpdateProfileReturnType,
+	UpdateProfileType
 };

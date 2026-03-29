@@ -27,28 +27,30 @@ type ReqPostType = ReqDefType & {
 	body: Record<string, unknown>;
 };
 
+type ReqPostMultiPartType = Omit<ReqPostType, 'body'> & {
+	body: FormData
+}
+
 type ReqParamsType = ReqGetType | ReqPostType;
 
-const req = async <T>({
+
+const reqImpl = async <T>({
 	base,
 	url,
 	method,
 	headers,
-	...props
-}: ReqParamsType) => {
+	body
+}: Omit<ReqParamsType, 'body'> & {
+	body?: string | FormData
+}) => {
 	const res = await fetch(`${base}/api/v1/auth/${url}`, {
-		headers: {
-			"content-type": "application/json",
-			...(headers || {}),
-		},
+		headers,
 		credentials: "include",
 		method,
-		body: (props as ReqPostType).body
-			? JSON.stringify((props as ReqPostType).body)
-			: undefined,
+		body,
 	});
 	const data = (await res.json()) as ResType<T>;
-
+	
 	if (!data.success) {
 		throw data.error;
 	}
@@ -56,18 +58,38 @@ const req = async <T>({
 	return data.data;
 };
 
+const reqMultiPart = <T>(props: ReqPostMultiPartType) => reqImpl<T>(props as ReqPostType & {
+	body: FormData
+})
+
+const req = <T>({
+	headers,
+	...props
+}: ReqParamsType) => reqImpl<T>({
+	...props,
+	headers: {
+		"content-type": "application/json",
+		...(headers || {}),
+	},
+	...((props as ReqPostType).body ? {
+		body: JSON.stringify((props as ReqPostType).body)
+	} : {})
+} as Omit<ReqParamsType, 'body'> & {
+	body?: string
+})
+
 type SafeUserType = Omit<UserType, "password">;
 
 type AuthStatusReturnType =
 	| {
-			authenticated: true;
-			token: string;
-			user: SafeUserType;
-	  }
+		authenticated: true;
+		token: string;
+		user: SafeUserType;
+	}
 	| {
-			authenticated: false;
-			user: null;
-	  };
+		authenticated: false;
+		user: null;
+	};
 
 const get = <T>(params: Omit<ReqGetType, "method">) =>
 	req<T>({
@@ -87,10 +109,18 @@ const patch = <T>(params: Omit<ReqPostType, "method">) =>
 		...params,
 	});
 
+
+const patchMultiPart = <T>(params: Omit<ReqPostMultiPartType, 'method'>) =>
+	reqMultiPart<T>({
+		method: "PATCH",
+		...params,
+	});
+
+
 type AuthResType = {
 	user: SafeUserType;
 };
 
 export type { AuthResType, AuthStatusReturnType };
 
-export { get, patch, post };
+export { get, patch, post, patchMultiPart };

@@ -1,4 +1,4 @@
-import type { AuthPropsType } from "@auth-guard/backend/types/index";
+import type { AuthPropsType, AuthReturnType } from "@auth-guard/backend/types/index";
 import type { UserType } from "base";
 import type { RequestHandler } from "express";
 
@@ -12,43 +12,27 @@ type AuthExpressPropsType = AuthPropsType & {
 type ResType = {
 	success: true;
 	data:
-		| {
-				user?: Omit<UserType, "password">;
-				token?: string;
-		  }
-		| {
-				id?: string;
-				message: string;
-		  }
-		| {
-				authenticated: true;
-				token: string;
-				user: Omit<UserType, "password">;
-		  }
-		| {
-				authenticated: false;
-				user: null;
-		  };
+	| {
+		user?: Omit<UserType, "password">;
+		token?: string;
+	}
+	| {
+		id?: string;
+		message: string;
+	}
+	| {
+		authenticated: true;
+		token: string;
+		user: Omit<UserType, "password">;
+	}
+	| {
+		authenticated: false;
+		user: null;
+	};
 };
 
 type AuthExpressReturnType = Record<
-	| "login"
-	| "register"
-	| "checkAuth"
-	| "loginRequired"
-	| "tokenRefresh"
-	| "me"
-	| "logout"
-	| "startVerification"
-	| "verifieAccount"
-	| "forgotPassword"
-	| "resetPassword"
-	| "changePassword"
-	| "changeName"
-	| "authStatus"
-	| "removeAvatar",
-	RequestHandler
->;
+	keyof AuthReturnType | 'me', RequestHandler>
 
 type AuthExpressType = (props: AuthExpressPropsType) => AuthExpressReturnType;
 
