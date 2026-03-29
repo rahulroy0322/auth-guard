@@ -12,10 +12,7 @@ import type {
 	UserModelType,
 	VerifieAccountType,
 } from "./auth";
-import type {
-	AvatarModelType,
-	RemoveAvatarType,
-} from "./avater";
+import type { AvatarModelType, RemoveAvatarType } from "./avater";
 import type { CacheConfigType } from "./cache";
 import type { JwtConfigType } from "./jwt";
 import type { LoggerType } from "./log";
@@ -57,7 +54,7 @@ type AuthReturnType = {
 	// avatar
 	removeAvatar: RemoveAvatarType;
 	// profile
-	updateProfile: UpdateProfileType
+	updateProfile: UpdateProfileType;
 };
 type AuthType = (props: AuthPropsType) => AuthReturnType;
 

@@ -29,9 +29,11 @@ class AvatarService extends BaseService {
 		this.session = session;
 	}
 
-	public newAvatar = async (
-		{ url, reqId, user }: NewAvatarPropsType,
-	): Promise<NewAvatarReturnType> => {
+	public newAvatar = async ({
+		url,
+		reqId,
+		user,
+	}: NewAvatarPropsType): Promise<NewAvatarReturnType> => {
 		this.logger.trace({ reqId, msg: "Starting new avatar" });
 
 		this.logger.trace({

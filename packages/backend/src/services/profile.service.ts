@@ -13,9 +13,9 @@ import type { SmartLogger } from "../utils/smart-logger";
 import type { TokenBanManager } from "../utils/token-ban";
 import type { TokenHelper } from "../utils/token-helpers";
 import { UserSanitizer } from "../utils/user-sanitizer";
+import type { AvatarService } from "./avatar.service";
 import { BaseService } from "./base.service";
 import type { SessionService } from "./session.service";
-import { AvatarService } from "./avatar.service";
 
 class ProfileService extends BaseService {
 	private readonly user: UserModelType;
@@ -49,7 +49,7 @@ class ProfileService extends BaseService {
 		this.user = user;
 		this.helper = helper;
 		this.session = session;
-		this.avatar = avatar
+		this.avatar = avatar;
 		this.banManager = banManager;
 		this.token = token;
 	}
@@ -113,31 +113,38 @@ class ProfileService extends BaseService {
 		};
 	};
 
-	public updateProfile = async (req: Parameters<UpdateProfileType>[0], { name, url, id }: Parameters<UpdateProfileType>[1]) => {
-		const reqId = genReqId()
+	public updateProfile = async (
+		req: Parameters<UpdateProfileType>[0],
+		{ name, url, id }: Parameters<UpdateProfileType>[1],
+	) => {
+		const reqId = genReqId();
 
 		this.logger.trace({ reqId, msg: "Starting update profile" });
 
 		if (!name && !id && !url) {
-			throw new AuthBadError('Give Something to update')
+			throw new AuthBadError("Give Something to update");
 		}
 
 		const { user } = await this.session.loginRequired(req, { reqId });
 
-		let avatar = user.avatar
+		let avatar = user.avatar;
 
 		if (url) {
-			avatar = (await this.avatar.newAvatar({
-				url, reqId, user
-			})).user.avatar
+			avatar = (
+				await this.avatar.newAvatar({
+					url,
+					reqId,
+					user,
+				})
+			).user.avatar;
 		}
 		// ! impl else if(id){}
 
 		if (name) {
 			this.logger.trace({ reqId, msg: "Update name" });
 			await this.user.updateById(user.id, {
-				name
-			})
+				name,
+			});
 		}
 
 		this.logger.info({
@@ -149,10 +156,10 @@ class ProfileService extends BaseService {
 		return {
 			user: UserSanitizer.removePassword({
 				...user,
-				avatar
-			})
-		}
-	}
+				avatar,
+			}),
+		};
+	};
 }
 
 export { ProfileService };

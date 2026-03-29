@@ -18,14 +18,12 @@ type AvatarModelType = {
 };
 
 type NewAvatarPropsType = {
-	url: string,
-	reqId: string
-	user: SafeUserType
-}
+	url: string;
+	reqId: string;
+	user: SafeUserType;
+};
 type NewAvatarReturnType = Omit<{ user: SafeUserType }, "token">;
-type NewAvatarType = (
-	data: NewAvatarPropsType
-) => Promise<NewAvatarReturnType>;
+type NewAvatarType = (data: NewAvatarPropsType) => Promise<NewAvatarReturnType>;
 
 type RemoveAvatarReturnType = NewAvatarReturnType;
 type RemoveAvatarType = (
@@ -35,8 +33,8 @@ type RemoveAvatarType = (
 export type {
 	AvatarModelType,
 	NewAvatarPropsType,
-	NewAvatarType,
 	NewAvatarReturnType,
+	NewAvatarType,
 	RemoveAvatarReturnType,
 	RemoveAvatarType,
 };

@@ -130,7 +130,7 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 		async <T,>(cb: (token: string) => Promise<T>) => {
 			setFetching(true);
 			setError(null);
-			let data: T | null = null
+			let data: T | null = null;
 			try {
 				let currenToken = token;
 				if (!currenToken) {
@@ -153,16 +153,16 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 			}
 
 			if (data) {
-				if (typeof data === 'object') {
-					if ('user' in data) {
-						setUser(data.user as UserType)
+				if (typeof data === "object") {
+					if ("user" in data) {
+						setUser(data.user as UserType);
 					}
-					if ('token' in data) {
-						setToken(data.token as string)
+					if ("token" in data) {
+						setToken(data.token as string);
 					}
 				}
 			}
-			return data
+			return data;
 		},
 		[token, refreshToken],
 	);

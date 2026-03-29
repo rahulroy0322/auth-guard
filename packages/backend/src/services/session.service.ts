@@ -86,10 +86,10 @@ class SessionService extends BaseService {
 
 	public loginRequired = async (
 		req: Parameters<LoginRequiredType>[0],
-		{ reqId }: Parameters<LoginRequiredType>[1] = {}
+		{ reqId }: Parameters<LoginRequiredType>[1] = {},
 	): Promise<LoginRequiredReturnType> => {
 		if (!reqId) {
-			reqId = genReqId()
+			reqId = genReqId();
 		}
 
 		const { user } = await this.checkAuth(req, reqId);

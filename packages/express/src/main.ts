@@ -1,3 +1,4 @@
+import { unlink } from "node:fs/promises";
 import { init as core } from "@auth-guard/backend";
 import { AuthServerError } from "@auth-guard/backend/error";
 import type { RequestHandler, Response } from "express";
@@ -9,7 +10,6 @@ import {
 	verifieSchema,
 } from "schema";
 import type { AuthExpressType, ResType, UpdateProfileType } from "./types";
-import { unlink } from "node:fs/promises";
 
 const options = {
 	sameSite: "strict",
@@ -243,23 +243,22 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 				await unlink(req.file.path);
 			}
 
-			throw error
+			throw error;
 		}
 
-		const _data = {} as Parameters<UpdateProfileType>[1]
+		const _data = {} as Parameters<UpdateProfileType>[1];
 
 		if (data.name) {
-			_data.name = data.name
+			_data.name = data.name;
 		}
 
 		if (data.profileImage) {
-			_data.url = `/avatar/${req.file?.filename}`
+			_data.url = `/avatar/${req.file?.filename}`;
 		}
 
 		console.log({
-			_data
+			_data,
 		});
-
 
 		const { user } = await coreApi.updateProfile(req, _data);
 

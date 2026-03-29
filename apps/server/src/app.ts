@@ -15,9 +15,7 @@ app.use(
 	}),
 );
 app.use(cookieParser());
-app.use(
-	express.static('uploads')
-)
+app.use(express.static("uploads"));
 
 app.use(json());
 app.use(

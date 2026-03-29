@@ -12,11 +12,13 @@ const ACCEPTED_IMAGE_TYPES = [
 ] as const;
 
 const updateProfileSchema = z.object({
-	profileImage: z.object({
-		originalname: z.string(),
-		mimetype: z.enum(ACCEPTED_IMAGE_TYPES),
-		size: z.number().max(MAX_FILE_SIZE, "File size must be less than 2MB"),
-	}).optional(),
+	profileImage: z
+		.object({
+			originalname: z.string(),
+			mimetype: z.enum(ACCEPTED_IMAGE_TYPES),
+			size: z.number().max(MAX_FILE_SIZE, "File size must be less than 2MB"),
+		})
+		.optional(),
 	name: z.string().optional(),
 });
 
@@ -24,8 +26,4 @@ type UpdateProfileSchemaType = z.infer<typeof updateProfileSchema>;
 
 export type { UpdateProfileSchemaType };
 
-export {
-	updateProfileSchema,
-	ACCEPTED_IMAGE_TYPES,
-	MAX_FILE_SIZE
-};
+export { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE, updateProfileSchema };

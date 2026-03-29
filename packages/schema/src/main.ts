@@ -1,7 +1,4 @@
-
-export type { UpdatePasswordSchemaType } from './auth'
-export type { UpdateProfileSchemaType } from './file'
-
+export type { UpdatePasswordSchemaType } from "./auth";
 export {
 	loginSchema,
 	passwordSchema,
@@ -9,6 +6,11 @@ export {
 	resetPasswordSchema,
 	updatePasswordSchema,
 	verifieSchema,
-} from './auth'
+} from "./auth";
+export type { UpdateProfileSchemaType } from "./file";
 
-export { ACCEPTED_IMAGE_TYPES, updateProfileSchema, MAX_FILE_SIZE } from './file'
+export {
+	ACCEPTED_IMAGE_TYPES,
+	MAX_FILE_SIZE,
+	updateProfileSchema,
+} from "./file";

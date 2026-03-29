@@ -27,21 +27,20 @@ type ReqPostType = ReqDefType & {
 	body: Record<string, unknown>;
 };
 
-type ReqPostMultiPartType = Omit<ReqPostType, 'body'> & {
-	body: FormData
-}
+type ReqPostMultiPartType = Omit<ReqPostType, "body"> & {
+	body: FormData;
+};
 
 type ReqParamsType = ReqGetType | ReqPostType;
-
 
 const reqImpl = async <T>({
 	base,
 	url,
 	method,
 	headers,
-	body
-}: Omit<ReqParamsType, 'body'> & {
-	body?: string | FormData
+	body,
+}: Omit<ReqParamsType, "body"> & {
+	body?: string | FormData;
 }) => {
 	const res = await fetch(`${base}/api/v1/auth/${url}`, {
 		headers,
@@ -50,7 +49,7 @@ const reqImpl = async <T>({
 		body,
 	});
 	const data = (await res.json()) as ResType<T>;
-	
+
 	if (!data.success) {
 		throw data.error;
 	}
@@ -58,38 +57,41 @@ const reqImpl = async <T>({
 	return data.data;
 };
 
-const reqMultiPart = <T>(props: ReqPostMultiPartType) => reqImpl<T>(props as ReqPostType & {
-	body: FormData
-})
+const reqMultiPart = <T>(props: ReqPostMultiPartType) =>
+	reqImpl<T>(
+		props as ReqPostType & {
+			body: FormData;
+		},
+	);
 
-const req = <T>({
-	headers,
-	...props
-}: ReqParamsType) => reqImpl<T>({
-	...props,
-	headers: {
-		"content-type": "application/json",
-		...(headers || {}),
-	},
-	...((props as ReqPostType).body ? {
-		body: JSON.stringify((props as ReqPostType).body)
-	} : {})
-} as Omit<ReqParamsType, 'body'> & {
-	body?: string
-})
+const req = <T>({ headers, ...props }: ReqParamsType) =>
+	reqImpl<T>({
+		...props,
+		headers: {
+			"content-type": "application/json",
+			...(headers || {}),
+		},
+		...((props as ReqPostType).body
+			? {
+					body: JSON.stringify((props as ReqPostType).body),
+				}
+			: {}),
+	} as Omit<ReqParamsType, "body"> & {
+		body?: string;
+	});
 
 type SafeUserType = Omit<UserType, "password">;
 
 type AuthStatusReturnType =
 	| {
-		authenticated: true;
-		token: string;
-		user: SafeUserType;
-	}
+			authenticated: true;
+			token: string;
+			user: SafeUserType;
+	  }
 	| {
-		authenticated: false;
-		user: null;
-	};
+			authenticated: false;
+			user: null;
+	  };
 
 const get = <T>(params: Omit<ReqGetType, "method">) =>
 	req<T>({
@@ -109,13 +111,11 @@ const patch = <T>(params: Omit<ReqPostType, "method">) =>
 		...params,
 	});
 
-
-const patchMultiPart = <T>(params: Omit<ReqPostMultiPartType, 'method'>) =>
+const patchMultiPart = <T>(params: Omit<ReqPostMultiPartType, "method">) =>
 	reqMultiPart<T>({
 		method: "PATCH",
 		...params,
 	});
-
 
 type AuthResType = {
 	user: SafeUserType;
@@ -123,4 +123,4 @@ type AuthResType = {
 
 export type { AuthResType, AuthStatusReturnType };
 
-export { get, patch, post, patchMultiPart };
+export { get, patch, patchMultiPart, post };

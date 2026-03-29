@@ -6,7 +6,11 @@ import {
 } from "@remixicon/react";
 import { useAppForm } from "form";
 import { type FC, type ReactNode, useEffect, useState } from "react";
-import { type UpdatePasswordSchemaType, updatePasswordSchema, updateProfileSchema } from "schema";
+import {
+	type UpdatePasswordSchemaType,
+	updatePasswordSchema,
+	updateProfileSchema,
+} from "schema";
 import { Avatar } from "ui/components/avatar";
 import {
 	AlertDialog,
@@ -254,14 +258,14 @@ const UpdateProfile: FC<UpdateProfilePropsType> = ({
 			return () => URL.revokeObjectURL(objectUrl);
 		}
 		setFileUrl(url || "");
-		return () => { };
+		return () => {};
 	}, [avatarFile, url]);
 
 	const handleSave = async () => {
 		if (avatarFile) {
 			if (!(avatarFile instanceof File)) {
-				toast.error('Invalid Avatar')
-				return
+				toast.error("Invalid Avatar");
+				return;
 			}
 
 			const { success, error } = updateProfileSchema.safeParse({
@@ -270,41 +274,44 @@ const UpdateProfile: FC<UpdateProfilePropsType> = ({
 					originalname: avatarFile.name,
 					mimetype: avatarFile.type,
 					size: avatarFile.size,
-				}
-			})
+				},
+			});
 
 			if (!success) {
 				toast.error(error.name, {
-					description: error.issues.reduce((acc, val) => {
+					description: error.issues
+						.reduce((acc, val) => {
+							acc.push(`"${val.path.join(".")}"-${val.message}`);
 
-						acc.push(`"${val.path.join('.')}"-${val.message}`)
-
-						return acc
-					}, [] as string[]).join(',')
-				})
-				return
+							return acc;
+						}, [] as string[])
+						.join(","),
+				});
+				return;
 			}
 		}
 
-		const formData = new FormData()
+		const formData = new FormData();
 
 		if (avatarFile) {
-			formData.set('profileImage', avatarFile)
+			formData.set("profileImage", avatarFile);
 		}
 		if (name !== prevName) {
-			formData.set('name', name)
+			formData.set("name", name);
 		}
 
 		try {
-			await reqWithToken((token) => patchMultiPart({
-				base: config.base,
-				url: "profile",
-				body: formData,
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			}));
-			toast.success('Profile Updated Succesfully')
+			await reqWithToken((token) =>
+				patchMultiPart({
+					base: config.base,
+					url: "profile",
+					body: formData,
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}),
+			);
+			toast.success("Profile Updated Succesfully");
 			closeModal();
 		} catch (error) {
 			console.error("Failed to update profile:", error);
@@ -374,8 +381,7 @@ const UpdateProfile: FC<UpdateProfilePropsType> = ({
 				>
 					Save
 				</Button>
-				<Button onClick={closeModal}
-					disabled={fetching} variant="outline">
+				<Button onClick={closeModal} disabled={fetching} variant="outline">
 					Cancel
 				</Button>
 			</CardFooter>
@@ -491,7 +497,7 @@ const ProfileButton: FC = () => {
 		<UserManagemant>
 			<DropdownMenu>
 				<DropdownMenuTrigger>
-					<ProfileAvatar user={user}/>
+					<ProfileAvatar user={user} />
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className="min-w-80 p-0">
 					<DropdownMenuGroup className="*:p-2 *:rounded-none">
