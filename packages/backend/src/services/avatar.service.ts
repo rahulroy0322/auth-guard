@@ -1,4 +1,5 @@
 import type { AvatarCacheModel } from "../cache/avatar";
+import type { ProfileCacheModel } from "../cache/profile";
 import { AuthBadError } from "../error";
 import type {
 	AvatarModelType,
@@ -16,21 +17,26 @@ import type { SessionService } from "./session.service";
 class AvatarService extends BaseService {
 	private readonly avatar: AvatarModelType;
 	private readonly avatarCache: AvatarCacheModel;
+	private readonly profileCache: ProfileCacheModel;
 	private readonly session: SessionService;
+
 	constructor({
 		logger,
 		avatar,
 		avatarCache,
+		profileCache,
 		session,
 	}: {
 		logger: SmartLogger;
 		avatar: AvatarModelType;
 		avatarCache: AvatarCacheModel;
+		profileCache: ProfileCacheModel;
 		session: SessionService;
 	}) {
 		super(logger);
 		this.avatar = avatar;
 		this.avatarCache = avatarCache;
+		this.profileCache = profileCache;
 		this.session = session;
 	}
 
@@ -82,12 +88,15 @@ class AvatarService extends BaseService {
 			msg: "Avatar create successful",
 			user,
 		});
+		const profiles = await this.profileCache.findByUserId(user.id, {
+			reqId,
+		});
+
 		return {
 			user: UserSanitizer.removePassword({
 				...user,
 				avatar,
-				// TODO!
-				profiles: [],
+				profiles,
 			}),
 		};
 	};
@@ -127,13 +136,15 @@ class AvatarService extends BaseService {
 				});
 			}
 		}
+		const profiles = await this.profileCache.findByUserId(user.id, {
+			reqId,
+		});
 
 		return {
 			user: UserSanitizer.removePassword({
 				...user,
 				avatar: null,
-				// TODO!
-				profiles: [],
+				profiles,
 			}),
 		};
 	};

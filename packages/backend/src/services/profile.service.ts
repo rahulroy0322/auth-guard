@@ -1,4 +1,6 @@
+import type { AvatarCacheModel } from "../cache/avatar";
 import type { CacheModel } from "../cache/base";
+import type { ProfileCacheModel } from "../cache/profile";
 import { AuthBadError } from "../error";
 import type {
 	ChangePasswordReturnType,
@@ -23,6 +25,8 @@ import type { SessionService } from "./session.service";
 class ProfileService extends BaseService {
 	private readonly user: Pick<UserModelType, "updateById">;
 	private readonly userCache: CacheModel<SafeUserType>;
+	private readonly avatarCache: AvatarCacheModel;
+	private readonly profileCache: ProfileCacheModel;
 	private readonly helper: TokenHelper;
 	private readonly session: SessionService;
 	private readonly avatar: AvatarService;
@@ -35,6 +39,8 @@ class ProfileService extends BaseService {
 			logger,
 			user,
 			userCache,
+			avatarCache,
+			profileCache,
 			helper,
 			session,
 			avatar,
@@ -44,6 +50,8 @@ class ProfileService extends BaseService {
 			logger: SmartLogger;
 			user: UserModelType;
 			userCache: CacheModel<SafeUserType>;
+			avatarCache: AvatarCacheModel;
+			profileCache: ProfileCacheModel;
 			helper: TokenHelper;
 			session: SessionService;
 			avatar: AvatarService;
@@ -54,6 +62,8 @@ class ProfileService extends BaseService {
 		super(logger);
 		this.user = user;
 		this.userCache = userCache;
+		this.avatarCache = avatarCache;
+		this.profileCache = profileCache;
 		this.helper = helper;
 		this.session = session;
 		this.avatar = avatar;
@@ -172,13 +182,22 @@ class ProfileService extends BaseService {
 			user: user,
 		});
 
+		const profiles = await this.profileCache.findByUserId(user.id, {
+			reqId,
+		});
+
+		if (!avatar) {
+			await this.avatarCache.destroyCacheData(user.id, {
+				reqId,
+			});
+		}
+
 		return {
 			user: UserSanitizer.removePassword({
 				...user,
 				name: name || user.name,
 				avatar,
-				// TODO!
-				profiles: [],
+				profiles,
 			}),
 		};
 	};

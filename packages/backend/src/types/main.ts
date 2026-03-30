@@ -22,11 +22,13 @@ import type {
 	ForgotPasswordType,
 	ResetPasswordType,
 } from "./password";
+import type { LoginWithProviderType, ProfileModelType } from "./profile";
 import type { TokenConfigType } from "./token";
 
 type AuthPropsType = {
 	User: UserModelType;
 	Avatar: AvatarModelType;
+	Profile: ProfileModelType;
 	Cache: CacheConfigType;
 	Mail: MailConfigType;
 	extractToken: TokenConfigType;
@@ -37,6 +39,7 @@ type AuthPropsType = {
 type AuthReturnType = {
 	// auth
 	login: LoginType;
+	loginWithProvider: LoginWithProviderType;
 	register: RegisterType;
 	startVerification: StartVerificationType;
 	verifieAccount: VerifieAccountType;

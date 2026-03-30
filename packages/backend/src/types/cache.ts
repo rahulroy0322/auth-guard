@@ -1,4 +1,4 @@
-type CacheKeysType = "token" | "code" | "user" | "avatar";
+type CacheKeysType = "token" | "code" | "user" | "avatar" | "profiles";
 type CacheKeyType = `${CacheKeysType}:${string}`;
 
 type CacheConfigType = {

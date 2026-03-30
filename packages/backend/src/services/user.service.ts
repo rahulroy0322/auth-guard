@@ -1,4 +1,5 @@
 import type { AvatarCacheModel } from "../cache/avatar";
+import type { ProfileCacheModel } from "../cache/profile";
 import type { UserCacheModel } from "../cache/user";
 import type { MailConfigType, UserModelType } from "../types";
 import type { SmartLogger } from "../utils/smart-logger";
@@ -14,6 +15,7 @@ class UserService extends CodeService {
 	>;
 	protected readonly userCache: UserCacheModel;
 	protected readonly avatarCache: AvatarCacheModel;
+	protected readonly profileCache: ProfileCacheModel;
 	protected readonly validator: UserValidator;
 	protected readonly helper: TokenHelper;
 	constructor({
@@ -21,6 +23,7 @@ class UserService extends CodeService {
 		user,
 		userCache,
 		avatarCache,
+		profileCache,
 		code,
 		mail,
 		validator,
@@ -30,6 +33,7 @@ class UserService extends CodeService {
 		user: UserModelType;
 		userCache: UserCacheModel;
 		avatarCache: AvatarCacheModel;
+		profileCache: ProfileCacheModel;
 		code: CodeManager;
 		mail: MailConfigType;
 		validator: UserValidator;
@@ -44,6 +48,7 @@ class UserService extends CodeService {
 		this.user = user;
 		this.userCache = userCache;
 		this.avatarCache = avatarCache;
+		this.profileCache = profileCache;
 		this.validator = validator;
 		this.helper = helper;
 	}

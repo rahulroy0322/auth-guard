@@ -1,5 +1,6 @@
 import type { IncomingMessage } from "node:http";
 import type { AvatarCacheModel } from "../cache/avatar";
+import type { ProfileCacheModel } from "../cache/profile";
 import type { UserCacheModel } from "../cache/user";
 import { AuthBadError, AuthNoTokenError } from "../error";
 import type {
@@ -23,6 +24,7 @@ import { BaseService } from "./base.service";
 class SessionService extends BaseService {
 	private readonly userCache: UserCacheModel;
 	private readonly avatarCache: AvatarCacheModel;
+	private readonly profileCache: ProfileCacheModel;
 	private readonly validator: UserValidator;
 	private readonly helper: TokenHelper;
 	private readonly token: TokenConfigType;
@@ -34,6 +36,7 @@ class SessionService extends BaseService {
 			logger,
 			userCache,
 			avatarCache,
+			profileCache,
 			validator,
 			helper,
 			token,
@@ -42,6 +45,7 @@ class SessionService extends BaseService {
 			logger: SmartLogger;
 			userCache: UserCacheModel;
 			avatarCache: AvatarCacheModel;
+			profileCache: ProfileCacheModel;
 			validator: UserValidator;
 			helper: TokenHelper;
 			token: TokenConfigType;
@@ -52,6 +56,7 @@ class SessionService extends BaseService {
 
 		this.userCache = userCache;
 		this.avatarCache = avatarCache;
+		this.profileCache = profileCache;
 		this.validator = validator;
 		this.helper = helper;
 		this.token = token;
@@ -277,12 +282,14 @@ class SessionService extends BaseService {
 		const avatar = await this.avatarCache.findByUserId(sanitizedUser.id, {
 			reqId,
 		});
+		const profiles = await this.profileCache.findByUserId(sanitizedUser.id, {
+			reqId,
+		});
 
 		return {
 			...sanitizedUser,
 			avatar,
-			// TODO!
-			profiles: [],
+			profiles,
 		};
 	};
 

@@ -96,6 +96,9 @@ class VerificationService extends UserService {
 		const avatar = await this.avatarCache.findByUserId(sanitizedUser.id, {
 			reqId,
 		});
+		const profiles = await this.profileCache.findByUserId(sanitizedUser.id, {
+			reqId,
+		});
 
 		const token = this.helper.signTokens(user, reqId);
 
@@ -110,8 +113,7 @@ class VerificationService extends UserService {
 			user: {
 				...sanitizedUser,
 				avatar,
-				// TODO!
-				profiles: [],
+				profiles,
 			},
 		};
 	};

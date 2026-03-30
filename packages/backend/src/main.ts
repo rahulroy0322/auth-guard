@@ -1,9 +1,11 @@
 import { AvatarCacheModel } from "./cache/avatar";
+import { ProfileCacheModel } from "./cache/profile";
 import { UserCacheModel } from "./cache/user";
 import { AuthService } from "./services/auth.service";
 import { AvatarService } from "./services/avatar.service";
 import { PasswordService } from "./services/password.service";
 import { ProfileService } from "./services/profile.service";
+import { ProviderService } from "./services/provider.service";
 import { SessionService } from "./services/session.service";
 import { VerificationService } from "./services/verification.service";
 import type { AuthReturnType, AuthType } from "./types/index";
@@ -17,6 +19,7 @@ import { CodeManager } from "./utils/verification-code";
 const init: AuthType = ({
 	User,
 	Avatar,
+	Profile,
 	Cache,
 	Mail,
 	extractToken,
@@ -55,6 +58,12 @@ const init: AuthType = ({
 		},
 		Cache,
 	);
+	const profileCache = new ProfileCacheModel(
+		"profiles",
+		logger,
+		Profile,
+		Cache,
+	);
 
 	const authService = new AuthService({
 		logger,
@@ -63,6 +72,7 @@ const init: AuthType = ({
 		mail: Mail,
 		userCache,
 		avatarCache,
+		profileCache,
 		user: User,
 		validator,
 	});
@@ -74,6 +84,7 @@ const init: AuthType = ({
 		mail: Mail,
 		userCache,
 		avatarCache,
+		profileCache,
 		user: User,
 		validator,
 	});
@@ -85,6 +96,7 @@ const init: AuthType = ({
 		mail: Mail,
 		userCache,
 		avatarCache,
+		profileCache,
 		user: User,
 		validator,
 	});
@@ -94,6 +106,7 @@ const init: AuthType = ({
 		helper,
 		userCache,
 		avatarCache,
+		profileCache,
 		validator,
 		banManager,
 		token: extractToken,
@@ -103,6 +116,7 @@ const init: AuthType = ({
 		logger,
 		avatar: Avatar,
 		avatarCache,
+		profileCache,
 		session: sessionService,
 	});
 
@@ -110,6 +124,8 @@ const init: AuthType = ({
 		logger,
 		helper,
 		userCache,
+		avatarCache,
+		profileCache,
 		user: User,
 		session: sessionService,
 		avatar: avatarService,
@@ -117,11 +133,26 @@ const init: AuthType = ({
 		token: extractToken,
 	});
 
+	const providerService = new ProviderService({
+		logger,
+		helper,
+		userCache,
+		avatarCache,
+		profileCache,
+		user: User,
+		profile: Profile,
+		avatar: avatarService,
+		code,
+		mail: Mail,
+		validator,
+	});
+
 	return {
 		// auth
 		register: authService.register,
 		login: authService.login,
 		logout: sessionService.logout,
+		loginWithProvider: providerService.loginWithProvider,
 
 		// logged-in
 		changePassword: profileService.changePassword,
