@@ -1,5 +1,5 @@
 import type { IncomingMessage } from "node:http";
-import type { UserType } from "base";
+import type { CacheModel } from "../cache.model";
 import { AuthBadError, AuthNoTokenError } from "../error";
 import type {
 	AuthStatusReturnType,
@@ -7,9 +7,9 @@ import type {
 	JwtConfigType,
 	LoginRequiredReturnType,
 	LoginRequiredType,
+	SafeUserType,
 	TokenConfigType,
 	TokenRefreshReturnType,
-	UserModelType,
 } from "../types";
 import { genReqId } from "../utils/request-id";
 import type { SmartLogger } from "../utils/smart-logger";
@@ -20,37 +20,37 @@ import type { UserValidator } from "../utils/user-validation";
 import { BaseService } from "./base.service";
 
 class SessionService extends BaseService {
-	private readonly User: UserModelType;
-	private readonly Validator: UserValidator;
-	private readonly Helper: TokenHelper;
-	private readonly Token: TokenConfigType;
-	private readonly BanManager: TokenBanManager;
+	private readonly userCache: CacheModel<SafeUserType>;
+	private readonly validator: UserValidator;
+	private readonly helper: TokenHelper;
+	private readonly token: TokenConfigType;
+	private readonly banManager: TokenBanManager;
 
 	constructor(
-		private readonly JWTConfig: JwtConfigType,
+		private readonly jwtConfig: JwtConfigType,
 		{
 			logger,
-			User,
-			Validator,
-			Helper,
-			Token,
-			BanManager,
+			userCache,
+			validator,
+			helper,
+			token,
+			banManager,
 		}: {
 			logger: SmartLogger;
-			User: UserModelType;
-			Validator: UserValidator;
-			Helper: TokenHelper;
-			Token: TokenConfigType;
-			BanManager: TokenBanManager;
+			userCache: CacheModel<SafeUserType>;
+			validator: UserValidator;
+			helper: TokenHelper;
+			token: TokenConfigType;
+			banManager: TokenBanManager;
 		},
 	) {
 		super(logger);
 
-		this.User = User;
-		this.Validator = Validator;
-		this.Helper = Helper;
-		this.Token = Token;
-		this.BanManager = BanManager;
+		this.userCache = userCache;
+		this.validator = validator;
+		this.helper = helper;
+		this.token = token;
+		this.banManager = banManager;
 	}
 
 	public checkAuth = async (
@@ -63,7 +63,7 @@ class SessionService extends BaseService {
 
 		this.logger.trace({ reqId, msg: "Checking authentication" });
 
-		const [, token] = (this.Token.access(req) || "").split(" ");
+		const [, token] = (this.token.access(req) || "").split(" ");
 
 		if (!token) {
 			return { user: null };
@@ -113,7 +113,7 @@ class SessionService extends BaseService {
 
 		this.logger.trace({ reqId, msg: "Starting token refresh" });
 
-		const [, token] = (this.Token.refresh(req) || "").split(" ");
+		const [, token] = (this.token.refresh(req) || "").split(" ");
 
 		if (!token) {
 			this.logger.error({
@@ -133,9 +133,9 @@ class SessionService extends BaseService {
 			type: "refresh",
 		});
 
-		const newTokens = this.Helper.signTokens(user, reqId);
+		const newTokens = this.helper.signTokens(user, reqId);
 
-		const shouldRotate = this.Helper.shouldRotateRefreshToken(exp);
+		const shouldRotate = this.helper.shouldRotateRefreshToken(exp);
 
 		if (!shouldRotate) {
 			delete (newTokens as Partial<typeof newTokens>).refresh;
@@ -166,7 +166,7 @@ class SessionService extends BaseService {
 
 		this.logger.trace({ reqId, msg: "Starting Auth Status" });
 
-		const [, token] = (this.Token.refresh(req) || "").split(" ");
+		const [, token] = (this.token.refresh(req) || "").split(" ");
 
 		if (!token) {
 			return {
@@ -183,9 +183,9 @@ class SessionService extends BaseService {
 			type: "refresh",
 		});
 
-		const newTokens = this.Helper.signTokens(user, reqId);
+		const newTokens = this.helper.signTokens(user, reqId);
 
-		const shouldRotate = this.Helper.shouldRotateRefreshToken(exp);
+		const shouldRotate = this.helper.shouldRotateRefreshToken(exp);
 
 		if (!shouldRotate) {
 			delete (newTokens as Partial<typeof newTokens>).refresh;
@@ -214,8 +214,8 @@ class SessionService extends BaseService {
 
 		this.logger.trace({ reqId, msg: "Processing logout" });
 
-		const [, accessToken] = (this.Token.access(req) || "").split(" ");
-		const [, refreshToken] = (this.Token.refresh(req) || "").split(" ");
+		const [, accessToken] = (this.token.access(req) || "").split(" ");
+		const [, refreshToken] = (this.token.refresh(req) || "").split(" ");
 
 		const tokensToBan: Array<{ token: string; expirySeconds: number }> = [];
 
@@ -223,7 +223,7 @@ class SessionService extends BaseService {
 			this.logger.trace({ reqId, msg: "Access Token found Banning it" });
 			tokensToBan.push({
 				token: accessToken,
-				expirySeconds: this.JWTConfig.expires.access,
+				expirySeconds: this.jwtConfig.expires.access,
 			});
 		}
 
@@ -231,12 +231,12 @@ class SessionService extends BaseService {
 			this.logger.trace({ reqId, msg: "Refresh Token found Banning it" });
 			tokensToBan.push({
 				token: refreshToken,
-				expirySeconds: this.JWTConfig.expires.refresh,
+				expirySeconds: this.jwtConfig.expires.refresh,
 			});
 		}
 
 		if (tokensToBan.length > 0) {
-			await this.BanManager.banMultiple(tokensToBan, reqId);
+			await this.banManager.banMultiple(tokensToBan, reqId);
 			this.logger.trace({
 				reqId,
 				msg: "Tokens banned",
@@ -256,14 +256,16 @@ class SessionService extends BaseService {
 	private findUserAndCheckBan = async (
 		userId: string,
 		reqId: string,
-	): Promise<UserType> => {
+	): Promise<SafeUserType> => {
 		this.logger.trace({ reqId, extra: { userId }, msg: "Fetching user" });
 
-		const user = await this.User.findById(userId);
-		const verifiedUser = this.Validator.validateExists(user, {
+		const user = await this.userCache.findById(userId, {
 			reqId,
 		});
-		this.Validator.validateNotBanned(verifiedUser, { reqId });
+		const verifiedUser = this.validator.validateExists(user, {
+			reqId,
+		});
+		this.validator.validateNotBanned(verifiedUser, { reqId });
 
 		return verifiedUser;
 	};
@@ -277,10 +279,10 @@ class SessionService extends BaseService {
 		type: "access" | "refresh";
 		reqId: string;
 	}): Promise<{
-		user: UserType;
+		user: SafeUserType;
 		token: ReturnType<TokenHelper["verifyAndDecode"]>;
 	}> => {
-		const token = this.Helper.verifyAndDecode({
+		const token = this.helper.verifyAndDecode({
 			reqId,
 			token: _token,
 			expectedType: reqType,
@@ -291,7 +293,7 @@ class SessionService extends BaseService {
 			extra: { token },
 			msg: "Checking if token is banned",
 		});
-		const isBanned = await this.BanManager.isBanned(_token, reqId);
+		const isBanned = await this.banManager.isBanned(_token, reqId);
 
 		if (isBanned) {
 			this.logger.error({

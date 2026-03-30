@@ -25,7 +25,7 @@ class AuthService extends UserService {
 			msg: "Starting Registration",
 		});
 
-		const existingUser = (await this.User.findByEmail(data.email)) ?? null;
+		const existingUser = (await this.user.findByEmail(data.email)) ?? null;
 
 		if (existingUser) {
 			this.logger.error({
@@ -40,7 +40,7 @@ class AuthService extends UserService {
 		const password = await hashPassword(passwd);
 
 		this.logger.trace({ reqId, msg: "Creating User" });
-		const user = await this.User.create({
+		const user = await this.user.create({
 			...data,
 			password,
 			roles: ["user"],
@@ -82,9 +82,9 @@ class AuthService extends UserService {
 			extra: { email },
 		});
 
-		const user = await this.User.findByEmail(email);
+		const user = await this.user.findByEmail(email);
 
-		const verifiedUser = this.Validator.validateForPasswordAuth(
+		const verifiedUser = this.validator.validateForPasswordAuth(
 			user,
 			{ reqId },
 			"Invalid email or password",
@@ -110,12 +110,16 @@ class AuthService extends UserService {
 			throw new AuthBadError("Invalid email or password");
 		}
 
-		const token = this.Helper.signTokens(verifiedUser, reqId);
+		const token = this.helper.signTokens(verifiedUser, reqId);
 
 		this.logger.info({
 			reqId,
 			msg: "User Login successful:)",
 			user: verifiedUser,
+		});
+
+		this.userCache.cacheData(verifiedUser.id, verifiedUser, {
+			reqId,
 		});
 
 		return {

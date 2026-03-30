@@ -23,8 +23,8 @@ class VerificationService extends UserService {
 			},
 		});
 
-		const user = await this.User.findByEmail(email);
-		const verifiedUser = this.Validator.validateForVerification(user, {
+		const user = await this.user.findByEmail(email);
+		const verifiedUser = this.validator.validateForVerification(user, {
 			reqId,
 		});
 
@@ -33,7 +33,7 @@ class VerificationService extends UserService {
 			msg: "Removing old verification codes",
 			extra: { userId: verifiedUser.id },
 		});
-		await this.Code.remove(verifiedUser, reqId);
+		await this.code.remove(verifiedUser, reqId);
 
 		this.sendCode({
 			kind: "verification",
@@ -56,7 +56,7 @@ class VerificationService extends UserService {
 			extra: { id },
 		});
 
-		await this.Code.verify({
+		await this.code.verify({
 			reqId,
 			code,
 			user: {
@@ -66,7 +66,7 @@ class VerificationService extends UserService {
 			},
 		});
 
-		const user = await this.User.updateById(id, {
+		const user = await this.user.updateById(id, {
 			verifiedAt: new Date(),
 		});
 
@@ -86,16 +86,18 @@ class VerificationService extends UserService {
 				userId: user.id,
 			},
 		});
-		await this.Code.remove(user, reqId);
+		await this.code.remove(user, reqId);
 
-		const updatedUser = await this.User.findById(user.id);
-		const verifiedUser = this.Validator.validateExists(
+		const updatedUser = await this.userCache.findById(user.id, {
+			reqId,
+		});
+		const verifiedUser = this.validator.validateExists(
 			updatedUser,
 			{ reqId },
 			"Invalid Code",
 		);
 
-		const token = this.Helper.signTokens(verifiedUser, reqId);
+		const token = this.helper.signTokens(verifiedUser, reqId);
 
 		this.logger.info({
 			reqId,

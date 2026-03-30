@@ -1,10 +1,11 @@
+import { CacheModel } from "./cache.model";
 import { AuthService } from "./services/auth.service";
 import { AvatarService } from "./services/avatar.service";
 import { PasswordService } from "./services/password.service";
 import { ProfileService } from "./services/profile.service";
 import { SessionService } from "./services/session.service";
 import { VerificationService } from "./services/verification.service";
-import type { AuthReturnType, AuthType } from "./types/index";
+import type { AuthReturnType, AuthType, SafeUserType } from "./types/index";
 import { SmartLogger } from "./utils/smart-logger";
 import { TokenBanManager } from "./utils/token-ban";
 import { TokenHelper } from "./utils/token-helpers";
@@ -28,40 +29,45 @@ const init: AuthType = ({
 	const helper = new TokenHelper(jwt, logger);
 	const banManager = new TokenBanManager(Cache, logger);
 
+	const userCache = new CacheModel<SafeUserType>("user", logger, User, Cache);
+
 	const authService = new AuthService({
 		logger,
-		Helper: helper,
-		Code: code,
-		Mail,
-		User,
-		Validator: validator,
+		helper,
+		code,
+		mail: Mail,
+		userCache,
+		user: User,
+		validator,
 	});
 
 	const verificationService = new VerificationService({
 		logger,
-		Helper: helper,
-		Code: code,
-		Mail,
-		User,
-		Validator: validator,
+		helper,
+		code,
+		mail: Mail,
+		userCache,
+		user: User,
+		validator,
 	});
 
 	const passwordService = new PasswordService({
 		logger,
-		Helper: helper,
-		Code: code,
-		Mail,
-		User,
-		Validator: validator,
+		helper,
+		code,
+		mail: Mail,
+		userCache,
+		user: User,
+		validator,
 	});
 
 	const sessionService = new SessionService(jwt, {
 		logger,
-		Helper: helper,
-		User,
-		Validator: validator,
-		BanManager: banManager,
-		Token: extractToken,
+		helper,
+		userCache,
+		validator,
+		banManager,
+		token: extractToken,
 	});
 
 	const avatarService = new AvatarService({
@@ -73,6 +79,7 @@ const init: AuthType = ({
 	const profileService = new ProfileService(jwt, {
 		logger,
 		helper,
+		userCache,
 		user: User,
 		session: sessionService,
 		avatar: avatarService,

@@ -4,20 +4,20 @@ import type { CodeManager } from "../utils/verification-code";
 import { BaseService } from "./base.service";
 
 class CodeService extends BaseService {
-	protected readonly Code: CodeManager;
-	protected readonly Mail: MailConfigType;
+	protected readonly code: CodeManager;
+	protected readonly mail: MailConfigType;
 	constructor({
 		logger,
-		Code,
-		Mail,
+		code,
+		mail,
 	}: {
 		logger: SmartLogger;
-		Code: CodeManager;
-		Mail: MailConfigType;
+		code: CodeManager;
+		mail: MailConfigType;
 	}) {
 		super(logger);
-		this.Code = Code;
-		this.Mail = Mail;
+		this.code = code;
+		this.mail = mail;
 	}
 
 	protected sendCode = async (
@@ -27,7 +27,7 @@ class CodeService extends BaseService {
 			reqId,
 			user: { id: userId },
 		} = props;
-		const code = await this.Code.generate(props);
+		const code = await this.code.generate(props);
 
 		this.logger.trace({
 			reqId,
@@ -36,7 +36,7 @@ class CodeService extends BaseService {
 				userId,
 			},
 		});
-		await this.Mail.sendMail(code);
+		await this.mail.sendMail(code);
 		this.logger.trace({
 			reqId,
 			msg: "Verification code sent successfully",

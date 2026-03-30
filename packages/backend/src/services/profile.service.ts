@@ -1,8 +1,10 @@
+import type { CacheModel } from "../cache.model";
 import { AuthBadError } from "../error";
 import type {
 	ChangePasswordReturnType,
 	ChangePasswordType,
 	JwtConfigType,
+	SafeUserType,
 	TokenConfigType,
 	UpdateProfileType,
 	UserModelType,
@@ -18,7 +20,8 @@ import { BaseService } from "./base.service";
 import type { SessionService } from "./session.service";
 
 class ProfileService extends BaseService {
-	private readonly user: UserModelType;
+	private readonly user: Pick<UserModelType, "updateById">;
+	protected readonly userCache: CacheModel<SafeUserType>;
 	private readonly helper: TokenHelper;
 	private readonly session: SessionService;
 	private readonly avatar: AvatarService;
@@ -30,6 +33,7 @@ class ProfileService extends BaseService {
 		{
 			logger,
 			user,
+			userCache,
 			helper,
 			session,
 			avatar,
@@ -38,6 +42,7 @@ class ProfileService extends BaseService {
 		}: {
 			logger: SmartLogger;
 			user: UserModelType;
+			userCache: CacheModel<SafeUserType>;
 			helper: TokenHelper;
 			session: SessionService;
 			avatar: AvatarService;
@@ -47,6 +52,7 @@ class ProfileService extends BaseService {
 	) {
 		super(logger);
 		this.user = user;
+		this.userCache = userCache;
 		this.helper = helper;
 		this.session = session;
 		this.avatar = avatar;
@@ -142,8 +148,11 @@ class ProfileService extends BaseService {
 
 		if (name) {
 			this.logger.trace({ reqId, msg: "Update name" });
-			await this.user.updateById(user.id, {
+			const updated = await this.user.updateById(user.id, {
 				name,
+			});
+			this.userCache.cacheData(user.id, updated as unknown as SafeUserType, {
+				reqId,
 			});
 		}
 
