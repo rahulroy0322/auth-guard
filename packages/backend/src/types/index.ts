@@ -1,5 +1,5 @@
 export * from "./auth";
-export * from "./avater";
+export * from "./avatar";
 export * from "./cache";
 export * from "./code";
 export * from "./jwt";
