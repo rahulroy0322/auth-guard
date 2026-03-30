@@ -26,7 +26,6 @@ const findProfiles = async ({
 
 const findByUserId: ProfileModelType["findByUserId"] = (userId) =>
 	findProfiles({
-		limit: 1,
 		filter: checkNull({
 			data: userId,
 			key: Profile.userId,
