@@ -1,3 +1,5 @@
+import { AvatarCacheModel } from "./cache/avatar";
+import { UserCacheModel } from "./cache/user";
 import { AuthService } from "./services/auth.service";
 import { AvatarService } from "./services/avatar.service";
 import { PasswordService } from "./services/password.service";
@@ -8,6 +10,7 @@ import type { AuthReturnType, AuthType } from "./types/index";
 import { SmartLogger } from "./utils/smart-logger";
 import { TokenBanManager } from "./utils/token-ban";
 import { TokenHelper } from "./utils/token-helpers";
+import { UserSanitizer } from "./utils/user-sanitizer";
 import { UserValidator } from "./utils/user-validation";
 import { CodeManager } from "./utils/verification-code";
 
@@ -28,51 +31,85 @@ const init: AuthType = ({
 	const helper = new TokenHelper(jwt, logger);
 	const banManager = new TokenBanManager(Cache, logger);
 
+	const userCache = new UserCacheModel(
+		"user",
+		logger,
+		{
+			findById: async (id) => {
+				const user = await User.findById(id);
+
+				if (!user) {
+					return null;
+				}
+
+				return UserSanitizer.removePassword(user);
+			},
+		},
+		Cache,
+	);
+	const avatarCache = new AvatarCacheModel(
+		"avatar",
+		logger,
+		{
+			findByUserId: Avatar.findActiveByUserId,
+		},
+		Cache,
+	);
+
 	const authService = new AuthService({
 		logger,
-		Helper: helper,
-		Code: code,
-		Mail,
-		User,
-		Validator: validator,
+		helper,
+		code,
+		mail: Mail,
+		userCache,
+		avatarCache,
+		user: User,
+		validator,
 	});
 
 	const verificationService = new VerificationService({
 		logger,
-		Helper: helper,
-		Code: code,
-		Mail,
-		User,
-		Validator: validator,
+		helper,
+		code,
+		mail: Mail,
+		userCache,
+		avatarCache,
+		user: User,
+		validator,
 	});
 
 	const passwordService = new PasswordService({
 		logger,
-		Helper: helper,
-		Code: code,
-		Mail,
-		User,
-		Validator: validator,
+		helper,
+		code,
+		mail: Mail,
+		userCache,
+		avatarCache,
+		user: User,
+		validator,
 	});
 
 	const sessionService = new SessionService(jwt, {
 		logger,
-		Helper: helper,
-		User,
-		Validator: validator,
-		BanManager: banManager,
-		Token: extractToken,
+		helper,
+		userCache,
+		avatarCache,
+		validator,
+		banManager,
+		token: extractToken,
 	});
 
 	const avatarService = new AvatarService({
 		logger,
 		avatar: Avatar,
+		avatarCache,
 		session: sessionService,
 	});
 
 	const profileService = new ProfileService(jwt, {
 		logger,
 		helper,
+		userCache,
 		user: User,
 		session: sessionService,
 		avatar: avatarService,

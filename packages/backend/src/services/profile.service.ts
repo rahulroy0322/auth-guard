@@ -1,9 +1,12 @@
+import type { CacheModel } from "../cache/base";
 import { AuthBadError } from "../error";
 import type {
 	ChangePasswordReturnType,
 	ChangePasswordType,
 	JwtConfigType,
+	SafeUserType,
 	TokenConfigType,
+	UpdateProfileReturnType,
 	UpdateProfileType,
 	UserModelType,
 } from "../types";
@@ -18,7 +21,8 @@ import { BaseService } from "./base.service";
 import type { SessionService } from "./session.service";
 
 class ProfileService extends BaseService {
-	private readonly user: UserModelType;
+	private readonly user: Pick<UserModelType, "updateById">;
+	private readonly userCache: CacheModel<SafeUserType>;
 	private readonly helper: TokenHelper;
 	private readonly session: SessionService;
 	private readonly avatar: AvatarService;
@@ -30,6 +34,7 @@ class ProfileService extends BaseService {
 		{
 			logger,
 			user,
+			userCache,
 			helper,
 			session,
 			avatar,
@@ -38,6 +43,7 @@ class ProfileService extends BaseService {
 		}: {
 			logger: SmartLogger;
 			user: UserModelType;
+			userCache: CacheModel<SafeUserType>;
 			helper: TokenHelper;
 			session: SessionService;
 			avatar: AvatarService;
@@ -47,6 +53,7 @@ class ProfileService extends BaseService {
 	) {
 		super(logger);
 		this.user = user;
+		this.userCache = userCache;
 		this.helper = helper;
 		this.session = session;
 		this.avatar = avatar;
@@ -116,7 +123,7 @@ class ProfileService extends BaseService {
 	public updateProfile = async (
 		req: Parameters<UpdateProfileType>[0],
 		{ name, url, id }: Parameters<UpdateProfileType>[1],
-	) => {
+	): Promise<UpdateProfileReturnType> => {
 		const reqId = genReqId();
 
 		this.logger.trace({ reqId, msg: "Starting update profile" });
@@ -142,9 +149,21 @@ class ProfileService extends BaseService {
 
 		if (name) {
 			this.logger.trace({ reqId, msg: "Update name" });
-			await this.user.updateById(user.id, {
+			const updated = await this.user.updateById(user.id, {
 				name,
 			});
+			if (updated) {
+				this.userCache.cacheData(
+					user.id,
+					UserSanitizer.removePassword({
+						...user,
+						...updated,
+					}),
+					{
+						reqId,
+					},
+				);
+			}
 		}
 
 		this.logger.info({
@@ -158,6 +177,8 @@ class ProfileService extends BaseService {
 				...user,
 				name: name || user.name,
 				avatar,
+				// TODO!
+				profiles: [],
 			}),
 		};
 	};

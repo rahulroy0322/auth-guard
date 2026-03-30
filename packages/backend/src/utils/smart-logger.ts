@@ -47,6 +47,15 @@ class SmartLogger {
 		this.logger.error(this.getLogData(data));
 	}
 
+	warn(data: Omit<SmartLogData, "user">): void {
+		this.logger.warn(
+			this.getLogData({
+				user: null,
+				...data,
+			}),
+		);
+	}
+
 	trace(data: Omit<SmartLogData, "user">): void {
 		this.logger.trace(
 			this.getLogData({

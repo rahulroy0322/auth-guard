@@ -22,8 +22,8 @@ class PasswordService extends UserService {
 			extra: { email },
 		});
 
-		const user = await this.User.findByEmail(email);
-		const verifiedUser = this.Validator.validateForPasswordAuth(
+		const user = await this.user.findByEmail(email);
+		const verifiedUser = this.validator.validateForPasswordAuth(
 			user,
 			{ reqId },
 			"Email is invalid!",
@@ -35,7 +35,7 @@ class PasswordService extends UserService {
 			extra: { userId: verifiedUser.id },
 		});
 
-		const codeExists = await this.Code.checkExists(verifiedUser);
+		const codeExists = await this.code.checkExists(verifiedUser);
 
 		if (codeExists) {
 			this.logger.error({
@@ -66,7 +66,7 @@ class PasswordService extends UserService {
 
 		this.logger.trace({ reqId, msg: "Starting password reset", extra: { id } });
 
-		await this.Code.verify({
+		await this.code.verify({
 			reqId,
 			code,
 			user: {
@@ -75,7 +75,7 @@ class PasswordService extends UserService {
 				name: "unknown",
 			},
 		});
-		await this.Code.remove(
+		await this.code.remove(
 			{
 				id,
 			},
@@ -91,7 +91,7 @@ class PasswordService extends UserService {
 		const password = await hashPassword(passwd);
 
 		this.logger.trace({ reqId, msg: "Reseting user Password" });
-		const user = await this.User.updateById(id, { password });
+		const user = await this.user.updateById(id, { password });
 
 		if (!user) {
 			this.logger.error({
@@ -102,24 +102,30 @@ class PasswordService extends UserService {
 			throw new AuthBadError("Password reset failed");
 		}
 
-		const updatedUser = await this.User.findById(user.id);
-		const verifiedUser = this.Validator.validateExists(updatedUser, {
+		const sanitizedUser = UserSanitizer.removePassword(user);
+		await this.userCache.cacheData(user.id, sanitizedUser, { reqId });
+		const avatar = await this.avatarCache.findByUserId(sanitizedUser.id, {
 			reqId,
 		});
 
 		// TODO! clear session
 
-		const token = this.Helper.signTokens(verifiedUser, reqId);
+		const token = this.helper.signTokens(user, reqId);
 
 		this.logger.info({
 			reqId,
 			msg: "Password reset successful:)",
-			user: verifiedUser,
+			user,
 		});
 
 		return {
 			token,
-			user: UserSanitizer.removePassword(verifiedUser),
+			user: {
+				...sanitizedUser,
+				avatar,
+				// TODO!
+				profiles: [],
+			},
 		};
 	};
 }

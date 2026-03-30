@@ -1,4 +1,5 @@
-type CacheKeyType = `${"token" | "code"}:${string}`;
+type CacheKeysType = "token" | "code" | "user" | "avatar";
+type CacheKeyType = `${CacheKeysType}:${string}`;
 
 type CacheConfigType = {
 	set: (key: CacheKeyType, value: string, seconds: number) => Promise<void>;
@@ -6,4 +7,4 @@ type CacheConfigType = {
 	remove: (key: CacheKeyType) => Promise<void>;
 };
 
-export type { CacheConfigType, CacheKeyType };
+export type { CacheConfigType, CacheKeysType, CacheKeyType };

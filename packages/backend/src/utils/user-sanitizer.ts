@@ -3,13 +3,13 @@ import type { SafeUserType } from "../types";
 
 // biome-ignore lint/complexity/noStaticOnlyClass: ts error
 class UserSanitizer {
-	static removePassword(
-		user: SafeUserType & {
+	static removePassword<
+		T extends SafeUserType & {
 			password?: UserType["password"];
 		},
-	): SafeUserType {
+	>(user: T): T {
 		const { password, ...safeUser } = user;
-		return safeUser;
+		return safeUser as T;
 	}
 }
 

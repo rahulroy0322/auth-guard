@@ -1,10 +1,9 @@
-import type { UserType } from "base";
 import {
 	AuthBadError,
 	AuthNotVerifiedError,
 	AuthUnAuthenticatedError,
 } from "../error";
-import type { LogType } from "../types";
+import type { LogType, SafeUserType, _UserType as UserType } from "../types";
 import type { SmartLogger } from "./smart-logger";
 
 type PropsType = Pick<LogType, "extra" | "reqId">;
@@ -13,10 +12,10 @@ class UserValidator {
 	constructor(private readonly logger: SmartLogger) {}
 
 	validateExists(
-		user: UserType | null,
+		user: SafeUserType | null,
 		props: PropsType,
 		errorMessage = "User not found",
-	): UserType {
+	): SafeUserType {
 		if (!user) {
 			this.logger.error({
 				msg: "User validation failed - user not found",
@@ -28,7 +27,7 @@ class UserValidator {
 		return user;
 	}
 
-	validateVerified(user: UserType, props: PropsType): void {
+	validateVerified(user: SafeUserType, props: PropsType): void {
 		if (!user.verifiedAt) {
 			this.logger.error({
 				msg: "User validation failed - account not verified",
@@ -39,7 +38,7 @@ class UserValidator {
 		}
 	}
 
-	validateNotBanned(user: UserType, props: PropsType): void {
+	validateNotBanned(user: SafeUserType, props: PropsType): void {
 		if (user.isBaned) {
 			this.logger.error({
 				msg: "User validation failed - account is banned",
@@ -64,10 +63,10 @@ class UserValidator {
 	}
 
 	validateForAuthentication(
-		user: UserType | null,
+		user: SafeUserType | null,
 		props: PropsType,
 		errorMessage: "Invalid email or password",
-	): UserType {
+	): SafeUserType {
 		const verifiedUser = this.validateExists(user, props, errorMessage);
 		this.validateVerified(verifiedUser, props);
 		this.validateNotBanned(verifiedUser, props);
@@ -79,7 +78,11 @@ class UserValidator {
 		props: PropsType,
 		errorMessage = "Invalid email or password",
 	): UserType {
-		const verifiedUser = this.validateExists(user, props, errorMessage);
+		const verifiedUser = this.validateExists(
+			user,
+			props,
+			errorMessage,
+		) as UserType;
 
 		this.validateVerified(verifiedUser, props);
 		this.validateNotBanned(verifiedUser, props);
@@ -88,10 +91,10 @@ class UserValidator {
 	}
 
 	validateForVerification(
-		user: UserType | null,
+		user: SafeUserType | null,
 		props: PropsType,
 		errorMessage = "Invalid user",
-	): UserType {
+	): SafeUserType {
 		const verifiedUser = this.validateExists(user, props, errorMessage);
 
 		if (verifiedUser.verifiedAt) {

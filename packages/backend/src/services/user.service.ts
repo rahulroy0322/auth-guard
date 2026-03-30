@@ -1,3 +1,5 @@
+import type { AvatarCacheModel } from "../cache/avatar";
+import type { UserCacheModel } from "../cache/user";
 import type { MailConfigType, UserModelType } from "../types";
 import type { SmartLogger } from "../utils/smart-logger";
 import type { TokenHelper } from "../utils/token-helpers";
@@ -6,33 +8,44 @@ import type { CodeManager } from "../utils/verification-code";
 import { CodeService } from "./code.service";
 
 class UserService extends CodeService {
-	protected readonly User: UserModelType;
-	protected readonly Validator: UserValidator;
-	protected readonly Helper: TokenHelper;
+	protected readonly user: Pick<
+		UserModelType,
+		"create" | "findByEmail" | "updateById"
+	>;
+	protected readonly userCache: UserCacheModel;
+	protected readonly avatarCache: AvatarCacheModel;
+	protected readonly validator: UserValidator;
+	protected readonly helper: TokenHelper;
 	constructor({
 		logger,
-		User,
-		Code,
-		Mail,
-		Validator,
-		Helper,
+		user,
+		userCache,
+		avatarCache,
+		code,
+		mail,
+		validator,
+		helper,
 	}: {
 		logger: SmartLogger;
-		User: UserModelType;
-		Code: CodeManager;
-		Mail: MailConfigType;
-		Validator: UserValidator;
-		Helper: TokenHelper;
+		user: UserModelType;
+		userCache: UserCacheModel;
+		avatarCache: AvatarCacheModel;
+		code: CodeManager;
+		mail: MailConfigType;
+		validator: UserValidator;
+		helper: TokenHelper;
 	}) {
 		super({
 			logger,
-			Code,
-			Mail,
+			code,
+			mail,
 		});
 
-		this.User = User;
-		this.Validator = Validator;
-		this.Helper = Helper;
+		this.user = user;
+		this.userCache = userCache;
+		this.avatarCache = avatarCache;
+		this.validator = validator;
+		this.helper = helper;
 	}
 }
 

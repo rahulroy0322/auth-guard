@@ -14,9 +14,10 @@ type LoggerFnType = (
 ) => void;
 
 type LoggerType = {
-	info: LoggerFnType;
-	error: LoggerFnType;
 	trace: LoggerFnType;
+	info: LoggerFnType;
+	warn: LoggerFnType;
+	error: LoggerFnType;
 };
 
 export type { LoggerType, LogType };
