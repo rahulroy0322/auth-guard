@@ -1,11 +1,12 @@
-import { CacheModel } from "./cache.model";
+import { AvatarCacheModel } from "./cache/avatar";
+import { UserCacheModel } from "./cache/user";
 import { AuthService } from "./services/auth.service";
 import { AvatarService } from "./services/avatar.service";
 import { PasswordService } from "./services/password.service";
 import { ProfileService } from "./services/profile.service";
 import { SessionService } from "./services/session.service";
 import { VerificationService } from "./services/verification.service";
-import type { AuthReturnType, AuthType, SafeUserType } from "./types/index";
+import type { AuthReturnType, AuthType } from "./types/index";
 import { SmartLogger } from "./utils/smart-logger";
 import { TokenBanManager } from "./utils/token-ban";
 import { TokenHelper } from "./utils/token-helpers";
@@ -29,7 +30,15 @@ const init: AuthType = ({
 	const helper = new TokenHelper(jwt, logger);
 	const banManager = new TokenBanManager(Cache, logger);
 
-	const userCache = new CacheModel<SafeUserType>("user", logger, User, Cache);
+	const userCache = new UserCacheModel("user", logger, User, Cache);
+	const avatarCache = new AvatarCacheModel(
+		"avatar",
+		logger,
+		{
+			findByUserId: Avatar.findActiveByUserId,
+		},
+		Cache,
+	);
 
 	const authService = new AuthService({
 		logger,
@@ -37,6 +46,7 @@ const init: AuthType = ({
 		code,
 		mail: Mail,
 		userCache,
+		avatarCache,
 		user: User,
 		validator,
 	});
@@ -47,6 +57,7 @@ const init: AuthType = ({
 		code,
 		mail: Mail,
 		userCache,
+		avatarCache,
 		user: User,
 		validator,
 	});
@@ -57,6 +68,7 @@ const init: AuthType = ({
 		code,
 		mail: Mail,
 		userCache,
+		avatarCache,
 		user: User,
 		validator,
 	});
@@ -65,6 +77,7 @@ const init: AuthType = ({
 		logger,
 		helper,
 		userCache,
+		avatarCache,
 		validator,
 		banManager,
 		token: extractToken,
@@ -73,6 +86,7 @@ const init: AuthType = ({
 	const avatarService = new AvatarService({
 		logger,
 		avatar: Avatar,
+		avatarCache,
 		session: sessionService,
 	});
 

@@ -43,3 +43,4 @@ routeTree.gen.ts
 *.http
 *.rest
 !sample.api.rest
+.codex

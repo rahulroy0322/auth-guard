@@ -118,13 +118,24 @@ class AuthService extends UserService {
 			user: verifiedUser,
 		});
 
-		this.userCache.cacheData(verifiedUser.id, verifiedUser, {
+		const sanitizedUser = UserSanitizer.removePassword(verifiedUser);
+
+		this.userCache.cacheData(verifiedUser.id, sanitizedUser, {
+			reqId,
+		});
+
+		const avatar = await this.avatarCache.findByUserId(sanitizedUser.id, {
 			reqId,
 		});
 
 		return {
 			token,
-			user: UserSanitizer.removePassword(verifiedUser),
+			user: {
+				...sanitizedUser,
+				avatar,
+				// TODO!
+				profiles: [],
+			},
 		};
 	};
 }

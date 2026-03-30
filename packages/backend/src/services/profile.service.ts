@@ -1,4 +1,4 @@
-import type { CacheModel } from "../cache.model";
+import type { CacheModel } from "../cache/base";
 import { AuthBadError } from "../error";
 import type {
 	ChangePasswordReturnType,
@@ -6,6 +6,7 @@ import type {
 	JwtConfigType,
 	SafeUserType,
 	TokenConfigType,
+	UpdateProfileReturnType,
 	UpdateProfileType,
 	UserModelType,
 } from "../types";
@@ -21,7 +22,7 @@ import type { SessionService } from "./session.service";
 
 class ProfileService extends BaseService {
 	private readonly user: Pick<UserModelType, "updateById">;
-	protected readonly userCache: CacheModel<SafeUserType>;
+	private readonly userCache: CacheModel<SafeUserType>;
 	private readonly helper: TokenHelper;
 	private readonly session: SessionService;
 	private readonly avatar: AvatarService;
@@ -122,7 +123,7 @@ class ProfileService extends BaseService {
 	public updateProfile = async (
 		req: Parameters<UpdateProfileType>[0],
 		{ name, url, id }: Parameters<UpdateProfileType>[1],
-	) => {
+	): Promise<UpdateProfileReturnType> => {
 		const reqId = genReqId();
 
 		this.logger.trace({ reqId, msg: "Starting update profile" });
@@ -151,9 +152,18 @@ class ProfileService extends BaseService {
 			const updated = await this.user.updateById(user.id, {
 				name,
 			});
-			this.userCache.cacheData(user.id, updated as unknown as SafeUserType, {
-				reqId,
-			});
+			if (updated) {
+				this.userCache.cacheData(
+					user.id,
+					UserSanitizer.removePassword({
+						...user,
+						...updated,
+					}),
+					{
+						reqId,
+					},
+				);
+			}
 		}
 
 		this.logger.info({
@@ -167,6 +177,8 @@ class ProfileService extends BaseService {
 				...user,
 				name: name || user.name,
 				avatar,
+				// TODO!
+				profiles: [],
 			}),
 		};
 	};

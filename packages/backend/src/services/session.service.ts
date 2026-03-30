@@ -1,5 +1,6 @@
 import type { IncomingMessage } from "node:http";
-import type { CacheModel } from "../cache.model";
+import type { AvatarCacheModel } from "../cache/avatar";
+import type { UserCacheModel } from "../cache/user";
 import { AuthBadError, AuthNoTokenError } from "../error";
 import type {
 	AuthStatusReturnType,
@@ -7,7 +8,7 @@ import type {
 	JwtConfigType,
 	LoginRequiredReturnType,
 	LoginRequiredType,
-	SafeUserType,
+	ReturnUserType,
 	TokenConfigType,
 	TokenRefreshReturnType,
 } from "../types";
@@ -20,7 +21,8 @@ import type { UserValidator } from "../utils/user-validation";
 import { BaseService } from "./base.service";
 
 class SessionService extends BaseService {
-	private readonly userCache: CacheModel<SafeUserType>;
+	private readonly userCache: UserCacheModel;
+	private readonly avatarCache: AvatarCacheModel;
 	private readonly validator: UserValidator;
 	private readonly helper: TokenHelper;
 	private readonly token: TokenConfigType;
@@ -31,13 +33,15 @@ class SessionService extends BaseService {
 		{
 			logger,
 			userCache,
+			avatarCache,
 			validator,
 			helper,
 			token,
 			banManager,
 		}: {
 			logger: SmartLogger;
-			userCache: CacheModel<SafeUserType>;
+			userCache: UserCacheModel;
+			avatarCache: AvatarCacheModel;
 			validator: UserValidator;
 			helper: TokenHelper;
 			token: TokenConfigType;
@@ -47,6 +51,7 @@ class SessionService extends BaseService {
 		super(logger);
 
 		this.userCache = userCache;
+		this.avatarCache = avatarCache;
 		this.validator = validator;
 		this.helper = helper;
 		this.token = token;
@@ -155,7 +160,7 @@ class SessionService extends BaseService {
 
 		return {
 			token: newTokens,
-			user: UserSanitizer.removePassword(user),
+			user,
 		};
 	};
 
@@ -205,7 +210,7 @@ class SessionService extends BaseService {
 
 		return {
 			token: newTokens,
-			user: UserSanitizer.removePassword(user),
+			user,
 		};
 	};
 
@@ -256,7 +261,7 @@ class SessionService extends BaseService {
 	private findUserAndCheckBan = async (
 		userId: string,
 		reqId: string,
-	): Promise<SafeUserType> => {
+	): Promise<ReturnUserType> => {
 		this.logger.trace({ reqId, extra: { userId }, msg: "Fetching user" });
 
 		const user = await this.userCache.findById(userId, {
@@ -267,7 +272,18 @@ class SessionService extends BaseService {
 		});
 		this.validator.validateNotBanned(verifiedUser, { reqId });
 
-		return verifiedUser;
+		const sanitizedUser = UserSanitizer.removePassword(verifiedUser);
+
+		const avatar = await this.avatarCache.findByUserId(sanitizedUser.id, {
+			reqId,
+		});
+
+		return {
+			...sanitizedUser,
+			avatar,
+			// TODO!
+			profiles: [],
+		};
 	};
 
 	private verifyAndCheckBan = async ({
@@ -279,7 +295,7 @@ class SessionService extends BaseService {
 		type: "access" | "refresh";
 		reqId: string;
 	}): Promise<{
-		user: SafeUserType;
+		user: ReturnUserType;
 		token: ReturnType<TokenHelper["verifyAndDecode"]>;
 	}> => {
 		const token = this.helper.verifyAndDecode({

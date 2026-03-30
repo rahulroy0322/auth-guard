@@ -1,10 +1,9 @@
-import type { UserType } from "base";
 import {
 	AuthBadError,
 	AuthNotVerifiedError,
 	AuthUnAuthenticatedError,
 } from "../error";
-import type { LogType, SafeUserType } from "../types";
+import type { LogType, SafeUserType, _UserType as UserType } from "../types";
 import type { SmartLogger } from "./smart-logger";
 
 type PropsType = Pick<LogType, "extra" | "reqId">;

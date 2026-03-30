@@ -2,33 +2,37 @@ import type { IncomingMessage } from "node:http";
 import type { UserType } from "base";
 import type { CodeType } from "./code";
 
-type SafeUserType = Omit<UserType, "password">;
+type _UserType = Omit<UserType, "avatar" | "profiles">;
+
+type SafeUserType = Omit<UserType, "password" | "avatar" | "profiles">;
+
+type ReturnUserType = Omit<UserType, "password">;
 
 type UserModelType = {
-	findById: (id: UserType["id"]) => Promise<UserType | null>;
-	findByEmail: (email: UserType["email"]) => Promise<UserType | null>;
+	findById: (id: UserType["id"]) => Promise<_UserType | null>;
+	findByEmail: (email: UserType["email"]) => Promise<_UserType | null>;
 
 	create: (
-		data: Pick<UserType, "email" | "name" | "password" | "roles">,
-	) => Promise<Omit<UserType, "profiles" | "avatar"> | null>;
+		data: Pick<_UserType, "email" | "name" | "password" | "roles">,
+	) => Promise<_UserType | null>;
 
 	updateById: (
 		id: UserType["id"],
-		data: Partial<UserType>,
-	) => Promise<Omit<UserType, "avatar" | "profiles"> | null>;
+		data: Partial<_UserType>,
+	) => Promise<_UserType | null>;
 };
 
-type RegisterPropsType = Pick<UserType, "email" | "name"> & {
+type RegisterPropsType = Pick<_UserType, "email" | "name"> & {
 	password: string;
 };
-type RegisterReturnType = Pick<UserType, "id">;
+type RegisterReturnType = Pick<_UserType, "id">;
 type RegisterType = (data: RegisterPropsType) => Promise<RegisterReturnType>;
 
-type LoginPropsType = Pick<UserType, "email"> & {
+type LoginPropsType = Pick<_UserType, "email"> & {
 	password: string;
 };
 type LoginReturnType = {
-	user: Omit<UserType, "password">;
+	user: ReturnUserType;
 	token: {
 		refresh: string;
 		access: string;
@@ -37,7 +41,7 @@ type LoginReturnType = {
 type LoginType = (data: LoginPropsType) => Promise<LoginReturnType>;
 
 type CheckAuthReturnType = {
-	user: Omit<UserType, "password"> | null;
+	user: ReturnUserType | null;
 };
 type CheckAuthType = (
 	req: IncomingMessage,
@@ -62,7 +66,7 @@ type TokenRefreshType = (
 
 type LogoutType = (req: IncomingMessage) => Promise<void>;
 
-type StartVerificationPropsType = Pick<UserType, "email">;
+type StartVerificationPropsType = Pick<_UserType, "email">;
 type StartVerificationReturnType = RegisterReturnType;
 type StartVerificationType = (
 	data: StartVerificationPropsType,
@@ -95,6 +99,7 @@ type AuthStatusReturnType =
 type AuthStatusType = (req: IncomingMessage) => Promise<AuthStatusReturnType>;
 
 export type {
+	_UserType,
 	AuthStatusReturnType,
 	AuthStatusType,
 	CheckAuthReturnType,
@@ -108,6 +113,7 @@ export type {
 	RegisterPropsType,
 	RegisterReturnType,
 	RegisterType,
+	ReturnUserType,
 	SafeUserType,
 	StartVerificationPropsType,
 	StartVerificationReturnType,

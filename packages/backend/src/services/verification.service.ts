@@ -88,26 +88,31 @@ class VerificationService extends UserService {
 		});
 		await this.code.remove(user, reqId);
 
-		const updatedUser = await this.userCache.findById(user.id, {
+		const sanitizedUser = UserSanitizer.removePassword(user);
+
+		await this.userCache.cacheData(user.id, sanitizedUser, {
 			reqId,
 		});
-		const verifiedUser = this.validator.validateExists(
-			updatedUser,
-			{ reqId },
-			"Invalid Code",
-		);
+		const avatar = await this.avatarCache.findByUserId(sanitizedUser.id, {
+			reqId,
+		});
 
-		const token = this.helper.signTokens(verifiedUser, reqId);
+		const token = this.helper.signTokens(user, reqId);
 
 		this.logger.info({
 			reqId,
 			msg: "Account verification successful:)",
-			user: verifiedUser,
+			user,
 		});
 
 		return {
 			token,
-			user: UserSanitizer.removePassword(verifiedUser),
+			user: {
+				...sanitizedUser,
+				avatar,
+				// TODO!
+				profiles: [],
+			},
 		};
 	};
 }

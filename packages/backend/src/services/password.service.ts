@@ -102,26 +102,30 @@ class PasswordService extends UserService {
 			throw new AuthBadError("Password reset failed");
 		}
 
-		const updatedUser = await this.userCache.findById(user.id, {
-			reqId,
-		});
-		const verifiedUser = this.validator.validateExists(updatedUser, {
+		const sanitizedUser = UserSanitizer.removePassword(user);
+		await this.userCache.cacheData(user.id, sanitizedUser, { reqId });
+		const avatar = await this.avatarCache.findByUserId(sanitizedUser.id, {
 			reqId,
 		});
 
 		// TODO! clear session
 
-		const token = this.helper.signTokens(verifiedUser, reqId);
+		const token = this.helper.signTokens(user, reqId);
 
 		this.logger.info({
 			reqId,
 			msg: "Password reset successful:)",
-			user: verifiedUser,
+			user,
 		});
 
 		return {
 			token,
-			user: UserSanitizer.removePassword(verifiedUser),
+			user: {
+				...user,
+				avatar,
+				// TODO!
+				profiles: [],
+			},
 		};
 	};
 }
