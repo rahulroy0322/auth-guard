@@ -10,6 +10,7 @@ import type { AuthReturnType, AuthType } from "./types/index";
 import { SmartLogger } from "./utils/smart-logger";
 import { TokenBanManager } from "./utils/token-ban";
 import { TokenHelper } from "./utils/token-helpers";
+import { UserSanitizer } from "./utils/user-sanitizer";
 import { UserValidator } from "./utils/user-validation";
 import { CodeManager } from "./utils/verification-code";
 
@@ -30,7 +31,22 @@ const init: AuthType = ({
 	const helper = new TokenHelper(jwt, logger);
 	const banManager = new TokenBanManager(Cache, logger);
 
-	const userCache = new UserCacheModel("user", logger, User, Cache);
+	const userCache = new UserCacheModel(
+		"user",
+		logger,
+		{
+			findById: async (id) => {
+				const user = await User.findById(id);
+
+				if (!user) {
+					return null;
+				}
+
+				return UserSanitizer.removePassword(user);
+			},
+		},
+		Cache,
+	);
 	const avatarCache = new AvatarCacheModel(
 		"avatar",
 		logger,

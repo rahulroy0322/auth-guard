@@ -33,49 +33,6 @@ class CacheModel<T extends Record<string, unknown>> {
 		);
 	};
 
-	// public checkCache = async (userId: string, { reqId }: { reqId: string }) => {
-	// 	this.logger.trace({
-	// 		reqId,
-	// 		msg: `Checking cache for "${this.key}"` as const,
-	// 		extra: { userId },
-	// 	});
-	// 	const cached = await this.cache.get(`${this.key}:${userId}`);
-	// 	if (cached) {
-	// 		this.logger.trace({
-	// 			reqId,
-	// 			msg: "Cache Found",
-	// 			extra: { userId },
-	// 		});
-	// 		try {
-	// 			return JSON.parse(cached) as T;
-	// 		} catch (error) {
-	// 			this.logger.warn({
-	// 				reqId,
-	// 				msg: "Failed to parse cached data, falling back to DB.",
-	// 				extra: { userId, error },
-	// 			});
-	// 		}
-	// 	}
-
-	// 	this.logger.trace({
-	// 		reqId,
-	// 		msg: "Cache Miss, quering db",
-	// 	});
-	// 	const data = await this.model.findByUserId(userId);
-
-	// 	if (!data) {
-	// 		this.logger.trace({
-	// 			reqId,
-	// 			msg: "Not Found in db",
-	// 		});
-	// 		return null;
-	// 	}
-
-	// 	await this.cacheData(userId, data, { reqId });
-
-	// 	return data;
-	// };
-
 	public getOrCache = async (
 		id: string,
 		cb: () => Promise<T | null>,
@@ -86,6 +43,7 @@ class CacheModel<T extends Record<string, unknown>> {
 			msg: `Checking cache for "${this.key}"` as const,
 			extra: { id },
 		});
+
 		const cached = await this.cache.get(this.getKey(id));
 		if (cached) {
 			this.logger.trace({

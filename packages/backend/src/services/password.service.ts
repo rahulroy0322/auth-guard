@@ -121,7 +121,7 @@ class PasswordService extends UserService {
 		return {
 			token,
 			user: {
-				...user,
+				...sanitizedUser,
 				avatar,
 				// TODO!
 				profiles: [],
