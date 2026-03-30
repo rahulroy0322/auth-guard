@@ -256,10 +256,6 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 			_data.url = `/avatar/${req.file?.filename}`;
 		}
 
-		console.log({
-			_data,
-		});
-
 		const { user } = await coreApi.updateProfile(req, _data);
 
 		res.status(200).json({

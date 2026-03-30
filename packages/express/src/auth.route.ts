@@ -1,5 +1,6 @@
 import { extname, join } from "node:path";
 import { cwd } from "node:process";
+import { genReqId } from "@auth-guard/backend/utils/request-id";
 import { Router } from "express";
 import multer from "multer";
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE } from "schema";
@@ -21,7 +22,7 @@ const authRouter = (
 ) => {
 	if (!options.fileName || typeof options.fileName !== "function") {
 		options.fileName = (file) =>
-			`${file.originalname}-${Date.now()}${extname(file.originalname)}`;
+			`${genReqId()}-${Date.now()}${extname(file.originalname)}`;
 	}
 
 	if (!options.destination) {

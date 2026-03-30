@@ -156,6 +156,7 @@ class ProfileService extends BaseService {
 		return {
 			user: UserSanitizer.removePassword({
 				...user,
+				name: name || user.name,
 				avatar,
 			}),
 		};

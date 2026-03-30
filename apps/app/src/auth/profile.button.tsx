@@ -280,11 +280,7 @@ const UpdateProfile: FC<UpdateProfilePropsType> = ({
 			if (!success) {
 				toast.error(error.name, {
 					description: error.issues
-						.reduce((acc, val) => {
-							acc.push(`"${val.path.join(".")}"-${val.message}`);
-
-							return acc;
-						}, [] as string[])
+						.map((val) => `"${val.path.join(".")}"-${val.message}`)
 						.join(","),
 				});
 				return;
