@@ -6,6 +6,7 @@ import type {
 	CheckAuthType,
 	JwtConfigType,
 	LoginRequiredReturnType,
+	LoginRequiredType,
 	TokenConfigType,
 	TokenRefreshReturnType,
 	UserModelType,
@@ -84,9 +85,12 @@ class SessionService extends BaseService {
 	};
 
 	public loginRequired = async (
-		req: IncomingMessage,
+		req: Parameters<LoginRequiredType>[0],
+		{ reqId }: Parameters<LoginRequiredType>[1] = {},
 	): Promise<LoginRequiredReturnType> => {
-		const reqId = genReqId();
+		if (!reqId) {
+			reqId = genReqId();
+		}
 
 		const { user } = await this.checkAuth(req, reqId);
 

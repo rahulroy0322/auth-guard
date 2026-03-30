@@ -1,4 +1,7 @@
-import type { AuthPropsType } from "@auth-guard/backend/types/index";
+import type {
+	AuthPropsType,
+	AuthReturnType,
+} from "@auth-guard/backend/types/index";
 import type { UserType } from "base";
 import type { RequestHandler } from "express";
 
@@ -32,21 +35,7 @@ type ResType = {
 };
 
 type AuthExpressReturnType = Record<
-	| "login"
-	| "register"
-	| "checkAuth"
-	| "loginRequired"
-	| "tokenRefresh"
-	| "me"
-	| "logout"
-	| "startVerification"
-	| "verifieAccount"
-	| "forgotPassword"
-	| "resetPassword"
-	| "changePassword"
-	| "changeName"
-	| "authStatus"
-	| "removeAvatar",
+	keyof AuthReturnType | "me",
 	RequestHandler
 >;
 

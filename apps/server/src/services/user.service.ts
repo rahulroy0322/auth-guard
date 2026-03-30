@@ -44,9 +44,9 @@ const findUsers = async ({
 		limit,
 	});
 
-	return users.map((user) => ({
+	return users.map(({ avatars, ...user }) => ({
 		...user,
-		avatar: user.avatars.at(0) || null,
+		avatar: avatars.at(0) || null,
 	}));
 };
 
