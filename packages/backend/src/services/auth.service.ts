@@ -127,14 +127,16 @@ class AuthService extends UserService {
 		const avatar = await this.avatarCache.findByUserId(sanitizedUser.id, {
 			reqId,
 		});
+		const profiles = await this.profileCache.findByUserId(sanitizedUser.id, {
+			reqId,
+		});
 
 		return {
 			token,
 			user: {
 				...sanitizedUser,
 				avatar,
-				// TODO!
-				profiles: [],
+				profiles,
 			},
 		};
 	};

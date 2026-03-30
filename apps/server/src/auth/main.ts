@@ -4,6 +4,7 @@ import { redis } from "../cache/main";
 import ENV from "../config/env.config";
 import { logger } from "../logger/pino";
 import * as Avatar from "../services/avatar.service";
+import * as Profile from "../services/profile.service";
 import * as User from "../services/user.service";
 
 const extractAccessToken = (req: Request) =>
@@ -37,6 +38,8 @@ const guard = auth({
 	},
 	logger,
 	User,
+	Avatar,
+	Profile,
 	Cache: {
 		set: (key, value, seconds) =>
 			redis.set(
@@ -49,7 +52,6 @@ const guard = auth({
 
 		remove: (key) => redis.del(key) as unknown as Promise<void>,
 	},
-	Avatar,
 	Mail: {
 		sendMail: async (code) => {
 			// TODO! temp not prod ready

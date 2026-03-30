@@ -118,13 +118,16 @@ class PasswordService extends UserService {
 			user,
 		});
 
+		const profiles = await this.profileCache.findByUserId(sanitizedUser.id, {
+			reqId,
+		});
+
 		return {
 			token,
 			user: {
 				...sanitizedUser,
 				avatar,
-				// TODO!
-				profiles: [],
+				profiles,
 			},
 		};
 	};

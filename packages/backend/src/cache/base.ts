@@ -1,7 +1,7 @@
 import type { CacheConfigType, CacheKeysType } from "../types";
 import type { SmartLogger } from "../utils/smart-logger";
 
-class CacheModel<T extends Record<string, unknown>> {
+class CacheModel<T> {
 	constructor(
 		protected readonly key: CacheKeysType,
 		protected readonly logger: SmartLogger,

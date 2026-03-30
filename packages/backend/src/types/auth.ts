@@ -13,7 +13,7 @@ type UserModelType = {
 	findByEmail: (email: UserType["email"]) => Promise<_UserType | null>;
 
 	create: (
-		data: Pick<_UserType, "email" | "name" | "password" | "roles">,
+		data: Pick<_UserType, "email" | "name" | "roles"> & Partial<_UserType>,
 	) => Promise<_UserType | null>;
 
 	updateById: (
