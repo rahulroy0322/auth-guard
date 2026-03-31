@@ -7,6 +7,7 @@ import type {
 	RegisterReturnType,
 	UserModelType,
 } from "../types";
+import type { SessionModelType } from "../types/session";
 import { hashPassword, validPassword } from "../utils/password";
 import { genReqId } from "../utils/request-id";
 import { AuthResponseBuilder } from "../utils/response-builder";
@@ -21,6 +22,7 @@ class AuthService {
 	constructor(
 		private readonly logger: SmartLogger,
 		private readonly userModel: Pick<UserModelType, "create" | "findByEmail">,
+		private readonly sessionModel: Pick<SessionModelType, "create">,
 		private readonly userService: UserService,
 		private readonly codeService: CodeService,
 		private readonly userCache: UserCacheModel,
@@ -90,6 +92,9 @@ class AuthService {
 	public login = async ({
 		password: passwd,
 		email,
+		deviceId,
+		deviceName,
+		deviceType,
 	}: LoginPropsType): Promise<LoginReturnType> => {
 		const reqId = genReqId();
 
@@ -128,6 +133,23 @@ class AuthService {
 		}
 
 		const token = this.helper.signTokens(verifiedUser, reqId);
+
+		const session = await this.sessionModel.create({
+			token: token.refresh,
+			userId: verifiedUser.id,
+			isActive: true,
+			deviceId,
+			deviceName,
+			deviceType,
+		});
+		if (!session) {
+			this.logger.error({
+				reqId,
+				msg: "Session Create failed",
+				user: verifiedUser,
+			});
+			throw new AuthServerError("Session Create failed");
+		}
 
 		this.logger.info({
 			reqId,

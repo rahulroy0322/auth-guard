@@ -5,6 +5,7 @@ import ENV from "../config/env.config";
 import { logger } from "../logger/pino";
 import * as Avatar from "../services/avatar.service";
 import * as Profile from "../services/profile.service";
+import * as Session from "../services/session.service";
 import * as User from "../services/user.service";
 
 const extractAccessToken = (req: Request) =>
@@ -24,6 +25,7 @@ const guard = auth({
 	cookie: {
 		access: "auth-access",
 		refresh: "auth-refresh",
+		extract: (req, key) => req.cookies?.[key] || null,
 	},
 	jwt: {
 		expires: {
@@ -40,6 +42,7 @@ const guard = auth({
 	User,
 	Avatar,
 	Profile,
+	Session,
 	Cache: {
 		set: (key, value, seconds) =>
 			redis.set(

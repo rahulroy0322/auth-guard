@@ -23,12 +23,14 @@ import type {
 	ResetPasswordType,
 } from "./password";
 import type { LoginWithProviderType, ProfileModelType } from "./profile";
+import type { SessionModelType } from "./session";
 import type { TokenConfigType } from "./token";
 
 type AuthPropsType = {
 	User: UserModelType;
 	Avatar: AvatarModelType;
 	Profile: ProfileModelType;
+	Session: SessionModelType;
 	Cache: CacheConfigType;
 	Mail: MailConfigType;
 	extractToken: TokenConfigType;

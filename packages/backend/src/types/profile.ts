@@ -1,4 +1,4 @@
-import type { ProfileType, ProviderType } from "base";
+import type { ProfileType, ProviderType, SessionType } from "base";
 import type { LoginReturnType } from "./auth";
 
 type ProfileModelType = {
@@ -12,7 +12,10 @@ type ProfileModelType = {
 	) => Promise<ProfileType | null>;
 };
 
-type LoginWithProviderPropsType = {
+type LoginWithProviderPropsType = Pick<
+	SessionType,
+	"deviceType" | "deviceId" | "deviceName"
+> & {
 	provider: ProviderType;
 	email: string;
 	avatarUrl: string | null;

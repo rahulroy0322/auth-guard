@@ -1,5 +1,5 @@
 import type { UserCacheModel } from "../cache/user";
-import { AuthBadError } from "../error";
+import { AuthBadError, AuthServerError } from "../error";
 import type {
 	StartVerificationPropsType,
 	StartVerificationReturnType,
@@ -7,6 +7,7 @@ import type {
 	VerifieAccountPropsType,
 	VerifieAccountReturnType,
 } from "../types";
+import type { SessionModelType } from "../types/session";
 import type { CodeFlowHelper } from "../utils/code-flow";
 import { genReqId } from "../utils/request-id";
 import { AuthResponseBuilder } from "../utils/response-builder";
@@ -25,6 +26,7 @@ class VerificationService {
 			UserModelType,
 			"findByEmail" | "updateById"
 		>,
+		private readonly sessionModel: Pick<SessionModelType, "create">,
 		private readonly codeService: CodeService,
 		private readonly userService: UserService,
 		private readonly userCache: UserCacheModel,
@@ -71,6 +73,9 @@ class VerificationService {
 	public verifieAccount = async ({
 		id,
 		code,
+		deviceId,
+		deviceName,
+		deviceType,
 	}: VerifieAccountPropsType): Promise<VerifieAccountReturnType> => {
 		const reqId = genReqId();
 
@@ -107,9 +112,26 @@ class VerificationService {
 
 		const token = this.helper.signTokens(user, reqId);
 
+		const session = await this.sessionModel.create({
+			token: token.refresh,
+			userId: user.id,
+			isActive: true,
+			deviceId,
+			deviceName,
+			deviceType,
+		});
+		if (!session) {
+			this.logger.error({
+				reqId,
+				msg: "Session Create failed",
+				user,
+			});
+			throw new AuthServerError("Session Create failed");
+		}
+
 		this.logger.info({
 			reqId,
-			msg: "Account verification successful:)",
+			msg: "Account verification successful",
 			user,
 		});
 

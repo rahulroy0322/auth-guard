@@ -8,6 +8,7 @@ import type {
 	LoginWithProviderReturnType,
 	ProfileModelType,
 } from "../types/profile";
+import type { SessionModelType } from "../types/session";
 import { genReqId } from "../utils/request-id";
 import { AuthResponseBuilder } from "../utils/response-builder";
 import type { SmartLogger } from "../utils/smart-logger";
@@ -20,6 +21,7 @@ class ProviderService {
 		private readonly logger: SmartLogger,
 		private readonly userModel: Pick<UserModelType, "create" | "findByEmail">,
 		private readonly profileModel: Pick<ProfileModelType, "create">,
+		private readonly sessionModel: Pick<SessionModelType, "create">,
 		private readonly avatarService: AvatarService,
 		private readonly userCache: UserCacheModel,
 		private readonly profileCache: ProfileCacheModel,
@@ -31,6 +33,9 @@ class ProviderService {
 		avatarUrl,
 		provider,
 		name,
+		deviceId,
+		deviceName,
+		deviceType,
 	}: LoginWithProviderPropsType): Promise<LoginWithProviderReturnType> => {
 		const reqId = genReqId();
 
@@ -107,6 +112,23 @@ class ProviderService {
 		});
 
 		const token = this.helper.signTokens(user, reqId);
+
+		const session = await this.sessionModel.create({
+			token: token.refresh,
+			userId: user.id,
+			isActive: true,
+			deviceId,
+			deviceName,
+			deviceType,
+		});
+		if (!session) {
+			this.logger.error({
+				reqId,
+				msg: "Session Create failed",
+				user,
+			});
+			throw new AuthServerError("Session Create failed");
+		}
 
 		this.logger.info({
 			reqId,

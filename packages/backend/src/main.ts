@@ -24,6 +24,7 @@ const init: AuthType = ({
 	User: userModel,
 	Avatar: avatarModel,
 	Profile: profileModel,
+	Session: sessionModel,
 	Cache,
 	Mail,
 	extractToken: tokenConfig,
@@ -75,6 +76,7 @@ const init: AuthType = ({
 	const authService = new AuthService(
 		logger,
 		userModel,
+		sessionModel,
 		userService,
 		codeService,
 		userCache,
@@ -84,6 +86,7 @@ const init: AuthType = ({
 	const verificationService = new VerificationService(
 		logger,
 		userModel,
+		sessionModel,
 		codeService,
 		userService,
 		userCache,
@@ -96,6 +99,7 @@ const init: AuthType = ({
 	const passwordService = new PasswordService(
 		logger,
 		userModel,
+		sessionModel,
 		userService,
 		codeService,
 		userCache,
@@ -107,6 +111,7 @@ const init: AuthType = ({
 
 	const sessionService = new SessionService(
 		logger,
+		sessionModel,
 		userService,
 		userCache,
 		validator,
@@ -127,6 +132,7 @@ const init: AuthType = ({
 	const profileService = new ProfileService(
 		logger,
 		userModel,
+		sessionModel,
 		userService,
 		avatarService,
 		sessionService,
@@ -142,6 +148,7 @@ const init: AuthType = ({
 		logger,
 		userModel,
 		profileModel,
+		sessionModel,
 		avatarService,
 		userCache,
 		profileCache,

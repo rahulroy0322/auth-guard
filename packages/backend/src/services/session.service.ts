@@ -1,6 +1,10 @@
 import type { IncomingMessage } from "node:http";
 import type { UserCacheModel } from "../cache/user";
-import { AuthBadError, AuthNoTokenError } from "../error";
+import {
+	AuthBadError,
+	AuthNoTokenError,
+	AuthUnAuthenticatedError,
+} from "../error";
 import type {
 	AuthStatusReturnType,
 	CheckAuthType,
@@ -10,6 +14,7 @@ import type {
 	TokenConfigType,
 	TokenRefreshReturnType,
 } from "../types";
+import type { SessionModelType } from "../types/session";
 import { genReqId } from "../utils/request-id";
 import { AuthResponseBuilder } from "../utils/response-builder";
 import type { SmartLogger } from "../utils/smart-logger";
@@ -22,6 +27,10 @@ import type { UserService } from "./user.service";
 class SessionService {
 	constructor(
 		private readonly logger: SmartLogger,
+		private readonly sessionModel: Pick<
+			SessionModelType,
+			"updateByToken" | "findByToken"
+		>,
 		private readonly userService: UserService,
 		private readonly userCache: UserCacheModel,
 		private readonly validator: UserValidator,
@@ -101,6 +110,15 @@ class SessionService {
 			});
 			throw new AuthNoTokenError();
 		}
+		const session = await this.sessionModel.findByToken(token);
+		if (!session || !session.isActive) {
+			this.logger.error({
+				reqId,
+				msg: "You Are not logged in",
+				user: null,
+			});
+			throw new AuthUnAuthenticatedError("You Are not logged in");
+		}
 
 		const {
 			token: { exp },
@@ -152,6 +170,16 @@ class SessionService {
 			};
 		}
 
+		const session = await this.sessionModel.findByToken(token);
+		if (!session || !session.isActive) {
+			this.logger.error({
+				reqId,
+				msg: "You Are not logged in",
+				user: null,
+			});
+			throw new AuthUnAuthenticatedError("You Are not logged in");
+		}
+
 		const {
 			token: { exp },
 			user,
@@ -177,7 +205,7 @@ class SessionService {
 
 		this.logger.info({
 			reqId,
-			msg: "Auth status successful:)",
+			msg: "Auth status successful",
 			user,
 		});
 
@@ -192,7 +220,8 @@ class SessionService {
 
 		this.logger.trace({ reqId, msg: "Processing logout" });
 
-		const tokensToBan = this.tokenExtractor.prepareTokensForBan(req);
+		const { tokens: tokensToBan, refreshToken } =
+			this.tokenExtractor.prepareTokensForBan(req);
 
 		if (tokensToBan.length > 0) {
 			await this.banManager.banMultiple(tokensToBan, reqId);
@@ -203,6 +232,23 @@ class SessionService {
 					count: tokensToBan.length,
 				},
 			});
+		}
+
+		if (refreshToken) {
+			this.logger.trace({
+				reqId,
+				msg: "Refresh Token Found: inactiving",
+			});
+			const session = await this.sessionModel.updateByToken(refreshToken, {
+				isActive: false,
+			});
+			if (!session) {
+				this.logger.error({
+					reqId,
+					msg: "Session Update failed",
+					user: null,
+				});
+			}
 		}
 
 		this.logger.info({
