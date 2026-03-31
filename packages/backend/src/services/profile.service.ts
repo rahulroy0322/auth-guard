@@ -1,12 +1,10 @@
 import type { AvatarCacheModel } from "../cache/avatar";
-import type { CacheModel } from "../cache/base";
-import type { ProfileCacheModel } from "../cache/profile";
+import type { UserCacheModel } from "../cache/user";
 import { AuthBadError } from "../error";
 import type {
 	ChangePasswordReturnType,
 	ChangePasswordType,
 	JwtConfigType,
-	SafeUserType,
 	TokenConfigType,
 	UpdateProfileReturnType,
 	UpdateProfileType,
@@ -14,62 +12,29 @@ import type {
 } from "../types";
 import { hashPassword } from "../utils/password";
 import { genReqId } from "../utils/request-id";
+import { AuthResponseBuilder } from "../utils/response-builder";
 import type { SmartLogger } from "../utils/smart-logger";
 import type { TokenBanManager } from "../utils/token-ban";
 import type { TokenHelper } from "../utils/token-helpers";
 import { UserSanitizer } from "../utils/user-sanitizer";
 import type { AvatarService } from "./avatar.service";
-import { BaseService } from "./base.service";
 import type { SessionService } from "./session.service";
+import type { UserService } from "./user.service";
 
-class ProfileService extends BaseService {
-	private readonly user: Pick<UserModelType, "updateById">;
-	private readonly userCache: CacheModel<SafeUserType>;
-	private readonly avatarCache: AvatarCacheModel;
-	private readonly profileCache: ProfileCacheModel;
-	private readonly helper: TokenHelper;
-	private readonly session: SessionService;
-	private readonly avatar: AvatarService;
-
-	private readonly banManager: TokenBanManager;
-	private readonly token: TokenConfigType;
+class ProfileService {
 	constructor(
+		private readonly logger: SmartLogger,
+		private readonly userModel: Pick<UserModelType, "updateById">,
+		private readonly userService: UserService,
+		private readonly avatarService: AvatarService,
+		private readonly sessionService: SessionService,
+		private readonly userCache: UserCacheModel,
+		private readonly avatarCache: AvatarCacheModel,
+		private readonly helper: TokenHelper,
+		private readonly tokenConfig: TokenConfigType,
 		private readonly jwtConfig: JwtConfigType,
-		{
-			logger,
-			user,
-			userCache,
-			avatarCache,
-			profileCache,
-			helper,
-			session,
-			avatar,
-			banManager,
-			token,
-		}: {
-			logger: SmartLogger;
-			user: UserModelType;
-			userCache: CacheModel<SafeUserType>;
-			avatarCache: AvatarCacheModel;
-			profileCache: ProfileCacheModel;
-			helper: TokenHelper;
-			session: SessionService;
-			avatar: AvatarService;
-			banManager: TokenBanManager;
-			token: TokenConfigType;
-		},
-	) {
-		super(logger);
-		this.user = user;
-		this.userCache = userCache;
-		this.avatarCache = avatarCache;
-		this.profileCache = profileCache;
-		this.helper = helper;
-		this.session = session;
-		this.avatar = avatar;
-		this.banManager = banManager;
-		this.token = token;
-	}
+		private readonly banManager: TokenBanManager,
+	) {}
 
 	public changePassword = async (
 		req: Parameters<ChangePasswordType>[0],
@@ -79,7 +44,7 @@ class ProfileService extends BaseService {
 
 		this.logger.trace({ reqId, msg: "Starting change password" });
 
-		const { user } = await this.session.loginRequired(req);
+		const { user } = await this.sessionService.loginRequired(req);
 
 		this.logger.trace({
 			reqId,
@@ -90,11 +55,11 @@ class ProfileService extends BaseService {
 
 		this.logger.trace({ reqId, msg: "Changing user Password" });
 
-		await this.user.updateById(user.id, { password });
+		await this.userModel.updateById(user.id, { password });
 
 		this.logger.trace({ reqId, msg: "Extracting tokens to ban" });
-		const [, accessToken] = (this.token.access(req) || "").split(" ");
-		const [, refreshToken] = (this.token.refresh(req) || "").split(" ");
+		const [, accessToken] = (this.tokenConfig.access(req) || "").split(" ");
+		const [, refreshToken] = (this.tokenConfig.refresh(req) || "").split(" ");
 
 		const tokensToBan: Array<{ token: string; expirySeconds: number }> = [];
 
@@ -124,10 +89,9 @@ class ProfileService extends BaseService {
 			user,
 		});
 
-		return {
-			token,
-			user: UserSanitizer.removePassword(user),
-		};
+		return AuthResponseBuilder.buildAuthResponse(user, token, () =>
+			this.userService.fetchUserWithRelations(user.id, { reqId }),
+		);
 	};
 
 	public updateProfile = async (
@@ -142,13 +106,13 @@ class ProfileService extends BaseService {
 			throw new AuthBadError("Give Something to update");
 		}
 
-		const { user } = await this.session.loginRequired(req, { reqId });
+		const { user } = await this.sessionService.loginRequired(req, { reqId });
 
 		let avatar = user.avatar;
 
 		if (url) {
 			avatar = (
-				await this.avatar.newAvatar({
+				await this.avatarService.newAvatar({
 					url,
 					reqId,
 					user,
@@ -159,7 +123,7 @@ class ProfileService extends BaseService {
 
 		if (name) {
 			this.logger.trace({ reqId, msg: "Update name" });
-			const updated = await this.user.updateById(user.id, {
+			const updated = await this.userModel.updateById(user.id, {
 				name,
 			});
 			if (updated) {
@@ -182,24 +146,15 @@ class ProfileService extends BaseService {
 			user: user,
 		});
 
-		const profiles = await this.profileCache.findByUserId(user.id, {
-			reqId,
-		});
-
 		if (!avatar) {
 			await this.avatarCache.destroyCacheData(user.id, {
 				reqId,
 			});
 		}
 
-		return {
-			user: UserSanitizer.removePassword({
-				...user,
-				name: name || user.name,
-				avatar,
-				profiles,
-			}),
-		};
+		return AuthResponseBuilder.buildUserResponse(user, () =>
+			this.userService.fetchUserWithRelations(user.id, { reqId }),
+		);
 	};
 }
 

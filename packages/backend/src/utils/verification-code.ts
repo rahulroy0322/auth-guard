@@ -10,8 +10,8 @@ class CodeManager {
 	private static readonly CODE_EXPIRY_SECONDS = 60 * 10;
 
 	constructor(
-		private readonly cache: CacheConfigType,
 		private readonly logger: SmartLogger,
+		private readonly cache: CacheConfigType,
 	) {}
 
 	async generate({

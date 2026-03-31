@@ -1,66 +1,30 @@
 import type { AvatarType } from "base";
-import type { AvatarCacheModel } from "../cache/avatar";
 import type { ProfileCacheModel } from "../cache/profile";
 import type { UserCacheModel } from "../cache/user";
 import { AuthServerError } from "../error";
-import type { MailConfigType, UserModelType } from "../types";
+import type { UserModelType } from "../types";
 import type {
 	LoginWithProviderPropsType,
 	LoginWithProviderReturnType,
 	ProfileModelType,
 } from "../types/profile";
 import { genReqId } from "../utils/request-id";
+import { AuthResponseBuilder } from "../utils/response-builder";
 import type { SmartLogger } from "../utils/smart-logger";
 import type { TokenHelper } from "../utils/token-helpers";
 import { UserSanitizer } from "../utils/user-sanitizer";
-import type { UserValidator } from "../utils/user-validation";
-import type { CodeManager } from "../utils/verification-code";
 import type { AvatarService } from "./avatar.service";
-import { UserService } from "./user.service";
 
-class ProviderService extends UserService {
-	private readonly profile: Pick<ProfileModelType, "create">;
-	private readonly avatar: AvatarService;
-
-	constructor({
-		logger,
-		user,
-		userCache,
-		avatarCache,
-		code,
-		mail,
-		validator,
-		helper,
-		profile,
-		profileCache,
-		avatar,
-	}: {
-		logger: SmartLogger;
-		user: UserModelType;
-		userCache: UserCacheModel;
-		avatarCache: AvatarCacheModel;
-		avatar: AvatarService;
-		code: CodeManager;
-		mail: MailConfigType;
-		validator: UserValidator;
-		helper: TokenHelper;
-		profile: Pick<ProfileModelType, "create" | "findByUserId">;
-		profileCache: ProfileCacheModel;
-	}) {
-		super({
-			logger,
-			code,
-			mail,
-			user,
-			userCache,
-			avatarCache,
-			profileCache,
-			validator,
-			helper,
-		});
-		this.profile = profile;
-		this.avatar = avatar;
-	}
+class ProviderService {
+	constructor(
+		private readonly logger: SmartLogger,
+		private readonly userModel: Pick<UserModelType, "create" | "findByEmail">,
+		private readonly profileModel: Pick<ProfileModelType, "create">,
+		private readonly avatarService: AvatarService,
+		private readonly userCache: UserCacheModel,
+		private readonly profileCache: ProfileCacheModel,
+		private readonly helper: TokenHelper,
+	) {}
 
 	public loginWithProvider = async ({
 		email,
@@ -76,14 +40,14 @@ class ProviderService extends UserService {
 			extra: { email, provider },
 		});
 
-		let user = await this.user.findByEmail(email);
+		let user = await this.userModel.findByEmail(email);
 
 		if (!user) {
 			this.logger.trace({
 				reqId,
 				msg: "Creating user",
 			});
-			user = await this.user.create({
+			user = await this.userModel.create({
 				email,
 				name,
 				roles: ["user"],
@@ -103,7 +67,7 @@ class ProviderService extends UserService {
 
 		if (avatarUrl) {
 			avatar = (
-				await this.avatar.newAvatar({
+				await this.avatarService.newAvatar({
 					url: avatarUrl,
 					user,
 					reqId,
@@ -120,7 +84,7 @@ class ProviderService extends UserService {
 				reqId,
 				msg: "Creating Profile",
 			});
-			const profile = await this.profile.create({
+			const profile = await this.profileModel.create({
 				email,
 				provider,
 				userId: user.id,
@@ -150,14 +114,10 @@ class ProviderService extends UserService {
 			user: sanitizedUser,
 		});
 
-		return {
-			user: {
-				...sanitizedUser,
-				avatar,
-				profiles,
-			},
-			token,
-		};
+		return AuthResponseBuilder.buildAuthResponse(user, token, async () => ({
+			avatar,
+			profiles,
+		}));
 	};
 }
 

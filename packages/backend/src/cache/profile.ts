@@ -6,13 +6,13 @@ import { CacheModel } from "./base";
 
 class ProfileCacheModel extends CacheModel<ProfileType[]> {
 	constructor(
-		protected readonly key: CacheKeysType,
 		protected readonly logger: SmartLogger,
-		protected readonly model: Pick<ProfileModelType, "findByUserId">,
+		protected readonly key: CacheKeysType,
 		protected readonly cache: CacheConfigType,
+		private readonly model: Pick<ProfileModelType, "findByUserId">,
 		protected readonly CACHE = 60 * 60,
 	) {
-		super(key, logger, cache, CACHE);
+		super(logger, key, cache, CACHE);
 	}
 
 	public findByUserId = async (id: string, { reqId }: { reqId: string }) =>
