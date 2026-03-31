@@ -26,7 +26,7 @@ class VerificationService {
 			"findByEmail" | "updateById"
 		>,
 		private readonly codeService: CodeService,
-		private readonly useerService: UserService,
+		private readonly userService: UserService,
 		private readonly userCache: UserCacheModel,
 		private readonly validator: UserValidator,
 		private readonly helper: TokenHelper,
@@ -114,7 +114,7 @@ class VerificationService {
 		});
 
 		return AuthResponseBuilder.buildAuthResponse(sanitizedUser, token, () =>
-			this.useerService.fetchUserWithRelations(sanitizedUser.id, { reqId }),
+			this.userService.fetchUserWithRelations(sanitizedUser.id, { reqId }),
 		);
 	};
 }
