@@ -7,8 +7,8 @@ import { signToken, verifyToken } from "./token";
 
 class TokenHelper {
 	constructor(
-		private readonly jwt: JwtConfigType,
 		private readonly logger: SmartLogger,
+		private readonly jwt: JwtConfigType,
 	) {}
 
 	signTokens(user: Pick<UserType, "id">, reqId: string) {

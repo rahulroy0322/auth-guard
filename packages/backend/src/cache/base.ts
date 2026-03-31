@@ -3,8 +3,8 @@ import type { SmartLogger } from "../utils/smart-logger";
 
 class CacheModel<T> {
 	constructor(
-		protected readonly key: CacheKeysType,
 		protected readonly logger: SmartLogger,
+		protected readonly key: CacheKeysType,
 		protected readonly cache: CacheConfigType,
 		protected readonly CACHE = 60 * 60,
 	) {}

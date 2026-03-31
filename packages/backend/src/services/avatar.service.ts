@@ -1,5 +1,4 @@
 import type { AvatarCacheModel } from "../cache/avatar";
-import type { ProfileCacheModel } from "../cache/profile";
 import { AuthBadError } from "../error";
 import type {
 	AvatarModelType,
@@ -9,36 +8,19 @@ import type {
 	RemoveAvatarType,
 } from "../types";
 import { genReqId } from "../utils/request-id";
+import { AuthResponseBuilder } from "../utils/response-builder";
 import type { SmartLogger } from "../utils/smart-logger";
-import { UserSanitizer } from "../utils/user-sanitizer";
-import { BaseService } from "./base.service";
 import type { SessionService } from "./session.service";
+import type { UserService } from "./user.service";
 
-class AvatarService extends BaseService {
-	private readonly avatar: AvatarModelType;
-	private readonly avatarCache: AvatarCacheModel;
-	private readonly profileCache: ProfileCacheModel;
-	private readonly session: SessionService;
-
-	constructor({
-		logger,
-		avatar,
-		avatarCache,
-		profileCache,
-		session,
-	}: {
-		logger: SmartLogger;
-		avatar: AvatarModelType;
-		avatarCache: AvatarCacheModel;
-		profileCache: ProfileCacheModel;
-		session: SessionService;
-	}) {
-		super(logger);
-		this.avatar = avatar;
-		this.avatarCache = avatarCache;
-		this.profileCache = profileCache;
-		this.session = session;
-	}
+class AvatarService {
+	constructor(
+		private readonly logger: SmartLogger,
+		private readonly avatarModel: AvatarModelType,
+		private readonly userService: UserService,
+		private readonly sessionService: SessionService,
+		private readonly avatarCache: AvatarCacheModel,
+	) {}
 
 	public newAvatar = async ({
 		url,
@@ -51,14 +33,14 @@ class AvatarService extends BaseService {
 			reqId,
 			msg: "Checking prev Avatar",
 		});
-		const prevAvatar = await this.avatar.findActiveByUserId(user.id);
+		const prevAvatar = await this.avatarModel.findActiveByUserId(user.id);
 
 		if (prevAvatar) {
 			this.logger.trace({
 				reqId,
 				msg: "Making inactive prev avatar",
 			});
-			await this.avatar.updateById(prevAvatar.id, {
+			await this.avatarModel.updateById(prevAvatar.id, {
 				active: false,
 			});
 		}
@@ -67,7 +49,7 @@ class AvatarService extends BaseService {
 			reqId,
 			msg: "Creating new avatar",
 		});
-		const avatar = await this.avatar.create({
+		const avatar = await this.avatarModel.create({
 			active: true,
 			src: url,
 			userId: user.id,
@@ -88,17 +70,10 @@ class AvatarService extends BaseService {
 			msg: "Avatar create successful",
 			user,
 		});
-		const profiles = await this.profileCache.findByUserId(user.id, {
-			reqId,
-		});
 
-		return {
-			user: UserSanitizer.removePassword({
-				...user,
-				avatar,
-				profiles,
-			}),
-		};
+		return AuthResponseBuilder.buildUserResponse(user, () =>
+			this.userService.fetchUserWithRelations(user.id, { reqId }),
+		);
 	};
 
 	public removeAvatar = async (
@@ -108,13 +83,13 @@ class AvatarService extends BaseService {
 
 		this.logger.trace({ reqId, msg: "Starting remove avatar" });
 
-		const { user } = await this.session.loginRequired(req);
+		const { user } = await this.sessionService.loginRequired(req);
 
 		this.logger.trace({
 			reqId,
 			msg: "Checking Avatar exists",
 		});
-		const avatar = await this.avatar.findActiveByUserId(user.id);
+		const avatar = await this.avatarModel.findActiveByUserId(user.id);
 
 		if (avatar) {
 			this.logger.trace({
@@ -123,11 +98,11 @@ class AvatarService extends BaseService {
 			});
 
 			if (
-				await this.avatar.updateById(avatar.id, {
+				await this.avatarModel.updateById(avatar.id, {
 					active: false,
 				})
 			) {
-				this.avatarCache.destroyCacheData(avatar.userId, {
+				await this.avatarCache.destroyCacheData(avatar.userId, {
 					reqId,
 				});
 				this.logger.trace({
@@ -136,17 +111,10 @@ class AvatarService extends BaseService {
 				});
 			}
 		}
-		const profiles = await this.profileCache.findByUserId(user.id, {
-			reqId,
-		});
 
-		return {
-			user: UserSanitizer.removePassword({
-				...user,
-				avatar: null,
-				profiles,
-			}),
-		};
+		return await AuthResponseBuilder.buildUserResponse(user, () =>
+			this.userService.fetchUserWithRelations(user.id, { reqId }),
+		);
 	};
 }
 

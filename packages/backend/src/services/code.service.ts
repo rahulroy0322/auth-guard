@@ -1,28 +1,15 @@
 import type { MailConfigType } from "../types";
 import type { SmartLogger } from "../utils/smart-logger";
 import type { CodeManager } from "../utils/verification-code";
-import { BaseService } from "./base.service";
 
-class CodeService extends BaseService {
-	protected readonly code: CodeManager;
-	protected readonly mail: MailConfigType;
-	constructor({
-		logger,
-		code,
-		mail,
-	}: {
-		logger: SmartLogger;
-		code: CodeManager;
-		mail: MailConfigType;
-	}) {
-		super(logger);
-		this.code = code;
-		this.mail = mail;
-	}
+class CodeService {
+	constructor(
+		private readonly logger: SmartLogger,
+		private readonly code: CodeManager,
+		private readonly mail: MailConfigType,
+	) {}
 
-	protected sendCode = async (
-		props: Parameters<CodeManager["generate"]>[0],
-	) => {
+	public sendCode = async (props: Parameters<CodeManager["generate"]>[0]) => {
 		const {
 			reqId,
 			user: { id: userId },

@@ -1,16 +1,33 @@
+import type { UserCacheModel } from "../cache/user";
 import { AuthBadError, AuthConflictError, AuthServerError } from "../error";
 import type {
 	LoginPropsType,
 	LoginReturnType,
 	RegisterPropsType,
 	RegisterReturnType,
+	UserModelType,
 } from "../types";
 import { hashPassword, validPassword } from "../utils/password";
 import { genReqId } from "../utils/request-id";
+import { AuthResponseBuilder } from "../utils/response-builder";
+import type { SmartLogger } from "../utils/smart-logger";
+import type { TokenHelper } from "../utils/token-helpers";
 import { UserSanitizer } from "../utils/user-sanitizer";
-import { UserService } from "./user.service";
+import type { UserValidator } from "../utils/user-validation";
+import type { CodeService } from "./code.service";
+import type { UserService } from "./user.service";
 
-class AuthService extends UserService {
+class AuthService {
+	constructor(
+		private readonly logger: SmartLogger,
+		private readonly userModel: Pick<UserModelType, "create" | "findByEmail">,
+		private readonly userService: UserService,
+		private readonly codeService: CodeService,
+		private readonly userCache: UserCacheModel,
+		private readonly validator: UserValidator,
+		private readonly helper: TokenHelper,
+	) {}
+
 	public register = async ({
 		password: passwd,
 		...data
@@ -25,7 +42,7 @@ class AuthService extends UserService {
 			msg: "Starting Registration",
 		});
 
-		const existingUser = (await this.user.findByEmail(data.email)) ?? null;
+		const existingUser = (await this.userModel.findByEmail(data.email)) ?? null;
 
 		if (existingUser) {
 			this.logger.error({
@@ -40,7 +57,7 @@ class AuthService extends UserService {
 		const password = await hashPassword(passwd);
 
 		this.logger.trace({ reqId, msg: "Creating User" });
-		const user = await this.user.create({
+		const user = await this.userModel.create({
 			...data,
 			password,
 			roles: ["user"],
@@ -55,7 +72,7 @@ class AuthService extends UserService {
 			});
 			throw new AuthServerError("Failed to create user account");
 		}
-		this.sendCode({
+		this.codeService.sendCode({
 			reqId,
 			kind: "verification",
 			user,
@@ -82,7 +99,7 @@ class AuthService extends UserService {
 			extra: { email },
 		});
 
-		const user = await this.user.findByEmail(email);
+		const user = await this.userModel.findByEmail(email);
 
 		const verifiedUser = this.validator.validateForPasswordAuth(
 			user,
@@ -124,21 +141,12 @@ class AuthService extends UserService {
 			reqId,
 		});
 
-		const avatar = await this.avatarCache.findByUserId(sanitizedUser.id, {
-			reqId,
-		});
-		const profiles = await this.profileCache.findByUserId(sanitizedUser.id, {
-			reqId,
-		});
-
-		return {
+		return await AuthResponseBuilder.buildAuthResponse(
+			sanitizedUser,
 			token,
-			user: {
-				...sanitizedUser,
-				avatar,
-				profiles,
-			},
-		};
+			() =>
+				this.userService.fetchUserWithRelations(sanitizedUser.id, { reqId }),
+		);
 	};
 }
 

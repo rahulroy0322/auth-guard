@@ -1,12 +1,9 @@
 import type { IncomingMessage } from "node:http";
-import type { AvatarCacheModel } from "../cache/avatar";
-import type { ProfileCacheModel } from "../cache/profile";
 import type { UserCacheModel } from "../cache/user";
 import { AuthBadError, AuthNoTokenError } from "../error";
 import type {
 	AuthStatusReturnType,
 	CheckAuthType,
-	JwtConfigType,
 	LoginRequiredReturnType,
 	LoginRequiredType,
 	ReturnUserType,
@@ -14,54 +11,25 @@ import type {
 	TokenRefreshReturnType,
 } from "../types";
 import { genReqId } from "../utils/request-id";
+import { AuthResponseBuilder } from "../utils/response-builder";
 import type { SmartLogger } from "../utils/smart-logger";
 import type { TokenBanManager } from "../utils/token-ban";
+import type { TokenExtractor } from "../utils/token-extractor";
 import type { TokenHelper } from "../utils/token-helpers";
-import { UserSanitizer } from "../utils/user-sanitizer";
 import type { UserValidator } from "../utils/user-validation";
-import { BaseService } from "./base.service";
+import type { UserService } from "./user.service";
 
-class SessionService extends BaseService {
-	private readonly userCache: UserCacheModel;
-	private readonly avatarCache: AvatarCacheModel;
-	private readonly profileCache: ProfileCacheModel;
-	private readonly validator: UserValidator;
-	private readonly helper: TokenHelper;
-	private readonly token: TokenConfigType;
-	private readonly banManager: TokenBanManager;
-
+class SessionService {
 	constructor(
-		private readonly jwtConfig: JwtConfigType,
-		{
-			logger,
-			userCache,
-			avatarCache,
-			profileCache,
-			validator,
-			helper,
-			token,
-			banManager,
-		}: {
-			logger: SmartLogger;
-			userCache: UserCacheModel;
-			avatarCache: AvatarCacheModel;
-			profileCache: ProfileCacheModel;
-			validator: UserValidator;
-			helper: TokenHelper;
-			token: TokenConfigType;
-			banManager: TokenBanManager;
-		},
-	) {
-		super(logger);
-
-		this.userCache = userCache;
-		this.avatarCache = avatarCache;
-		this.profileCache = profileCache;
-		this.validator = validator;
-		this.helper = helper;
-		this.token = token;
-		this.banManager = banManager;
-	}
+		private readonly logger: SmartLogger,
+		private readonly userService: UserService,
+		private readonly userCache: UserCacheModel,
+		private readonly validator: UserValidator,
+		private readonly helper: TokenHelper,
+		private readonly tokenConfig: TokenConfigType,
+		private readonly banManager: TokenBanManager,
+		private readonly tokenExtractor: TokenExtractor,
+	) {}
 
 	public checkAuth = async (
 		req: Parameters<CheckAuthType>[0],
@@ -73,7 +41,7 @@ class SessionService extends BaseService {
 
 		this.logger.trace({ reqId, msg: "Checking authentication" });
 
-		const [, token] = (this.token.access(req) || "").split(" ");
+		const [, token] = (this.tokenConfig.access(req) || "").split(" ");
 
 		if (!token) {
 			return { user: null };
@@ -91,7 +59,7 @@ class SessionService extends BaseService {
 			user,
 		});
 
-		return { user: UserSanitizer.removePassword(user) };
+		return { user };
 	};
 
 	public loginRequired = async (
@@ -123,7 +91,7 @@ class SessionService extends BaseService {
 
 		this.logger.trace({ reqId, msg: "Starting token refresh" });
 
-		const [, token] = (this.token.refresh(req) || "").split(" ");
+		const [, token] = (this.tokenConfig.refresh(req) || "").split(" ");
 
 		if (!token) {
 			this.logger.error({
@@ -159,7 +127,7 @@ class SessionService extends BaseService {
 
 		this.logger.info({
 			reqId,
-			msg: "Token refresh successful:)",
+			msg: "Token refresh successful",
 			user,
 		});
 
@@ -176,7 +144,7 @@ class SessionService extends BaseService {
 
 		this.logger.trace({ reqId, msg: "Starting Auth Status" });
 
-		const [, token] = (this.token.refresh(req) || "").split(" ");
+		const [, token] = (this.tokenConfig.refresh(req) || "").split(" ");
 
 		if (!token) {
 			return {
@@ -224,26 +192,7 @@ class SessionService extends BaseService {
 
 		this.logger.trace({ reqId, msg: "Processing logout" });
 
-		const [, accessToken] = (this.token.access(req) || "").split(" ");
-		const [, refreshToken] = (this.token.refresh(req) || "").split(" ");
-
-		const tokensToBan: Array<{ token: string; expirySeconds: number }> = [];
-
-		if (accessToken) {
-			this.logger.trace({ reqId, msg: "Access Token found Banning it" });
-			tokensToBan.push({
-				token: accessToken,
-				expirySeconds: this.jwtConfig.expires.access,
-			});
-		}
-
-		if (refreshToken) {
-			this.logger.trace({ reqId, msg: "Refresh Token found Banning it" });
-			tokensToBan.push({
-				token: refreshToken,
-				expirySeconds: this.jwtConfig.expires.refresh,
-			});
-		}
+		const tokensToBan = this.tokenExtractor.prepareTokensForBan(req);
 
 		if (tokensToBan.length > 0) {
 			await this.banManager.banMultiple(tokensToBan, reqId);
@@ -277,20 +226,11 @@ class SessionService extends BaseService {
 		});
 		this.validator.validateNotBanned(verifiedUser, { reqId });
 
-		const sanitizedUser = UserSanitizer.removePassword(verifiedUser);
-
-		const avatar = await this.avatarCache.findByUserId(sanitizedUser.id, {
-			reqId,
-		});
-		const profiles = await this.profileCache.findByUserId(sanitizedUser.id, {
-			reqId,
-		});
-
-		return {
-			...sanitizedUser,
-			avatar,
-			profiles,
-		};
+		return (
+			await AuthResponseBuilder.buildUserResponse(verifiedUser, () =>
+				this.userService.fetchUserWithRelations(verifiedUser.id, { reqId }),
+			)
+		).user;
 	};
 
 	private verifyAndCheckBan = async ({

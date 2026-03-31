@@ -1,16 +1,40 @@
+import type { UserCacheModel } from "../cache/user";
 import { AuthBadError } from "../error";
 import type {
 	ForgotPasswordPropsType,
 	ForgotPasswordReturnType,
 	ResetPasswordPropsType,
 	ResetPasswordReturnType,
+	UserModelType,
 } from "../types";
+import type { CodeFlowHelper } from "../utils/code-flow";
 import { hashPassword } from "../utils/password";
 import { genReqId } from "../utils/request-id";
+import { AuthResponseBuilder } from "../utils/response-builder";
+import type { SmartLogger } from "../utils/smart-logger";
+import type { TokenHelper } from "../utils/token-helpers";
 import { UserSanitizer } from "../utils/user-sanitizer";
-import { UserService } from "./user.service";
+import type { UserValidator } from "../utils/user-validation";
+import type { CodeManager } from "../utils/verification-code";
+import type { CodeService } from "./code.service";
+import type { UserService } from "./user.service";
 
-class PasswordService extends UserService {
+class PasswordService {
+	constructor(
+		private readonly logger: SmartLogger,
+		private readonly userModel: Pick<
+			UserModelType,
+			"findByEmail" | "updateById"
+		>,
+		private readonly userService: UserService,
+		private readonly codeService: CodeService,
+		private readonly userCache: UserCacheModel,
+		private readonly validator: UserValidator,
+		private readonly helper: TokenHelper,
+		private readonly codeFlowHelper: CodeFlowHelper,
+		private readonly codeManager: CodeManager,
+	) {}
+
 	public forgotPassword = async ({
 		email,
 	}: ForgotPasswordPropsType): Promise<ForgotPasswordReturnType> => {
@@ -22,7 +46,7 @@ class PasswordService extends UserService {
 			extra: { email },
 		});
 
-		const user = await this.user.findByEmail(email);
+		const user = await this.userModel.findByEmail(email);
 		const verifiedUser = this.validator.validateForPasswordAuth(
 			user,
 			{ reqId },
@@ -35,7 +59,7 @@ class PasswordService extends UserService {
 			extra: { userId: verifiedUser.id },
 		});
 
-		const codeExists = await this.code.checkExists(verifiedUser);
+		const codeExists = await this.codeManager.checkExists(verifiedUser);
 
 		if (codeExists) {
 			this.logger.error({
@@ -48,7 +72,7 @@ class PasswordService extends UserService {
 
 		// TODO! clear session
 
-		this.sendCode({
+		this.codeService.sendCode({
 			reqId,
 			kind: "forgot",
 			user: verifiedUser,
@@ -66,21 +90,11 @@ class PasswordService extends UserService {
 
 		this.logger.trace({ reqId, msg: "Starting password reset", extra: { id } });
 
-		await this.code.verify({
-			reqId,
+		await this.codeFlowHelper.verifyAndRemove({
 			code,
-			user: {
-				id,
-				email: "unknown",
-				name: "unknown",
-			},
-		});
-		await this.code.remove(
-			{
-				id,
-			},
 			reqId,
-		);
+			userId: id,
+		});
 
 		this.logger.trace({
 			reqId,
@@ -91,7 +105,7 @@ class PasswordService extends UserService {
 		const password = await hashPassword(passwd);
 
 		this.logger.trace({ reqId, msg: "Reseting user Password" });
-		const user = await this.user.updateById(id, { password });
+		const user = await this.userModel.updateById(id, { password });
 
 		if (!user) {
 			this.logger.error({
@@ -104,9 +118,6 @@ class PasswordService extends UserService {
 
 		const sanitizedUser = UserSanitizer.removePassword(user);
 		await this.userCache.cacheData(user.id, sanitizedUser, { reqId });
-		const avatar = await this.avatarCache.findByUserId(sanitizedUser.id, {
-			reqId,
-		});
 
 		// TODO! clear session
 
@@ -118,18 +129,9 @@ class PasswordService extends UserService {
 			user,
 		});
 
-		const profiles = await this.profileCache.findByUserId(sanitizedUser.id, {
-			reqId,
-		});
-
-		return {
-			token,
-			user: {
-				...sanitizedUser,
-				avatar,
-				profiles,
-			},
-		};
+		return AuthResponseBuilder.buildAuthResponse(user, token, () =>
+			this.userService.fetchUserWithRelations(user.id, { reqId }),
+		);
 	};
 }
 

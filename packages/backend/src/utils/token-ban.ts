@@ -4,8 +4,8 @@ import type { SmartLogger } from "./smart-logger";
 
 class TokenBanManager {
 	constructor(
-		private readonly cache: Pick<CacheConfigType, "get" | "set">,
 		private readonly logger: SmartLogger,
+		private readonly cache: Pick<CacheConfigType, "get" | "set">,
 	) {}
 
 	async ban({

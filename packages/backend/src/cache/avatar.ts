@@ -5,15 +5,15 @@ import { CacheModel } from "./base";
 
 class AvatarCacheModel extends CacheModel<AvatarType> {
 	constructor(
-		protected readonly key: CacheKeysType,
 		protected readonly logger: SmartLogger,
-		protected readonly model: {
-			findByUserId: (id: string) => Promise<AvatarType | null>;
-		},
+		protected readonly key: CacheKeysType,
 		protected readonly cache: CacheConfigType,
+		private readonly model: {
+			findByUserId: (userId: string) => Promise<AvatarType | null>;
+		},
 		protected readonly CACHE = 60 * 60,
 	) {
-		super(key, logger, cache, CACHE);
+		super(logger, key, cache, CACHE);
 	}
 
 	public findByUserId = async (id: string, { reqId }: { reqId: string }) =>
