@@ -4,7 +4,7 @@ import { defaults } from "./helper";
 import { User } from "./user";
 
 const Session = pgTable("sessions", {
-	token: varchar({ length: 255 }).notNull(),
+	token: varchar({ length: 2048 }).notNull(),
 	deviceId: varchar({ length: 255 }).notNull(),
 	deviceType: varchar({ length: 255 }).notNull(),
 	deviceName: varchar({ length: 255 }).notNull(),
