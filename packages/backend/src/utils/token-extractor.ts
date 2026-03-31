@@ -16,7 +16,10 @@ class TokenExtractor {
 
 	public prepareTokensForBan = (req: IncomingMessage) => {
 		const { accessToken, refreshToken } = this.extractTokens(req);
-		const tokens: Array<{ token: string; expirySeconds: number }> = [];
+		const tokens: Array<{
+			token: string;
+			expirySeconds: number;
+		}> = [];
 
 		if (accessToken) {
 			tokens.push({
@@ -32,7 +35,11 @@ class TokenExtractor {
 			});
 		}
 
-		return tokens;
+		return {
+			tokens,
+			accessToken,
+			refreshToken,
+		};
 	};
 }
 

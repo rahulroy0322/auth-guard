@@ -3,12 +3,13 @@ import type {
 	AuthReturnType,
 } from "@auth-guard/backend/types/index";
 import type { UserType } from "base";
-import type { RequestHandler } from "express";
+import type { Request, RequestHandler } from "express";
 
 type AuthExpressPropsType = AuthPropsType & {
 	cookie: {
 		refresh: string;
 		access: string;
+		extract: (req: Request, key: "deviceId") => string | null;
 	};
 };
 

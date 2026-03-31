@@ -1,7 +1,8 @@
 import { unlink } from "node:fs/promises";
 import { init as core } from "@auth-guard/backend";
 import { AuthServerError } from "@auth-guard/backend/error";
-import type { RequestHandler, Response } from "express";
+import { genReqId } from "@auth-guard/backend/utils/request-id";
+import type { Request, RequestHandler, Response } from "express";
 import {
 	loginSchema,
 	registerSchema,
@@ -9,6 +10,7 @@ import {
 	updateProfileSchema,
 	verifieSchema,
 } from "schema";
+import { UAParser } from "ua-parser-js";
 import type { AuthExpressType, ResType, UpdateProfileType } from "./types";
 
 const options = {
@@ -20,6 +22,29 @@ const options = {
 
 const init: AuthExpressType = ({ cookie, ...props }) => {
 	const coreApi = core(props);
+
+	const getDeviceId = (req: Request, res: Response) => {
+		let deviceId = cookie.extract(req, "deviceId");
+		if (!deviceId) {
+			deviceId = genReqId();
+			res.cookie("deviceId", deviceId, {
+				...options,
+			});
+		}
+		return deviceId;
+	};
+
+	const getDeviceInfo = (req: Request, res: Response) => {
+		const ua = new UAParser(req.headers["user-agent"]);
+
+		const deviceId = getDeviceId(req, res);
+
+		return {
+			deviceId,
+			deviceName: ua.getOS().name || "Unknown",
+			deviceType: ua.getBrowser().name || "Unknown",
+		};
+	};
 
 	const setAuthCookie = (res: Response, refreshToken: string) => {
 		res.cookie(cookie.refresh, refreshToken, {
@@ -51,7 +76,10 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		const {
 			token: { access, refresh },
 			user,
-		} = await coreApi.login(data);
+		} = await coreApi.login({
+			...data,
+			...getDeviceInfo(req, res),
+		});
 
 		setAuthCookie(res, refresh);
 
@@ -91,7 +119,10 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		const {
 			token: { access, refresh },
 			user,
-		} = await coreApi.verifieAccount(data);
+		} = await coreApi.verifieAccount({
+			...data,
+			...getDeviceInfo(req, res),
+		});
 
 		setAuthCookie(res, refresh);
 
@@ -196,7 +227,10 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		const {
 			token: { access, refresh },
 			user,
-		} = await coreApi.resetPassword(data);
+		} = await coreApi.resetPassword({
+			...data,
+			...getDeviceInfo(req, res),
+		});
 
 		setAuthCookie(res, refresh);
 
@@ -219,7 +253,10 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		const {
 			token: { access, refresh },
 			user,
-		} = await coreApi.changePassword(req, data.password);
+		} = await coreApi.changePassword(req, {
+			password: data.password,
+			...getDeviceInfo(req, res),
+		});
 
 		setAuthCookie(res, refresh);
 
@@ -303,6 +340,10 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		} satisfies ResType);
 	};
 
+	const loginWithProvider: RequestHandler = async () => {
+		throw new Error("wet to impl");
+	};
+
 	return {
 		removeAvatar,
 		login,
@@ -319,6 +360,7 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		changePassword,
 		updateProfile,
 		authStatus,
+		loginWithProvider,
 	};
 };
 

@@ -1,6 +1,6 @@
 import type { AvatarCacheModel } from "../cache/avatar";
 import type { UserCacheModel } from "../cache/user";
-import { AuthBadError } from "../error";
+import { AuthBadError, AuthServerError } from "../error";
 import type {
 	ChangePasswordReturnType,
 	ChangePasswordType,
@@ -10,6 +10,7 @@ import type {
 	UpdateProfileType,
 	UserModelType,
 } from "../types";
+import type { SessionModelType } from "../types/session";
 import { hashPassword } from "../utils/password";
 import { genReqId } from "../utils/request-id";
 import { AuthResponseBuilder } from "../utils/response-builder";
@@ -25,6 +26,10 @@ class ProfileService {
 	constructor(
 		private readonly logger: SmartLogger,
 		private readonly userModel: Pick<UserModelType, "updateById">,
+		private readonly sessionModel: Pick<
+			SessionModelType,
+			"create" | "updateAllByUserId"
+		>,
 		private readonly userService: UserService,
 		private readonly avatarService: AvatarService,
 		private readonly sessionService: SessionService,
@@ -38,7 +43,12 @@ class ProfileService {
 
 	public changePassword = async (
 		req: Parameters<ChangePasswordType>[0],
-		passwd: Parameters<ChangePasswordType>[1],
+		{
+			password: passwd,
+			deviceId,
+			deviceName,
+			deviceType,
+		}: Parameters<ChangePasswordType>[1],
 	): Promise<ChangePasswordReturnType> => {
 		const reqId = genReqId();
 
@@ -80,8 +90,28 @@ class ProfileService {
 		}
 
 		this.banManager.banMultiple(tokensToBan, reqId);
+		await this.sessionModel.updateAllByUserId(user.id, {
+			isActive: false,
+		});
 
 		const token = this.helper.signTokens(user, reqId);
+
+		const session = await this.sessionModel.create({
+			token: token.refresh,
+			userId: user.id,
+			isActive: true,
+			deviceId,
+			deviceName,
+			deviceType,
+		});
+		if (!session) {
+			this.logger.error({
+				reqId,
+				msg: "Session Create failed",
+				user,
+			});
+			throw new AuthServerError("Session Create failed");
+		}
 
 		this.logger.info({
 			reqId,

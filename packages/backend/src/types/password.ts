@@ -1,5 +1,5 @@
 import type { IncomingMessage } from "node:http";
-import type { UserType } from "base";
+import type { SessionType, UserType } from "base";
 import type {
 	LoginReturnType,
 	RegisterReturnType,
@@ -12,9 +12,10 @@ type ForgotPasswordType = (
 	data: ForgotPasswordPropsType,
 ) => Promise<ForgotPasswordReturnType>;
 
-type ResetPasswordPropsType = VerifieAccountPropsType & {
-	password: string;
-};
+type ResetPasswordPropsType = VerifieAccountPropsType &
+	Pick<SessionType, "deviceType" | "deviceId" | "deviceName"> & {
+		password: string;
+	};
 type ResetPasswordReturnType = LoginReturnType;
 type ResetPasswordType = (
 	data: ResetPasswordPropsType,
@@ -23,7 +24,9 @@ type ResetPasswordType = (
 type ChangePasswordReturnType = LoginReturnType;
 type ChangePasswordType = (
 	req: IncomingMessage,
-	password: string,
+	data: Pick<SessionType, "deviceId" | "deviceName" | "deviceType"> & {
+		password: string;
+	},
 ) => Promise<ChangePasswordReturnType>;
 
 export type {

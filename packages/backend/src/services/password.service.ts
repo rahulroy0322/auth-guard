@@ -1,5 +1,5 @@
 import type { UserCacheModel } from "../cache/user";
-import { AuthBadError } from "../error";
+import { AuthBadError, AuthServerError } from "../error";
 import type {
 	ForgotPasswordPropsType,
 	ForgotPasswordReturnType,
@@ -7,6 +7,7 @@ import type {
 	ResetPasswordReturnType,
 	UserModelType,
 } from "../types";
+import type { SessionModelType } from "../types/session";
 import type { CodeFlowHelper } from "../utils/code-flow";
 import { hashPassword } from "../utils/password";
 import { genReqId } from "../utils/request-id";
@@ -25,6 +26,10 @@ class PasswordService {
 		private readonly userModel: Pick<
 			UserModelType,
 			"findByEmail" | "updateById"
+		>,
+		private readonly sessionModel: Pick<
+			SessionModelType,
+			"create" | "updateAllByUserId"
 		>,
 		private readonly userService: UserService,
 		private readonly codeService: CodeService,
@@ -70,7 +75,9 @@ class PasswordService {
 			return { id: verifiedUser.id };
 		}
 
-		// TODO! clear session
+		await this.sessionModel.updateAllByUserId(verifiedUser.id, {
+			isActive: false,
+		});
 
 		this.codeService.sendCode({
 			reqId,
@@ -85,6 +92,9 @@ class PasswordService {
 		id,
 		password: passwd,
 		code,
+		deviceId,
+		deviceName,
+		deviceType,
 	}: ResetPasswordPropsType): Promise<ResetPasswordReturnType> => {
 		const reqId = genReqId();
 
@@ -119,9 +129,28 @@ class PasswordService {
 		const sanitizedUser = UserSanitizer.removePassword(user);
 		await this.userCache.cacheData(user.id, sanitizedUser, { reqId });
 
-		// TODO! clear session
+		await this.sessionModel.updateAllByUserId(user.id, {
+			isActive: false,
+		});
 
 		const token = this.helper.signTokens(user, reqId);
+
+		const session = await this.sessionModel.create({
+			token: token.refresh,
+			userId: user.id,
+			isActive: true,
+			deviceId,
+			deviceName,
+			deviceType,
+		});
+		if (!session) {
+			this.logger.error({
+				reqId,
+				msg: "Session Create failed",
+				user,
+			});
+			throw new AuthServerError("Session Create failed");
+		}
 
 		this.logger.info({
 			reqId,

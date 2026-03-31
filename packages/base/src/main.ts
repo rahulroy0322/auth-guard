@@ -27,4 +27,21 @@ type AvatarType = {
 	userId: UserType['id']
 }
 
-export type { AvatarType, ProfileType, ProviderType, RoleType, UserType }
+type SessionType = {
+	id: string
+	token: string
+	userId: UserType['id']
+	deviceId: string
+	deviceType: string
+	deviceName: string
+	isActive: boolean
+}
+
+export type {
+	AvatarType,
+	ProfileType,
+	ProviderType,
+	RoleType,
+	SessionType,
+	UserType,
+}

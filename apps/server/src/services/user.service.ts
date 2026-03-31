@@ -2,20 +2,19 @@ import type { AuthPropsType } from "@auth-guard/express/types";
 import type { UserType } from "base";
 import { eq, type SQL } from "drizzle-orm";
 import { db } from "../db/main";
-import { Avatar } from "../db/schema/avatar";
 import { User } from "../db/schema/user";
 import { checkNull } from "./utils";
 
 type UserModelType = AuthPropsType["User"];
 
-const findUsers = async ({
+const findUsers = ({
 	filter = undefined,
 	limit = undefined,
 }: {
 	filter?: SQL<unknown>;
 	limit?: number;
-}): Promise<UserType[]> => {
-	const users = await db.query.User.findMany({
+}): Promise<Omit<UserType, "profiles" | "avatar">[]> =>
+	db.query.User.findMany({
 		where: filter,
 		columns: {
 			id: true,
@@ -26,29 +25,8 @@ const findUsers = async ({
 			isBaned: true,
 			verifiedAt: true,
 		},
-		with: {
-			profiles: {
-				columns: {
-					email: true,
-					provider: true,
-				},
-			},
-			avatars: {
-				limit: 1,
-				where: eq(Avatar.active, true),
-				columns: {
-					src: true,
-				},
-			},
-		},
 		limit,
 	});
-
-	return users.map(({ avatars, ...user }) => ({
-		...user,
-		avatar: avatars.at(0) || null,
-	}));
-};
 
 const findByEmail: UserModelType["findByEmail"] = async (email) => {
 	const [user = null] = await findUsers({

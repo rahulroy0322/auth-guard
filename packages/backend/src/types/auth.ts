@@ -1,5 +1,5 @@
 import type { IncomingMessage } from "node:http";
-import type { UserType } from "base";
+import type { SessionType, UserType } from "base";
 import type { CodeType } from "./code";
 
 type _UserType = Omit<UserType, "avatar" | "profiles">;
@@ -28,9 +28,10 @@ type RegisterPropsType = Pick<_UserType, "email" | "name"> & {
 type RegisterReturnType = Pick<_UserType, "id">;
 type RegisterType = (data: RegisterPropsType) => Promise<RegisterReturnType>;
 
-type LoginPropsType = Pick<_UserType, "email"> & {
-	password: string;
-};
+type LoginPropsType = Pick<_UserType, "email"> &
+	Pick<SessionType, "deviceType" | "deviceId" | "deviceName"> & {
+		password: string;
+	};
 type LoginReturnType = {
 	user: ReturnUserType;
 	token: {
@@ -72,7 +73,10 @@ type StartVerificationType = (
 	data: StartVerificationPropsType,
 ) => Promise<StartVerificationReturnType>;
 
-type VerifieAccountPropsType = {
+type VerifieAccountPropsType = Pick<
+	SessionType,
+	"deviceId" | "deviceName" | "deviceType"
+> & {
 	id: UserType["id"];
 	code: CodeType;
 };
