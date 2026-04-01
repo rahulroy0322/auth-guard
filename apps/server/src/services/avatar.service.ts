@@ -1,11 +1,11 @@
 import type { AuthPropsType } from "@auth-guard/express/types";
-import type { AvatarType } from "base";
+import type { AvatarType, ProviderType } from "base";
 import { and, eq, type SQL } from "drizzle-orm";
 import { db } from "../db/main";
 import { Avatar } from "../db/schema/avatar";
 import { checkNull } from "./utils";
 
-type AvatarModelType = AuthPropsType["Avatar"];
+type AvatarModelType = AuthPropsType<ProviderType>["Avatar"];
 
 const findAvatars = async ({
 	filter = undefined,

@@ -1,16 +1,18 @@
+import type { ProviderType } from "base";
 import { AvatarCacheModel } from "./cache/avatar";
 import { ProfileCacheModel } from "./cache/profile";
 import { UserCacheModel } from "./cache/user";
+import { createOAuthClients } from "./OAuth/main";
 import { AuthService } from "./services/auth.service";
 import { AvatarService } from "./services/avatar.service";
 import { CodeService } from "./services/code.service";
+import { OAuthService } from "./services/OAuth.service";
 import { PasswordService } from "./services/password.service";
 import { ProfileService } from "./services/profile.service";
-import { ProviderService } from "./services/provider.service";
 import { SessionService } from "./services/session.service";
 import { UserService } from "./services/user.service";
 import { VerificationService } from "./services/verification.service";
-import type { AuthReturnType, AuthType } from "./types/index";
+import type { AuthPropsType, AuthReturnType, AuthType } from "./types/index";
 import { CodeFlowHelper } from "./utils/code-flow";
 import { SmartLogger } from "./utils/smart-logger";
 import { TokenBanManager } from "./utils/token-ban";
@@ -20,7 +22,8 @@ import { UserSanitizer } from "./utils/user-sanitizer";
 import { UserValidator } from "./utils/user-validation";
 import { CodeManager } from "./utils/verification-code";
 
-const init: AuthType = ({
+const init: AuthType = <T extends ProviderType>({
+	OAuth,
 	User: userModel,
 	Avatar: avatarModel,
 	Profile: profileModel,
@@ -30,7 +33,7 @@ const init: AuthType = ({
 	extractToken: tokenConfig,
 	jwt,
 	logger: mainLogger,
-}): AuthReturnType => {
+}: AuthPropsType<T>): AuthReturnType<T> => {
 	const logger = new SmartLogger(mainLogger);
 
 	const validator = new UserValidator(logger);
@@ -40,6 +43,8 @@ const init: AuthType = ({
 
 	const helper = new TokenHelper(logger, jwt);
 	const banManager = new TokenBanManager(logger, Cache);
+
+	const clients = createOAuthClients(OAuth);
 
 	const avatarCache = new AvatarCacheModel(logger, "avatar", Cache, {
 		findByUserId: avatarModel.findActiveByUserId,
@@ -144,15 +149,15 @@ const init: AuthType = ({
 		banManager,
 	);
 
-	const providerService = new ProviderService(
+	const oAuthService = new OAuthService<T>(
 		logger,
 		userModel,
 		profileModel,
 		sessionModel,
-		avatarService,
 		userCache,
 		profileCache,
 		helper,
+		clients,
 	);
 
 	return {
@@ -160,7 +165,8 @@ const init: AuthType = ({
 		register: authService.register,
 		login: authService.login,
 		logout: sessionService.logout,
-		loginWithProvider: providerService.loginWithProvider,
+		oAuthStart: oAuthService.oAuthStart,
+		loginWithProvider: oAuthService.login,
 
 		// logged-in
 		changePassword: profileService.changePassword,
@@ -180,7 +186,7 @@ const init: AuthType = ({
 		checkAuth: sessionService.checkAuth,
 		loginRequired: sessionService.loginRequired,
 		tokenRefresh: sessionService.tokenRefresh,
-	} satisfies AuthReturnType;
+	} satisfies AuthReturnType<T>;
 };
 
 const auth = init;

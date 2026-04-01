@@ -2,10 +2,10 @@ import type {
 	AuthPropsType,
 	AuthReturnType,
 } from "@auth-guard/backend/types/index";
-import type { UserType } from "base";
+import type { ProviderType, UserType } from "base";
 import type { Request, RequestHandler } from "express";
 
-type AuthExpressPropsType = AuthPropsType & {
+type AuthExpressPropsType<T extends ProviderType> = AuthPropsType<T> & {
 	cookie: {
 		refresh: string;
 		access: string;
@@ -35,12 +35,20 @@ type ResType = {
 		  };
 };
 
-type AuthExpressReturnType = Record<
-	keyof AuthReturnType | "me",
+type AuthExpressReturnType<T extends ProviderType> = Record<
+	Exclude<keyof AuthReturnType<T>, "oAuthStart" | "loginWithProvider"> | "me",
 	RequestHandler
->;
+> &
+	Record<
+		"oAuthStart" | "loginWithProvider",
+		RequestHandler<{
+			provider: T;
+		}>
+	>;
 
-type AuthExpressType = (props: AuthExpressPropsType) => AuthExpressReturnType;
+type AuthExpressType = <T extends ProviderType>(
+	props: AuthExpressPropsType<T>,
+) => AuthExpressReturnType<T>;
 
 declare global {
 	namespace Express {
@@ -51,4 +59,9 @@ declare global {
 }
 
 export type * from "@auth-guard/backend/types/index";
-export type { AuthExpressReturnType, AuthExpressType, ResType };
+export type {
+	AuthExpressPropsType,
+	AuthExpressReturnType,
+	AuthExpressType,
+	ResType,
+};

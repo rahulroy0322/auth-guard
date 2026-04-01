@@ -21,6 +21,7 @@ const envSchema = z.object({
 		.optional()
 		.default("dev")
 		.describe("which env running?"),
+	BACKEND_URL: z.url(),
 	ADMIN_URL: z.url(),
 	// DB
 	DB_HOST: z.string(),
@@ -46,6 +47,11 @@ const envSchema = z.object({
 			return invalidUrls.length === 0;
 		})
 		.transform((value) => transformToArray(value)),
+
+	// OAuth
+
+	GITHUB_CLIENT_ID: z.string(),
+	GITHUB_CLIENT_SECRET: z.string(),
 });
 
 type EnvType = z.infer<typeof envSchema>;

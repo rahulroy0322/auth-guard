@@ -2,6 +2,7 @@ import { unlink } from "node:fs/promises";
 import { init as core } from "@auth-guard/backend";
 import { AuthServerError } from "@auth-guard/backend/error";
 import { genReqId } from "@auth-guard/backend/utils/request-id";
+import type { ProviderType } from "base";
 import type { Request, RequestHandler, Response } from "express";
 import {
 	loginSchema,
@@ -11,7 +12,13 @@ import {
 	verifieSchema,
 } from "schema";
 import { UAParser } from "ua-parser-js";
-import type { AuthExpressType, ResType, UpdateProfileType } from "./types";
+import type {
+	AuthExpressPropsType,
+	AuthExpressReturnType,
+	AuthExpressType,
+	ResType,
+	UpdateProfileType,
+} from "./types";
 
 const options = {
 	sameSite: "strict",
@@ -20,7 +27,10 @@ const options = {
 	path: "/",
 } as const;
 
-const init: AuthExpressType = ({ cookie, ...props }) => {
+const init: AuthExpressType = <T extends ProviderType>({
+	cookie,
+	...props
+}: AuthExpressPropsType<T>) => {
 	const coreApi = core(props);
 
 	const getDeviceId = (req: Request, res: Response) => {
@@ -340,8 +350,34 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		} satisfies ResType);
 	};
 
-	const loginWithProvider: RequestHandler = async () => {
-		throw new Error("wet to impl");
+	const oAuthStart: RequestHandler<{
+		provider: T;
+	}> = (req, res) => {
+		const { url } = coreApi.oAuthStart(req.params.provider);
+
+		res.redirect(url);
+	};
+
+	const loginWithProvider: RequestHandler<{
+		provider: T;
+	}> = async (req, res) => {
+		const {
+			token: { access, refresh },
+			user,
+		} = await coreApi.loginWithProvider(req.query, {
+			provider: req.params.provider,
+			...getDeviceInfo(req, res),
+		});
+
+		setAuthCookie(res, refresh);
+
+		res.status(200).json({
+			success: true,
+			data: {
+				user,
+				token: access,
+			},
+		} satisfies ResType);
 	};
 
 	return {
@@ -360,8 +396,9 @@ const init: AuthExpressType = ({ cookie, ...props }) => {
 		changePassword,
 		updateProfile,
 		authStatus,
+		oAuthStart,
 		loginWithProvider,
-	};
+	} satisfies AuthExpressReturnType<T>;
 };
 
 const auth = init;

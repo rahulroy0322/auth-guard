@@ -1,3 +1,4 @@
+import type { ProviderType } from "base";
 import type {
 	AuthStatusType,
 	CheckAuthType,
@@ -17,16 +18,18 @@ import type { CacheConfigType } from "./cache";
 import type { JwtConfigType } from "./jwt";
 import type { LoggerType } from "./log";
 import type { MailConfigType } from "./mail";
+import type { OAuthLoginType, OAuthStartType, OAuthType } from "./OAuth";
 import type {
 	ChangePasswordType,
 	ForgotPasswordType,
 	ResetPasswordType,
 } from "./password";
-import type { LoginWithProviderType, ProfileModelType } from "./profile";
+import type { ProfileModelType } from "./profile";
 import type { SessionModelType } from "./session";
 import type { TokenConfigType } from "./token";
 
-type AuthPropsType = {
+type AuthPropsType<T extends ProviderType> = {
+	OAuth?: OAuthType<T>;
 	User: UserModelType;
 	Avatar: AvatarModelType;
 	Profile: ProfileModelType;
@@ -38,11 +41,12 @@ type AuthPropsType = {
 	logger: LoggerType;
 };
 
-type AuthReturnType = {
+type AuthReturnType<T extends ProviderType> = {
 	// auth
 	login: LoginType;
-	loginWithProvider: LoginWithProviderType;
 	register: RegisterType;
+	oAuthStart: OAuthStartType<T>;
+	loginWithProvider: OAuthLoginType<T>;
 	startVerification: StartVerificationType;
 	verifieAccount: VerifieAccountType;
 	// pass
@@ -61,7 +65,10 @@ type AuthReturnType = {
 	// profile
 	updateProfile: UpdateProfileType;
 };
-type AuthType = (props: AuthPropsType) => AuthReturnType;
+
+type AuthType = <T extends ProviderType>(
+	props: AuthPropsType<T>,
+) => AuthReturnType<T>;
 
 type TokenType = Pick<SafeUserType, "id"> & {
 	type: "refresh" | "access";

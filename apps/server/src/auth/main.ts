@@ -61,6 +61,16 @@ const guard = auth({
 			logger.error({ code }, "TODO");
 		},
 	},
+
+	OAuth: {
+		callbackUri: `${ENV.BACKEND_URL}/auth/oauth/callback/`,
+		providers: {
+			github: {
+				clientId: ENV.GITHUB_CLIENT_ID,
+				clientSecret: ENV.GITHUB_CLIENT_SECRET,
+			},
+		},
+	},
 });
 
 export { guard };

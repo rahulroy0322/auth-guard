@@ -1,6 +1,7 @@
 import { extname, join } from "node:path";
 import { cwd } from "node:process";
 import { genReqId } from "@auth-guard/backend/utils/request-id";
+import type { ProviderType } from "base";
 import { Router } from "express";
 import multer from "multer";
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE } from "schema";
@@ -16,8 +17,8 @@ type OptionsType = {
 	destination: string;
 };
 
-const authRouter = (
-	props: AuthExpressReturnType,
+const authRouter = <T extends ProviderType>(
+	props: AuthExpressReturnType<T>,
 	options: Partial<OptionsType> = {},
 ) => {
 	if (!options.fileName || typeof options.fileName !== "function") {
@@ -50,6 +51,9 @@ const authRouter = (
 	});
 
 	const authRouter: Router = Router();
+
+	authRouter.get("/oauth/:provider", props.oAuthStart);
+	authRouter.get("/oauth/callback/:provider", props.loginWithProvider);
 
 	authRouter.get("/status", props.authStatus);
 
