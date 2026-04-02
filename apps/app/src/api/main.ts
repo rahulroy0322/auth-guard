@@ -82,6 +82,11 @@ const req = <T>({ headers, ...props }: ReqParamsType) =>
 
 type SafeUserType = Omit<UserType, "password">;
 
+type AuthTokenType = {
+	refresh: string;
+	access: string;
+};
+
 type AuthStatusReturnType =
 	| {
 			authenticated: true;
@@ -119,8 +124,39 @@ const patchMultiPart = <T>(params: Omit<ReqPostMultiPartType, "method">) =>
 
 type AuthResType = {
 	user: SafeUserType;
+	token?: AuthTokenType;
 };
 
-export type { AuthResType, AuthStatusReturnType };
+type StartVerificationReturnType = {
+	id: string;
+};
 
-export { get, patch, patchMultiPart, post };
+type VerifyAccountPayloadType = {
+	id: string;
+	code: string;
+};
+
+const startVerification = (base: string, email: string) =>
+	post<StartVerificationReturnType>({
+		base,
+		url: "start-verification",
+		body: {
+			email,
+		},
+	});
+
+const verifyAccount = (base: string, body: VerifyAccountPayloadType) =>
+	patch<AuthResType>({
+		base,
+		url: "verify",
+		body,
+	});
+
+export type {
+	AuthResType,
+	AuthStatusReturnType,
+	StartVerificationReturnType,
+	VerifyAccountPayloadType,
+};
+
+export { get, patch, patchMultiPart, post, startVerification, verifyAccount };

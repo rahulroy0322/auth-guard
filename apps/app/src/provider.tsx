@@ -14,6 +14,9 @@ import {
 	type AuthStatusReturnType,
 	get,
 	post,
+	type StartVerificationReturnType,
+	startVerification as startVerificationRequest,
+	verifyAccount as verifyAccountRequest,
 } from "./api/main";
 import { PathProvider } from "./auth/provider";
 import { config } from "./config";
@@ -26,6 +29,13 @@ type RegisterSchemaType = Pick<UserType, "name" | "email"> & {
 
 type LoginSchemaType = Omit<RegisterSchemaType, "name">;
 
+type VerificationStateType = {
+	email: string;
+	id: string;
+};
+
+const VERIFICATION_STORAGE_KEY = "auth.verification";
+
 const isError = (value: unknown): value is Error =>
 	value instanceof Error ||
 	(!!value &&
@@ -33,14 +43,33 @@ const isError = (value: unknown): value is Error =>
 		"message" in value &&
 		"name" in value);
 
+const readVerificationState = (): VerificationStateType | null => {
+	const stored = sessionStorage.getItem(VERIFICATION_STORAGE_KEY);
+
+	if (!stored) {
+		return null;
+	}
+
+	try {
+		return JSON.parse(stored) as VerificationStateType;
+	} catch {
+		sessionStorage.removeItem(VERIFICATION_STORAGE_KEY);
+		return null;
+	}
+};
+
 type GuardContextType = {
 	user: GuardUserType | null;
 	token: string | null;
 	error: Error | null;
 	loading: boolean;
 	fetching: boolean;
+	verification: VerificationStateType | null;
 	login: (data: LoginSchemaType) => Promise<void>;
 	register: (data: RegisterSchemaType) => Promise<void>;
+	startVerification: (email: string) => Promise<StartVerificationReturnType>;
+	verifyAccount: (code: string) => Promise<void>;
+	clearVerification: () => void;
 	logout: () => Promise<void>;
 	refreshToken: () => Promise<{ token: string }>;
 	reqWithToken: <T>(cb: (token: string) => Promise<T>) => Promise<T>;
@@ -58,6 +87,9 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 	const [loading, setLoading] = useState(false);
 	const [fetching, setFetching] = useState(false);
 	const [error, setError] = useState<Error | null>(null);
+	const [verification, setVerification] = useState<
+		GuardContextType["verification"]
+	>(() => readVerificationState());
 
 	useEffect(() => {
 		const checkAuth = async () => {
@@ -82,6 +114,33 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 
 		checkAuth();
 	}, []);
+
+	useEffect(() => {
+		if (!verification) {
+			sessionStorage.removeItem(VERIFICATION_STORAGE_KEY);
+			return;
+		}
+
+		sessionStorage.setItem(
+			VERIFICATION_STORAGE_KEY,
+			JSON.stringify(verification),
+		);
+	}, [verification]);
+
+	const clearVerification = useCallback(() => {
+		setVerification(null);
+	}, []);
+
+	const applyAuthState = useCallback(
+		(data: AuthResType) => {
+			setUser(data.user);
+			if (data.token?.access) {
+				setToken(data.token.access);
+			}
+			clearVerification();
+		},
+		[clearVerification],
+	);
 
 	const refreshToken = useCallback(async () => {
 		setFetching(true);
@@ -108,19 +167,22 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 		}
 	}, []);
 
-	const req = useCallback(async (cb: () => Promise<AuthResType>) => {
+	const startVerification = useCallback(async (email: string) => {
 		setFetching(true);
 		setError(null);
 
 		try {
-			const { user } = await cb();
-			setUser(user);
+			const data = await startVerificationRequest(config.base, email);
+			setVerification({
+				email,
+				id: data.id,
+			});
+			return data;
 		} catch (e) {
 			if (isError(e)) {
 				setError(e);
-			} else {
-				throw e;
 			}
+			throw e;
 		} finally {
 			setFetching(false);
 		}
@@ -142,7 +204,7 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 					throw e;
 				}
 
-				if (e?.name !== "AuthExpiredError") {
+				if (e.name !== "AuthExpiredError") {
 					throw e;
 				}
 
@@ -152,52 +214,141 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 				setFetching(false);
 			}
 
-			if (data) {
-				if (typeof data === "object") {
-					if ("user" in data) {
-						setUser(data.user as UserType);
-					}
-					if ("token" in data) {
-						setToken(data.token as string);
+			if (data && typeof data === "object") {
+				if ("user" in data) {
+					setUser(data.user as UserType);
+				}
+				if ("token" in data && data.token && typeof data.token === "object") {
+					const tokenData = data.token as {
+						access?: string;
+					};
+					if (tokenData.access) {
+						setToken(tokenData.access);
 					}
 				}
 			}
+
 			return data;
 		},
 		[token, refreshToken],
 	);
 
+	const verifyAccount = useCallback(
+		async (code: string) => {
+			if (!verification) {
+				const verificationError = new Error("Verification session not found");
+				verificationError.name = "AuthVerificationStateError";
+				setError(verificationError);
+				throw verificationError;
+			}
+
+			setFetching(true);
+			setError(null);
+
+			try {
+				const auth = await verifyAccountRequest(config.base, {
+					id: verification.id,
+					code,
+				});
+				applyAuthState(auth);
+			} catch (e) {
+				if (isError(e)) {
+					setError(e);
+				}
+				throw e;
+			} finally {
+				setFetching(false);
+			}
+		},
+		[applyAuthState, verification],
+	);
+
 	const login = useCallback(
-		(data: LoginSchemaType) =>
-			req(async () =>
-				post<AuthResType>({
+		async (data: LoginSchemaType) => {
+			setFetching(true);
+			setError(null);
+
+			try {
+				const auth = await post<AuthResType>({
 					body: data,
 					base: config.base,
 					url: "login",
-				}),
-			),
-		[req],
+				});
+				applyAuthState(auth);
+			} catch (e) {
+				if (!isError(e)) {
+					throw e;
+				}
+
+				if (e.name === "AuthNotVerifiedError") {
+					const verificationData = await startVerificationRequest(
+						config.base,
+						data.email,
+					);
+					setVerification({
+						email: data.email,
+						id: verificationData.id,
+					});
+					return;
+				}
+
+				setError(e);
+			} finally {
+				setFetching(false);
+			}
+		},
+		[applyAuthState],
 	);
 
-	const register = useCallback(
-		(data: RegisterSchemaType) =>
-			req(async () =>
-				post<AuthResType>({
-					body: data,
-					base: config.base,
-					url: "register",
-				}),
-			),
-		[req],
-	);
+	const register = useCallback(async (data: RegisterSchemaType) => {
+		setFetching(true);
+		setError(null);
+
+		try {
+			await post<StartVerificationReturnType>({
+				body: data,
+				base: config.base,
+				url: "register",
+			});
+			const verificationData = await startVerificationRequest(
+				config.base,
+				data.email,
+			);
+			setVerification({
+				email: data.email,
+				id: verificationData.id,
+			});
+		} catch (e) {
+			if (!isError(e)) {
+				throw e;
+			}
+
+			if (e.name === "AuthNotVerifiedError") {
+				const verificationData = await startVerificationRequest(
+					config.base,
+					data.email,
+				);
+				setVerification({
+					email: data.email,
+					id: verificationData.id,
+				});
+				return;
+			}
+
+			setError(e);
+		} finally {
+			setFetching(false);
+		}
+	}, []);
 
 	const logout = useCallback(async () => {
 		setLoading(true);
 		setError(null);
 
 		try {
-			// ! TODO
 			setUser(null);
+			setToken(null);
+			clearVerification();
 		} catch (e) {
 			if (e instanceof Error) {
 				setError(e);
@@ -205,7 +356,7 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 		} finally {
 			setLoading(false);
 		}
-	}, []);
+	}, [clearVerification]);
 
 	return (
 		<GuardContext
@@ -215,8 +366,12 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 				error,
 				loading,
 				fetching,
+				verification,
 				login,
 				register,
+				startVerification,
+				verifyAccount,
+				clearVerification,
 				logout,
 				refreshToken,
 				reqWithToken,

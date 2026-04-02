@@ -6,6 +6,7 @@
 	"include": [
 		"src",
 		"../../packages/react/src/components/auth/register.button.tsx",
-		"../../packages/react/src/components/auth/login.button.tsx"
+		"../../packages/react/src/components/auth/login.button.tsx",
+		"src/routes/(auth)/verify.tsx"
 	]
 }

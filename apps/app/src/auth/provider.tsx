@@ -1,6 +1,6 @@
 import { createContext, type FC, type ReactNode, use, useState } from "react";
 
-type AuthPathsType = "register" | "login";
+type AuthPathsType = "register" | "login" | "verify";
 
 type AuthPathContextType = {
 	path: AuthPathsType;

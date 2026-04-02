@@ -1,4 +1,4 @@
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import type { FC } from "react";
 import { LoginButton } from "../../auth/login.button";
 import { ProfileButton } from "../../auth/profile.button";
@@ -14,20 +14,10 @@ const Header: FC = () => {
 		<header className="flex items-center justify-between p-2">
 			<Show when="loged-out">
 				<div className="flex gap-4">
-					<LoginButton
-						mode="page"
-						nativeButton={false}
-						render={<Link to="/login" />}
-						variant="link"
-					>
+					<LoginButton mode="model" nativeButton={false} variant="link">
 						Login
 					</LoginButton>
-					<RegisterButton
-						mode="page"
-						nativeButton={false}
-						render={<Link to="/register" />}
-						variant="link"
-					>
+					<RegisterButton mode="model" nativeButton={false} variant="link">
 						Register
 					</RegisterButton>
 				</div>

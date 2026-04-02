@@ -1,17 +1,28 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import type { FC } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { type FC, useEffect } from "react";
 import { RegisterForm } from "shared";
 import { useGuard } from "../../provider";
 
 const RegisterRoute: FC = () => {
-	const { register, loading } = useGuard();
+	const navigate = useNavigate();
+	const { register, fetching, verification } = useGuard();
+
+	useEffect(() => {
+		if (!verification) {
+			return;
+		}
+
+		navigate({
+			to: "/verify",
+		});
+	}, [navigate, verification]);
 
 	return (
 		<RegisterForm
 			nativeButton={false}
 			render={<Link to="/login" />}
 			handleSubmit={register}
-			pending={loading}
+			pending={fetching}
 		/>
 	);
 };
