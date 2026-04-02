@@ -26,12 +26,15 @@ const options = {
 	httpOnly: true,
 	path: "/",
 } as const;
-const OAUTH_STATE_COOKIE = "auth-oauth-state";
 
 const init: AuthExpressType = <T extends ProviderType>({
 	cookie,
 	...props
 }: AuthExpressPropsType<T>) => {
+	const {
+		authState = "auth-oauth-state",
+		authVerifier = "auth-oauth-verifier",
+	} = cookie;
 	const coreApi = core(props);
 
 	const getDeviceId = (req: Request, res: Response) => {
@@ -66,14 +69,31 @@ const init: AuthExpressType = <T extends ProviderType>({
 	const clearAuthCookie = (res: Response) => {
 		res.clearCookie(cookie.refresh);
 	};
-	const setOAuthStateCookie = (res: Response, state: string) => {
-		res.cookie(OAUTH_STATE_COOKIE, state, {
+	const setOAuthStateCookie = (
+		res: Response,
+		{
+			codeVerifier,
+			state,
+		}: {
+			codeVerifier: string;
+			state: string;
+		},
+	) => {
+		res.cookie(authVerifier, codeVerifier, {
+			...options,
+			sameSite: "lax",
+		});
+		res.cookie(authState, state, {
 			...options,
 			sameSite: "lax",
 		});
 	};
 	const clearOAuthStateCookie = (res: Response) => {
-		res.clearCookie(OAUTH_STATE_COOKIE, {
+		res.clearCookie(authVerifier, {
+			...options,
+			sameSite: "lax",
+		});
+		res.clearCookie(authState, {
 			...options,
 			sameSite: "lax",
 		});
@@ -366,9 +386,14 @@ const init: AuthExpressType = <T extends ProviderType>({
 	const oAuthStart: RequestHandler<{
 		provider: T;
 	}> = (req, res) => {
-		const { url, state } = coreApi.oAuthStart(req.params.provider);
+		const { url, state, codeVerifier } = coreApi.oAuthStart(
+			req.params.provider,
+		);
 
-		setOAuthStateCookie(res, state);
+		setOAuthStateCookie(res, {
+			state,
+			codeVerifier,
+		});
 
 		res.redirect(url);
 	};
@@ -376,13 +401,20 @@ const init: AuthExpressType = <T extends ProviderType>({
 	const loginWithProvider: RequestHandler<{
 		provider: T;
 	}> = async (req, res) => {
-		const state = req.cookies?.[OAUTH_STATE_COOKIE];
+		const codeVerifier = req.cookies?.[authVerifier];
+		const state = req.cookies?.[authState];
+
+		if (typeof state !== "string" || typeof codeVerifier !== "string") {
+			throw new AuthServerError("misconfigured");
+		}
+
 		const {
 			token: { access, refresh },
 			user,
 		} = await coreApi.loginWithProvider(req.query, {
 			provider: req.params.provider,
 			state,
+			codeVerifier,
 			...getDeviceInfo(req, res),
 		});
 

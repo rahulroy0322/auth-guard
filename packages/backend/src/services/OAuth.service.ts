@@ -56,17 +56,25 @@ class OAuthService<T extends ProviderType> {
 			provider,
 			reqId,
 		});
-		const { url, state } = client.createLoginURL();
+		const { url, state, codeVerifier } = client.createLoginURL();
 
 		return {
 			url: url.toString(),
 			state,
+			codeVerifier,
 		};
 	};
 
 	public login: OAuthLoginType<T> = async (
 		query,
-		{ provider, deviceId, deviceName, deviceType, state: expectedState },
+		{
+			provider,
+			deviceId,
+			deviceName,
+			deviceType,
+			state: expectedState,
+			codeVerifier,
+		},
 	) => {
 		const reqId = genReqId();
 
@@ -88,10 +96,14 @@ class OAuthService<T extends ProviderType> {
 			reqId,
 		});
 
-		const { email, name, avatarUrl } = await client.fetchUser(code, {
-			expected: expectedState,
-			got: state,
-		});
+		const { email, name, avatarUrl } = await client.fetchUser(
+			code,
+			{
+				expected: expectedState,
+				got: state,
+			},
+			codeVerifier,
+		);
 
 		let user = await this.userModel.findByEmail(email);
 
