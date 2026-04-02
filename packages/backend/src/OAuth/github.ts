@@ -4,7 +4,8 @@ import { OAuth } from "./base";
 const userSchema = z.object({
 	name: z.string().nullable(),
 	login: z.string(),
-	email: z.string().email(),
+	email: z.email(),
+	avatar_url: z.url().nullable(),
 });
 
 class Github extends OAuth<z.infer<typeof userSchema>> {
@@ -35,6 +36,7 @@ class Github extends OAuth<z.infer<typeof userSchema>> {
 				parser: (user) => ({
 					name: user.name ?? user.login,
 					email: user.email,
+					avatarUrl: user.avatar_url || null,
 				}),
 			},
 		);

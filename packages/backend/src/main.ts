@@ -154,6 +154,8 @@ const init: AuthType = <T extends ProviderType>({
 		userModel,
 		profileModel,
 		sessionModel,
+		userService,
+		avatarService,
 		userCache,
 		profileCache,
 		helper,
