@@ -97,12 +97,16 @@ class OAuthService<T extends ProviderType> {
 		});
 
 		const { email, name, avatarUrl } = await client.fetchUser(
+			this.logger,
 			code,
 			{
 				expected: expectedState,
 				got: state,
 			},
 			codeVerifier,
+			{
+				reqId,
+			},
 		);
 
 		let user = await this.userModel.findByEmail(email);
