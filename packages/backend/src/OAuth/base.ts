@@ -24,7 +24,12 @@ class OAuth<T> {
 		}),
 	) {}
 
-	private redirectUrl = () => new URL(this.provider, this.callbackUri);
+	private redirectUrl = () => {
+		const base = this.callbackUri.endsWith("/")
+			? this.callbackUri
+			: `${this.callbackUri}/`;
+		return new URL(this.provider, base);
+	};
 
 	public createLoginURL = () => {
 		const url = new URL(this.urls.auth);
@@ -45,6 +50,10 @@ class OAuth<T> {
 				Authorization: `${tokenType} ${accessToken}`,
 			},
 		});
+
+		if (!res.ok) {
+			throw new AuthInvalidUserError();
+		}
 
 		const rawData = await res.json();
 
@@ -71,6 +80,10 @@ class OAuth<T> {
 				client_secret: this.clientSecret,
 			}),
 		});
+
+		if (!res.ok) {
+			throw new AuthInvalidTokenError();
+		}
 
 		const rawData = await res.json();
 		const { data, success } = this.tokenSchema.safeParse(rawData);
