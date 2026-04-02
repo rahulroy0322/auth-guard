@@ -19,6 +19,7 @@ type OAuthType<T extends ProviderType> = {
 type OAuthStartType<T extends ProviderType> = (provider: T) => {
 	url: string;
 	state: string;
+	codeVerifier: string;
 };
 
 type OAuthLoginReturnType = LoginReturnType;
@@ -28,6 +29,7 @@ type OAuthLoginPropsType<T extends ProviderType> = Pick<
 > & {
 	provider: T;
 	state: string;
+	codeVerifier: string;
 };
 
 type OAuthLoginType<T extends ProviderType> = (

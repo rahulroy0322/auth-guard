@@ -1,4 +1,4 @@
-import { randomBytes } from "node:crypto";
+import { hash, randomBytes } from "node:crypto";
 import type { ProviderType } from "base";
 import { z } from "zod";
 import {
@@ -42,18 +42,33 @@ class OAuth<T> {
 
 	private createState = () => randomBytes(64).toString("hex").normalize();
 
+	private createCodeVerifier = () =>
+		randomBytes(64).toString("hex").normalize();
+
+	private createCodeChallenge = (codeVerifier: string) =>
+		hash("sha256", codeVerifier, "base64url");
+
 	public createLoginURL = () => {
 		const state = this.createState();
+		const codeVerifier = this.createCodeVerifier();
+
 		const url = new URL(this.urls.auth);
 		url.searchParams.set("client_id", this.clientId);
 		url.searchParams.set("redirect_uri", this.redirectUrl().toString());
 		url.searchParams.set("response_type", "code");
 		url.searchParams.set("scope", this.scopes.join(" "));
+
 		url.searchParams.set("state", state);
+		url.searchParams.set("code_challenge_method", "S256");
+		url.searchParams.set(
+			"code_challenge",
+			this.createCodeChallenge(codeVerifier),
+		);
 
 		return {
 			url,
 			state,
+			codeVerifier,
 		};
 	};
 
@@ -71,13 +86,17 @@ class OAuth<T> {
 			expected: string;
 			got: string | undefined;
 		},
+		codeVerifier: string,
 	) => {
 		const isValidState = this.validateState(state);
 		if (!isValidState) {
 			throw new AuthInvalidStateError();
 		}
 
-		const { accessToken, tokenType } = await this.fetchToken(code);
+		const { accessToken, tokenType } = await this.fetchToken(
+			code,
+			codeVerifier,
+		);
 
 		const res = await fetch(this.urls.user, {
 			headers: {
@@ -98,7 +117,7 @@ class OAuth<T> {
 		return this.userInfo.parser(data);
 	};
 
-	private fetchToken = async (code: string) => {
+	private fetchToken = async (code: string, codeVerifier: string) => {
 		const res = await fetch(this.urls.token, {
 			method: "POST",
 			headers: {
@@ -111,6 +130,7 @@ class OAuth<T> {
 				grant_type: "authorization_code",
 				client_id: this.clientId,
 				client_secret: this.clientSecret,
+				code_verifier: codeVerifier,
 			}),
 		});
 

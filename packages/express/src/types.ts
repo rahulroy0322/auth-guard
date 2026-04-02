@@ -9,6 +9,8 @@ type AuthExpressPropsType<T extends ProviderType> = AuthPropsType<T> & {
 	cookie: {
 		refresh: string;
 		access: string;
+		authState?: string;
+		authVerifier?: string;
 		extract: (req: Request, key: "deviceId") => string | null;
 	};
 };
