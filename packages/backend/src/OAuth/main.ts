@@ -3,6 +3,7 @@ import { AuthServerError } from "../error";
 import type { OAuthType } from "../types/OAuth";
 import { OAuth } from "./base";
 import { Github } from "./github";
+import { Google } from "./google";
 
 const createOAuthClient = ({
 	provider,
@@ -17,6 +18,11 @@ const createOAuthClient = ({
 }) => {
 	switch (provider) {
 		case "google":
+			return new Google({
+				callbackUri,
+				clientId,
+				clientSecret,
+			});
 		case "github":
 			return new Github({
 				callbackUri,
