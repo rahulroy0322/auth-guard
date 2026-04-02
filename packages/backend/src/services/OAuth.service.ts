@@ -1,49 +1,89 @@
-import type { AvatarType } from "base";
+import type { AvatarType, ProviderType } from "base";
 import type { ProfileCacheModel } from "../cache/profile";
 import type { UserCacheModel } from "../cache/user";
-import { AuthServerError } from "../error";
+import { AuthInvalidCodeError, AuthServerError } from "../error";
+import type { OAuth } from "../OAuth/base";
 import type { UserModelType } from "../types";
-import type {
-	LoginWithProviderPropsType,
-	LoginWithProviderReturnType,
-	ProfileModelType,
-} from "../types/profile";
+import type { OAuthLoginType, OAuthStartType } from "../types/OAuth";
+import type { ProfileModelType } from "../types/profile";
 import type { SessionModelType } from "../types/session";
 import { genReqId } from "../utils/request-id";
 import { AuthResponseBuilder } from "../utils/response-builder";
 import type { SmartLogger } from "../utils/smart-logger";
 import type { TokenHelper } from "../utils/token-helpers";
 import { UserSanitizer } from "../utils/user-sanitizer";
-import type { AvatarService } from "./avatar.service";
 
-class ProviderService {
+class OAuthService<T extends ProviderType> {
 	constructor(
 		private readonly logger: SmartLogger,
 		private readonly userModel: Pick<UserModelType, "create" | "findByEmail">,
 		private readonly profileModel: Pick<ProfileModelType, "create">,
 		private readonly sessionModel: Pick<SessionModelType, "create">,
-		private readonly avatarService: AvatarService,
 		private readonly userCache: UserCacheModel,
 		private readonly profileCache: ProfileCacheModel,
 		private readonly helper: TokenHelper,
+		private readonly clients: Partial<Record<T, OAuth<unknown>>>,
 	) {}
 
-	public loginWithProvider = async ({
-		email,
-		avatarUrl,
-		provider,
-		name,
-		deviceId,
-		deviceName,
-		deviceType,
-	}: LoginWithProviderPropsType): Promise<LoginWithProviderReturnType> => {
+	private getClient = ({ provider, reqId }: { provider: T; reqId: string }) => {
+		const client = this.clients[provider];
+		if (!client) {
+			this.logger.error({
+				reqId,
+				msg: "Invalid provider => May be developer forget to configure",
+				user: null,
+			});
+			throw new AuthServerError("Invalid provider");
+		}
+
+		return client;
+	};
+
+	public oAuthStart: OAuthStartType<T> = (provider) => {
+		const reqId = genReqId();
+
+		this.logger.trace({
+			reqId,
+			msg: "Starting oAuthStart",
+			extra: { provider },
+		});
+
+		const client = this.getClient({
+			provider,
+			reqId,
+		});
+
+		const data = client.createLoginURL();
+
+		return {
+			url: data.url.toString(),
+		};
+	};
+
+	public login: OAuthLoginType<T> = async (
+		query,
+		{ provider, deviceId, deviceName, deviceType },
+	) => {
 		const reqId = genReqId();
 
 		this.logger.trace({
 			reqId,
 			msg: "Starting Login with provider",
-			extra: { email, provider },
+			extra: { provider },
 		});
+
+		const code = query.code;
+
+		if (typeof code !== "string") {
+			throw new AuthInvalidCodeError();
+		}
+
+		const client = this.getClient({
+			provider,
+			reqId,
+		});
+
+		const { email, name } = await client.fetchUser(code);
 
 		let user = await this.userModel.findByEmail(email);
 
@@ -68,17 +108,8 @@ class ProviderService {
 			}
 		}
 
-		let avatar: AvatarType | null = null;
-
-		if (avatarUrl) {
-			avatar = (
-				await this.avatarService.newAvatar({
-					url: avatarUrl,
-					user,
-					reqId,
-				})
-			).user.avatar as AvatarType;
-		}
+		// TODO!
+		const avatar: AvatarType | null = null;
 
 		const profiles = await this.profileCache.findByUserId(user.id, {
 			reqId,
@@ -143,4 +174,4 @@ class ProviderService {
 	};
 }
 
-export { ProviderService };
+export { OAuthService };

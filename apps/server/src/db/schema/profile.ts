@@ -20,7 +20,6 @@ const Profile = pgTable(
 			})
 			.notNull(),
 		...times,
-		// TODO! add userid provide pk
 	},
 	(table) => [
 		primaryKey({

@@ -15,6 +15,23 @@ class AuthBadError extends AuthError {
 	}
 }
 
+class AuthInvalidCodeError extends AuthError {
+	constructor() {
+		super("Invalid Code", 400);
+	}
+}
+
+class AuthInvalidTokenError extends AuthError {
+	constructor() {
+		super("Invalid Token", 400);
+	}
+}
+
+class AuthInvalidUserError extends AuthError {
+	constructor() {
+		super("Invalid User", 400);
+	}
+}
 class AuthExpiredError extends AuthError {
 	constructor(msg = "Token Expired!") {
 		super(msg, 401);
@@ -71,6 +88,9 @@ export {
 	AuthConflictError,
 	AuthError,
 	AuthExpiredError,
+	AuthInvalidCodeError,
+	AuthInvalidTokenError,
+	AuthInvalidUserError,
 	AuthNoTokenError,
 	AuthNotVerifiedError,
 	// 5**

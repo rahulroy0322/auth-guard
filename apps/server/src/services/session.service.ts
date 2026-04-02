@@ -1,11 +1,11 @@
 import type { AuthPropsType } from "@auth-guard/express/types";
-import type { SessionType } from "base";
+import type { ProviderType, SessionType } from "base";
 import type { SQL } from "drizzle-orm";
 import { db } from "../db/main";
 import { Session } from "../db/schema/session";
 import { checkNull } from "./utils";
 
-type SessionModelType = AuthPropsType["Session"];
+type SessionModelType = AuthPropsType<ProviderType>["Session"];
 
 const findSessions = ({
 	filter = undefined,

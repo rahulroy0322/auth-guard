@@ -1,5 +1,4 @@
-import type { ProfileType, ProviderType, SessionType } from "base";
-import type { LoginReturnType } from "./auth";
+import type { ProfileType } from "base";
 
 type ProfileModelType = {
 	findByUserId: (userId: ProfileType["userId"]) => Promise<ProfileType[]>;
@@ -12,23 +11,4 @@ type ProfileModelType = {
 	) => Promise<ProfileType | null>;
 };
 
-type LoginWithProviderPropsType = Pick<
-	SessionType,
-	"deviceType" | "deviceId" | "deviceName"
-> & {
-	provider: ProviderType;
-	email: string;
-	avatarUrl: string | null;
-	name: string;
-};
-type LoginWithProviderReturnType = LoginReturnType;
-type LoginWithProviderType = (
-	data: LoginWithProviderPropsType,
-) => Promise<LoginWithProviderReturnType>;
-
-export type {
-	LoginWithProviderPropsType,
-	LoginWithProviderReturnType,
-	LoginWithProviderType,
-	ProfileModelType,
-};
+export type { ProfileModelType };
