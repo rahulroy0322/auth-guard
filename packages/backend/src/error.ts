@@ -21,6 +21,12 @@ class AuthInvalidCodeError extends AuthError {
 	}
 }
 
+class AuthInvalidStateError extends AuthError {
+	constructor() {
+		super("Invalid State", 400);
+	}
+}
+
 class AuthInvalidTokenError extends AuthError {
 	constructor() {
 		super("Invalid Token", 400);
@@ -89,6 +95,7 @@ export {
 	AuthError,
 	AuthExpiredError,
 	AuthInvalidCodeError,
+	AuthInvalidStateError,
 	AuthInvalidTokenError,
 	AuthInvalidUserError,
 	AuthNoTokenError,
