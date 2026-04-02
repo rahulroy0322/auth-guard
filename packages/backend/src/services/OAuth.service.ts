@@ -1,4 +1,4 @@
-import type { AvatarType, ProviderType } from "base";
+import type { ProviderType } from "base";
 import type { ProfileCacheModel } from "../cache/profile";
 import type { UserCacheModel } from "../cache/user";
 import { AuthInvalidCodeError, AuthServerError } from "../error";
@@ -12,6 +12,8 @@ import { AuthResponseBuilder } from "../utils/response-builder";
 import type { SmartLogger } from "../utils/smart-logger";
 import type { TokenHelper } from "../utils/token-helpers";
 import { UserSanitizer } from "../utils/user-sanitizer";
+import type { AvatarService } from "./avatar.service";
+import type { UserService } from "./user.service";
 
 class OAuthService<T extends ProviderType> {
 	constructor(
@@ -19,6 +21,8 @@ class OAuthService<T extends ProviderType> {
 		private readonly userModel: Pick<UserModelType, "create" | "findByEmail">,
 		private readonly profileModel: Pick<ProfileModelType, "create">,
 		private readonly sessionModel: Pick<SessionModelType, "create">,
+		private readonly userService: UserService,
+		private readonly avatarService: AvatarService,
 		private readonly userCache: UserCacheModel,
 		private readonly profileCache: ProfileCacheModel,
 		private readonly helper: TokenHelper,
@@ -83,7 +87,7 @@ class OAuthService<T extends ProviderType> {
 			reqId,
 		});
 
-		const { email, name } = await client.fetchUser(code);
+		const { email, name, avatarUrl } = await client.fetchUser(code);
 
 		let user = await this.userModel.findByEmail(email);
 
@@ -106,10 +110,14 @@ class OAuthService<T extends ProviderType> {
 				});
 				throw new AuthServerError("User Create failed");
 			}
+			if (avatarUrl) {
+				await this.avatarService.newAvatar({
+					url: avatarUrl,
+					reqId,
+					user,
+				});
+			}
 		}
-
-		// TODO!
-		const avatar: AvatarType | null = null;
 
 		const profiles = await this.profileCache.findByUserId(user.id, {
 			reqId,
@@ -167,10 +175,11 @@ class OAuthService<T extends ProviderType> {
 			user: sanitizedUser,
 		});
 
-		return AuthResponseBuilder.buildAuthResponse(user, token, async () => ({
-			avatar,
-			profiles,
-		}));
+		return AuthResponseBuilder.buildAuthResponse(user, token, async () =>
+			this.userService.fetchUserWithRelations(user.id, {
+				reqId,
+			}),
+		);
 	};
 }
 

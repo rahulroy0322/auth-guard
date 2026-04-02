@@ -16,7 +16,11 @@ class OAuth<T> {
 		},
 		private readonly userInfo: {
 			schema: z.ZodSchema<T>;
-			parser: (data: T) => { email: string; name: string };
+			parser: (data: T) => {
+				email: string;
+				name: string;
+				avatarUrl: string | null;
+			};
 		},
 		private readonly tokenSchema = z.object({
 			access_token: z.string(),
