@@ -79,24 +79,21 @@ const init: AuthExpressType = <T extends ProviderType>({
 			state: string;
 		},
 	) => {
+		const expires = new Date(Date.now() + 1000 * 60 * 5);
 		res.cookie(authVerifier, codeVerifier, {
 			...options,
 			sameSite: "lax",
+			expires,
 		});
 		res.cookie(authState, state, {
 			...options,
 			sameSite: "lax",
+			expires,
 		});
 	};
 	const clearOAuthStateCookie = (res: Response) => {
-		res.clearCookie(authVerifier, {
-			...options,
-			sameSite: "lax",
-		});
-		res.clearCookie(authState, {
-			...options,
-			sameSite: "lax",
-		});
+		res.clearCookie(authVerifier);
+		res.clearCookie(authState);
 	};
 
 	const register: RequestHandler = async (req, res) => {
@@ -395,14 +392,20 @@ const init: AuthExpressType = <T extends ProviderType>({
 			codeVerifier,
 		});
 
-		res.redirect(url);
+		res.json({
+			success: true,
+			data: {
+				url,
+			},
+		} satisfies ResType);
 	};
 
 	const loginWithProvider: RequestHandler<{
 		provider: T;
 	}> = async (req, res) => {
-		const codeVerifier = req.cookies?.[authVerifier];
-		const state = req.cookies?.[authState];
+		const cookies = { ...req.cookies };
+		const codeVerifier = cookies?.[authVerifier];
+		const state = cookies?.[authState];
 
 		if (typeof state !== "string" || typeof codeVerifier !== "string") {
 			throw new AuthServerError(
