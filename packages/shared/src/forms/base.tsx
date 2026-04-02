@@ -1,8 +1,7 @@
-import { RiAppleLine, RiGithubLine, RiGoogleLine } from "@remixicon/react";
 import type { FC, ReactNode } from "react";
-import { Button } from "ui/components/ui/button";
 import { Card, CardContent } from "ui/components/ui/card";
-import { Field, FieldGroup, FieldSeparator } from "ui/components/ui/field";
+import { Field, FieldGroup } from "ui/components/ui/field";
+import { OAuthButtons, type OAuthProviderOptionType } from "./oauth";
 
 type BasePropsType = {
 	children: ReactNode;
@@ -10,6 +9,7 @@ type BasePropsType = {
 	description: string;
 	src: string;
 	alt: string;
+	oauthProviders?: OAuthProviderOptionType[];
 };
 
 const Base: FC<BasePropsType> = ({
@@ -18,6 +18,7 @@ const Base: FC<BasePropsType> = ({
 	description,
 	src,
 	alt,
+	oauthProviders,
 }) => (
 	<Card className="overflow-hidden p-0 ring-0">
 		<CardContent className="grid p-0 md:grid-cols-2 overflow-hidden items-center">
@@ -29,26 +30,7 @@ const Base: FC<BasePropsType> = ({
 
 				{children}
 
-				<FieldSeparator>Or continue with</FieldSeparator>
-
-				<Field>
-					<Button disabled>
-						<RiAppleLine />
-						<span>Login with Apple</span>
-					</Button>
-				</Field>
-				<Field>
-					<Button>
-						<RiGoogleLine />
-						<span>Login with Google</span>
-					</Button>
-				</Field>
-				<Field>
-					<Button>
-						<RiGithubLine />
-						<span>Login with Github</span>
-					</Button>
-				</Field>
+				<OAuthButtons providers={oauthProviders} />
 			</FieldGroup>
 
 			<figure className="hidden bg-muted md:block">

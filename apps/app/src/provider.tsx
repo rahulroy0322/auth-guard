@@ -6,15 +6,19 @@ import {
 	use,
 	useCallback,
 	useEffect,
+	useMemo,
 	useState,
 } from "react";
-
+import type { OAuthProviderOptionType } from "shared";
+import { toast } from "ui/components/ui/sonner";
 import {
 	type AuthResType,
 	type AuthStatusReturnType,
 	get,
+	loginWithOAuthProvider,
 	post,
 	type StartVerificationReturnType,
+	startLoginWithOAuthProvider,
 	startVerification as startVerificationRequest,
 	verifyAccount as verifyAccountRequest,
 } from "./api/main";
@@ -65,8 +69,17 @@ type GuardContextType = {
 	loading: boolean;
 	fetching: boolean;
 	verification: VerificationStateType | null;
+	oauthProviders: OAuthProviderOptionType[];
 	login: (data: LoginSchemaType) => Promise<void>;
 	register: (data: RegisterSchemaType) => Promise<void>;
+	finishOAuth: (
+		provider: OAuthProviderOptionType["provider"],
+		query: {
+			code: string;
+			state: string;
+		},
+		signal: Request["signal"],
+	) => Promise<void>;
 	startVerification: (email: string) => Promise<StartVerificationReturnType>;
 	verifyAccount: (code: string) => Promise<void>;
 	clearVerification: () => void;
@@ -79,9 +92,26 @@ const GuardContext = createContext<GuardContextType | null>(null);
 
 type GuardProviderPropsType = {
 	children: ReactNode;
+	oauth?: Omit<OAuthProviderOptionType, "onClick">[];
 };
 
-const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
+const startOAuth = async (provider: OAuthProviderOptionType["provider"]) => {
+	const { url } = await startLoginWithOAuthProvider(config.base, provider);
+
+	window.location.assign(url);
+};
+
+const GuardProviderImpl: FC<GuardProviderPropsType> = ({
+	children,
+	oauth = [],
+}) => {
+	const oauthProviders = useMemo(() => {
+		return oauth.map((val) => ({
+			...val,
+			onClick: () => startOAuth(val.provider),
+		}));
+	}, [oauth]);
+
 	const [user, setUser] = useState<GuardContextType["user"]>(null);
 	const [token, setToken] = useState<GuardContextType["token"]>(null);
 	const [loading, setLoading] = useState(false);
@@ -134,8 +164,8 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 	const applyAuthState = useCallback(
 		(data: AuthResType) => {
 			setUser(data.user);
-			if (data.token?.access) {
-				setToken(data.token.access);
+			if (data.token) {
+				setToken(data.token);
 			}
 			clearVerification();
 		},
@@ -218,13 +248,8 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 				if ("user" in data) {
 					setUser(data.user as UserType);
 				}
-				if ("token" in data && data.token && typeof data.token === "object") {
-					const tokenData = data.token as {
-						access?: string;
-					};
-					if (tokenData.access) {
-						setToken(tokenData.access);
-					}
+				if ("token" in data && typeof data.token === "string") {
+					setToken(data.token);
 				}
 			}
 
@@ -272,6 +297,39 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 			setError(e);
 		},
 		[startVerification],
+	);
+
+	const finishOAuth = useCallback(
+		async (
+			provider: OAuthProviderOptionType["provider"],
+			query: {
+				code: string;
+				state: string;
+			},
+			signal: Request["signal"],
+		) => {
+			setFetching(true);
+			setError(null);
+
+			try {
+				const auth = await loginWithOAuthProvider(
+					config.base,
+					provider,
+					query,
+					signal,
+				);
+				applyAuthState(auth);
+				toast.success("Login Success");
+			} catch (e) {
+				if (isError(e)) {
+					setError(e);
+				}
+				throw e;
+			} finally {
+				setFetching(false);
+			}
+		},
+		[applyAuthState],
 	);
 
 	const login = useCallback(
@@ -353,8 +411,10 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 				loading,
 				fetching,
 				verification,
+				oauthProviders,
 				login,
 				register,
+				finishOAuth,
 				startVerification,
 				verifyAccount,
 				clearVerification,
@@ -368,8 +428,8 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 	);
 };
 
-const GuardProvider: FC<GuardProviderPropsType> = ({ children }) => (
-	<GuardProviderImpl>
+const GuardProvider: FC<GuardProviderPropsType> = ({ children, oauth }) => (
+	<GuardProviderImpl oauth={oauth}>
 		<PathProvider>{children}</PathProvider>
 	</GuardProviderImpl>
 );

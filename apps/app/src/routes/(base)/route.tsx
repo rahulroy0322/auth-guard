@@ -14,10 +14,10 @@ const Header: FC = () => {
 		<header className="flex items-center justify-between p-2">
 			<Show when="loged-out">
 				<div className="flex gap-4">
-					<LoginButton mode="model" nativeButton={false} variant="link">
+					<LoginButton mode="model" variant="link">
 						Login
 					</LoginButton>
-					<RegisterButton mode="model" nativeButton={false} variant="link">
+					<RegisterButton mode="model" variant="link">
 						Register
 					</RegisterButton>
 				</div>

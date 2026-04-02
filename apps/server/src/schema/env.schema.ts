@@ -21,7 +21,7 @@ const envSchema = z.object({
 		.optional()
 		.default("dev")
 		.describe("which env running?"),
-	BACKEND_URL: z.url(),
+	APP_URL: z.url(),
 	ADMIN_URL: z.url(),
 	// DB
 	DB_HOST: z.string(),

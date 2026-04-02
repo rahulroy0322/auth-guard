@@ -22,6 +22,7 @@ const AuthModelBaseButton: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 		login,
 		register,
 		error,
+		oauthProviders,
 		verification,
 		verifyAccount,
 		startVerification,
@@ -67,6 +68,7 @@ const AuthModelBaseButton: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 						}}
 						handleSubmit={login}
 						pending={fetching}
+						oauthProviders={oauthProviders}
 					/>
 				) : null}
 				{path === "register" ? (
@@ -76,6 +78,7 @@ const AuthModelBaseButton: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 						}}
 						handleSubmit={register}
 						pending={fetching}
+						oauthProviders={oauthProviders}
 					/>
 				) : null}
 				{path === "verify" && verification ? (

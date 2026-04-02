@@ -1,4 +1,4 @@
-import type { UserType } from "base";
+import type { ProviderType, UserType } from "base";
 
 type SuccessType<T> = {
 	success: true;
@@ -16,7 +16,7 @@ type ReqDefType = {
 	base: string;
 	url: string;
 	headers?: Record<string, string>;
-};
+} & Partial<Pick<Request, "signal">>;
 
 type ReqGetType = ReqDefType & {
 	method: "GET";
@@ -39,6 +39,7 @@ const reqImpl = async <T>({
 	method,
 	headers,
 	body,
+	signal,
 }: Omit<ReqParamsType, "body"> & {
 	body?: string | FormData;
 }) => {
@@ -47,6 +48,7 @@ const reqImpl = async <T>({
 		credentials: "include",
 		method,
 		body,
+		signal,
 	});
 	const data = (await res.json()) as ResType<T>;
 
@@ -81,11 +83,6 @@ const req = <T>({ headers, ...props }: ReqParamsType) =>
 	});
 
 type SafeUserType = Omit<UserType, "password">;
-
-type AuthTokenType = {
-	refresh: string;
-	access: string;
-};
 
 type AuthStatusReturnType =
 	| {
@@ -124,7 +121,7 @@ const patchMultiPart = <T>(params: Omit<ReqPostMultiPartType, "method">) =>
 
 type AuthResType = {
 	user: SafeUserType;
-	token?: AuthTokenType;
+	token?: string;
 };
 
 type StartVerificationReturnType = {
@@ -152,6 +149,29 @@ const verifyAccount = (base: string, body: VerifyAccountPayloadType) =>
 		body,
 	});
 
+const startLoginWithOAuthProvider = (base: string, provider: ProviderType) =>
+	get<{
+		url: string;
+	}>({
+		base,
+		url: `oauth/${provider}`,
+	});
+
+const loginWithOAuthProvider = (
+	base: string,
+	provider: ProviderType,
+	query: {
+		code: string;
+		state: string;
+	},
+	signal: Request["signal"],
+) =>
+	get<AuthResType>({
+		base,
+		url: `oauth/callback/${provider}?${new URLSearchParams(query).toString()}`,
+		signal,
+	});
+
 export type {
 	AuthResType,
 	AuthStatusReturnType,
@@ -159,4 +179,13 @@ export type {
 	VerifyAccountPayloadType,
 };
 
-export { get, patch, patchMultiPart, post, startVerification, verifyAccount };
+export {
+	get,
+	loginWithOAuthProvider,
+	patch,
+	patchMultiPart,
+	post,
+	startLoginWithOAuthProvider,
+	startVerification,
+	verifyAccount,
+};

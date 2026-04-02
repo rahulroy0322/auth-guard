@@ -5,6 +5,7 @@ import { passwordSchema, registerSchema } from "schema";
 import { Button } from "ui/components/ui/button";
 import { Field, FieldDescription } from "ui/components/ui/field";
 import { Base } from "./base";
+import type { OAuthProviderOptionType } from "./oauth";
 
 const registerFrontendSchema = registerSchema
 	.extend({
@@ -25,11 +26,13 @@ type RegisterSchemaType = Pick<UserType, "email" | "password" | "name"> & {
 type RegisterFormPropsType = Parameters<typeof Button>[0] & {
 	handleSubmit: (value: RegisterSchemaType) => void;
 	pending: boolean;
+	oauthProviders?: OAuthProviderOptionType[];
 };
 
 const RegisterForm: FC<RegisterFormPropsType> = ({
 	handleSubmit: parentSubmit,
 	pending,
+	oauthProviders,
 	...props
 }) => {
 	const { AppField, handleSubmit: submit } = useAppForm({
@@ -61,6 +64,7 @@ const RegisterForm: FC<RegisterFormPropsType> = ({
 			alt="Login"
 			title="Create your account"
 			description="Enter your details below to create your account"
+			oauthProviders={oauthProviders}
 		>
 			<form
 				className="space-y-2"
