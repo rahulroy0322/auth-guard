@@ -50,6 +50,11 @@ const envSchema = z.object({
 
 	// OAuth
 
+	// google
+	GOOGLE_CLIENT_ID: z.string(),
+	GOOGLE_CLIENT_SECRET: z.string(),
+
+	// github
 	GITHUB_CLIENT_ID: z.string(),
 	GITHUB_CLIENT_SECRET: z.string(),
 });

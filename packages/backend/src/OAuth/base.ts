@@ -60,7 +60,6 @@ class OAuth<T> {
 		}
 
 		const rawData = await res.json();
-
 		const { data, success } = this.userInfo.schema.safeParse(rawData);
 		if (!success) {
 			throw new AuthInvalidUserError();
