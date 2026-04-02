@@ -1,6 +1,11 @@
+import { randomBytes } from "node:crypto";
 import type { ProviderType } from "base";
 import { z } from "zod";
-import { AuthInvalidTokenError, AuthInvalidUserError } from "../error";
+import {
+	AuthInvalidStateError,
+	AuthInvalidTokenError,
+	AuthInvalidUserError,
+} from "../error";
 
 class OAuth<T> {
 	constructor(
@@ -35,18 +40,43 @@ class OAuth<T> {
 		return new URL(this.provider, base);
 	};
 
+	private createSate = () => randomBytes(64).toString("hex").normalize();
+
 	public createLoginURL = () => {
+		const state = this.createSate();
 		const url = new URL(this.urls.auth);
 		url.searchParams.set("client_id", this.clientId);
 		url.searchParams.set("redirect_uri", this.redirectUrl().toString());
 		url.searchParams.set("response_type", "code");
 		url.searchParams.set("scope", this.scopes.join(" "));
+		url.searchParams.set("state", state);
+
 		return {
 			url,
+			state,
 		};
 	};
 
-	public fetchUser = async (code: string) => {
+	private validateState = ({
+		expected,
+		got,
+	}: {
+		expected: string;
+		got: string | undefined;
+	}) => expected === got;
+
+	public fetchUser = async (
+		code: string,
+		state: {
+			expected: string;
+			got: string | undefined;
+		},
+	) => {
+		const isValidState = this.validateState(state);
+		if (!isValidState) {
+			throw new AuthInvalidStateError();
+		}
+
 		const { accessToken, tokenType } = await this.fetchToken(code);
 
 		const res = await fetch(this.urls.user, {

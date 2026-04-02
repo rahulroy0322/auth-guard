@@ -56,17 +56,17 @@ class OAuthService<T extends ProviderType> {
 			provider,
 			reqId,
 		});
-
-		const data = client.createLoginURL();
+		const { url, state } = client.createLoginURL();
 
 		return {
-			url: data.url.toString(),
+			url: url.toString(),
+			state,
 		};
 	};
 
 	public login: OAuthLoginType<T> = async (
 		query,
-		{ provider, deviceId, deviceName, deviceType },
+		{ provider, deviceId, deviceName, deviceType, state: expectedState },
 	) => {
 		const reqId = genReqId();
 
@@ -77,8 +77,9 @@ class OAuthService<T extends ProviderType> {
 		});
 
 		const code = query.code;
+		const state = query.state;
 
-		if (typeof code !== "string") {
+		if (typeof code !== "string" || typeof state !== "string") {
 			throw new AuthInvalidCodeError();
 		}
 
@@ -87,7 +88,10 @@ class OAuthService<T extends ProviderType> {
 			reqId,
 		});
 
-		const { email, name, avatarUrl } = await client.fetchUser(code);
+		const { email, name, avatarUrl } = await client.fetchUser(code, {
+			expected: expectedState,
+			got: state,
+		});
 
 		let user = await this.userModel.findByEmail(email);
 

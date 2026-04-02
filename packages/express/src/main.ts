@@ -26,6 +26,7 @@ const options = {
 	httpOnly: true,
 	path: "/",
 } as const;
+const OAUTH_STATE_COOKIE = "auth-oauth-state";
 
 const init: AuthExpressType = <T extends ProviderType>({
 	cookie,
@@ -64,6 +65,18 @@ const init: AuthExpressType = <T extends ProviderType>({
 	};
 	const clearAuthCookie = (res: Response) => {
 		res.clearCookie(cookie.refresh);
+	};
+	const setOAuthStateCookie = (res: Response, state: string) => {
+		res.cookie(OAUTH_STATE_COOKIE, state, {
+			...options,
+			sameSite: "lax",
+		});
+	};
+	const clearOAuthStateCookie = (res: Response) => {
+		res.clearCookie(OAUTH_STATE_COOKIE, {
+			...options,
+			sameSite: "lax",
+		});
 	};
 
 	const register: RequestHandler = async (req, res) => {
@@ -353,7 +366,9 @@ const init: AuthExpressType = <T extends ProviderType>({
 	const oAuthStart: RequestHandler<{
 		provider: T;
 	}> = (req, res) => {
-		const { url } = coreApi.oAuthStart(req.params.provider);
+		const { url, state } = coreApi.oAuthStart(req.params.provider);
+
+		setOAuthStateCookie(res, state);
 
 		res.redirect(url);
 	};
@@ -361,14 +376,17 @@ const init: AuthExpressType = <T extends ProviderType>({
 	const loginWithProvider: RequestHandler<{
 		provider: T;
 	}> = async (req, res) => {
+		const state = req.cookies?.[OAUTH_STATE_COOKIE];
 		const {
 			token: { access, refresh },
 			user,
 		} = await coreApi.loginWithProvider(req.query, {
 			provider: req.params.provider,
+			state,
 			...getDeviceInfo(req, res),
 		});
 
+		clearOAuthStateCookie(res);
 		setAuthCookie(res, refresh);
 
 		res.status(200).json({

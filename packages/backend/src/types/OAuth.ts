@@ -18,6 +18,7 @@ type OAuthType<T extends ProviderType> = {
 
 type OAuthStartType<T extends ProviderType> = (provider: T) => {
 	url: string;
+	state: string;
 };
 
 type OAuthLoginReturnType = LoginReturnType;
@@ -26,11 +27,13 @@ type OAuthLoginPropsType<T extends ProviderType> = Pick<
 	"deviceType" | "deviceId" | "deviceName"
 > & {
 	provider: T;
+	state: string;
 };
 
 type OAuthLoginType<T extends ProviderType> = (
 	query: Partial<{
 		code: string;
+		state: string;
 	}>,
 	props: OAuthLoginPropsType<T>,
 ) => Promise<OAuthLoginReturnType>;
