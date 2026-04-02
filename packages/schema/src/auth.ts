@@ -23,12 +23,12 @@ const loginSchema = registerSchema.pick({
 	password: true,
 }) satisfies z.ZodType<Pick<UserType, "email" | "password">>;
 
-const verifieSchema = z.object({
+const verifySchema = z.object({
 	id: z.string(),
 	code: z.string().length(6, "Invalid code"),
 });
 
-const resetPasswordSchema = verifieSchema.extend({
+const resetPasswordSchema = verifySchema.extend({
 	password: passwordSchema,
 });
 
@@ -52,5 +52,5 @@ export {
 	registerSchema,
 	resetPasswordSchema,
 	updatePasswordSchema,
-	verifieSchema,
+	verifySchema,
 };

@@ -1,5 +1,5 @@
 import { type FC, type SubmitEvent, useMemo, useState } from "react";
-import { verifieSchema } from "schema";
+import { verifySchema } from "schema";
 import { Button } from "ui/components/ui/button";
 import {
 	Field,
@@ -33,14 +33,14 @@ const VerifyForm: FC<VerifyFormPropsType> = ({
 	const [error, setError] = useState<string | null>(null);
 
 	const isValidCode = useMemo(
-		() => verifieSchema.shape.code.safeParse(code).success,
+		() => verifySchema.shape.code.safeParse(code).success,
 		[code],
 	);
 
 	const onSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
-		const parsed = verifieSchema.shape.code.safeParse(code);
+		const parsed = verifySchema.shape.code.safeParse(code);
 		if (!parsed.success) {
 			setError(parsed.error.issues[0]?.message ?? "Invalid code");
 			return;

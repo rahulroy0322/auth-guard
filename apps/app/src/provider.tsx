@@ -263,6 +263,17 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 		[applyAuthState, verification],
 	);
 
+	const startVerificationIfError = useCallback(
+		async (e: Error, email: string) => {
+			if (e.name === "AuthNotVerifiedError") {
+				await startVerification(email);
+				return;
+			}
+			setError(e);
+		},
+		[startVerification],
+	);
+
 	const login = useCallback(
 		async (data: LoginSchemaType) => {
 			setFetching(true);
@@ -280,66 +291,41 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({ children }) => {
 					throw e;
 				}
 
-				if (e.name === "AuthNotVerifiedError") {
-					const verificationData = await startVerificationRequest(
-						config.base,
-						data.email,
-					);
-					setVerification({
-						email: data.email,
-						id: verificationData.id,
-					});
-					return;
-				}
-
-				setError(e);
+				await startVerificationIfError(e, data.email);
 			} finally {
 				setFetching(false);
 			}
 		},
-		[applyAuthState],
+		[applyAuthState, startVerificationIfError],
 	);
 
-	const register = useCallback(async (data: RegisterSchemaType) => {
-		setFetching(true);
-		setError(null);
+	const register = useCallback(
+		async (data: RegisterSchemaType) => {
+			setFetching(true);
+			setError(null);
 
-		try {
-			await post<StartVerificationReturnType>({
-				body: data,
-				base: config.base,
-				url: "register",
-			});
-			const verificationData = await startVerificationRequest(
-				config.base,
-				data.email,
-			);
-			setVerification({
-				email: data.email,
-				id: verificationData.id,
-			});
-		} catch (e) {
-			if (!isError(e)) {
-				throw e;
-			}
-
-			if (e.name === "AuthNotVerifiedError") {
-				const verificationData = await startVerificationRequest(
-					config.base,
-					data.email,
-				);
+			try {
+				const { id } = await post<StartVerificationReturnType>({
+					body: data,
+					base: config.base,
+					url: "register",
+				});
 				setVerification({
 					email: data.email,
-					id: verificationData.id,
+					id,
 				});
-				return;
-			}
+			} catch (e) {
+				if (!isError(e)) {
+					throw e;
+				}
 
-			setError(e);
-		} finally {
-			setFetching(false);
-		}
-	}, []);
+				await startVerificationIfError(e, data.email);
+			} finally {
+				setFetching(false);
+			}
+		},
+		[startVerificationIfError],
+	);
 
 	const logout = useCallback(async () => {
 		setLoading(true);
