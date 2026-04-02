@@ -40,10 +40,10 @@ class OAuth<T> {
 		return new URL(this.provider, base);
 	};
 
-	private createSate = () => randomBytes(64).toString("hex").normalize();
+	private createState = () => randomBytes(64).toString("hex").normalize();
 
 	public createLoginURL = () => {
-		const state = this.createSate();
+		const state = this.createState();
 		const url = new URL(this.urls.auth);
 		url.searchParams.set("client_id", this.clientId);
 		url.searchParams.set("redirect_uri", this.redirectUrl().toString());
