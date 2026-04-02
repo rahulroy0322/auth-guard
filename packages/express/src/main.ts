@@ -9,7 +9,7 @@ import {
 	registerSchema,
 	resetPasswordSchema,
 	updateProfileSchema,
-	verifieSchema,
+	verifySchema,
 } from "schema";
 import { UAParser } from "ua-parser-js";
 import type {
@@ -154,7 +154,7 @@ const init: AuthExpressType = <T extends ProviderType>({
 	};
 
 	const verifieAccount: RequestHandler = async (req, res) => {
-		const data = verifieSchema.parse({
+		const data = verifySchema.parse({
 			...req.body,
 			...req.query,
 		});

@@ -3,9 +3,5 @@
 	"compilerOptions": {
 		"tsBuildInfoFile": "node_modules/.tsbuildinfo"
 	},
-	"include": [
-		"src",
-		"../../packages/react/src/components/auth/register.button.tsx",
-		"../../packages/react/src/components/auth/login.button.tsx"
-	]
+	"include": ["src"]
 }

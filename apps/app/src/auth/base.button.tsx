@@ -1,5 +1,5 @@
 import { type FC, type ReactNode, useEffect } from "react";
-import { LoginForm, RegisterForm } from "shared";
+import { LoginForm, RegisterForm, VerifyForm } from "shared";
 import { Button } from "ui/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "ui/components/ui/dialog";
 import { toast } from "ui/components/ui/sonner";
@@ -14,9 +14,19 @@ type AuthBaseButtonPropsType = {
 
 const AuthModelBaseButton: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 	defaultState,
+	children,
 	...props
 }) => {
-	const { loading, login, register, error } = useGuard();
+	const {
+		fetching,
+		login,
+		register,
+		error,
+		verification,
+		verifyAccount,
+		startVerification,
+		clearVerification,
+	} = useGuard();
 	const { path, setPath } = usePath();
 
 	useEffect(() => {
@@ -27,9 +37,25 @@ const AuthModelBaseButton: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 		}
 	}, [error]);
 
+	useEffect(() => {
+		if (!verification) {
+			return;
+		}
+
+		setPath("verify");
+	}, [setPath, verification]);
+
 	return (
 		<Dialog>
-			<DialogTrigger {...props} />
+			<DialogTrigger
+				render={<Button {...props} />}
+				onClick={(event) => {
+					props.onClick?.(event);
+					setPath(defaultState);
+				}}
+			>
+				{children}
+			</DialogTrigger>
 			<DialogContent
 				className="max-w-sm md:max-w-4xl p-0"
 				showCloseButton={false}
@@ -40,7 +66,7 @@ const AuthModelBaseButton: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 							setPath("register");
 						}}
 						handleSubmit={login}
-						pending={loading}
+						pending={fetching}
 					/>
 				) : null}
 				{path === "register" ? (
@@ -49,25 +75,26 @@ const AuthModelBaseButton: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 							setPath("login");
 						}}
 						handleSubmit={register}
-						pending={loading}
+						pending={fetching}
+					/>
+				) : null}
+				{path === "verify" && verification ? (
+					<VerifyForm
+						email={verification.email}
+						handleSubmit={verifyAccount}
+						handleResend={async () => {
+							await startVerification(verification.email);
+						}}
+						handleBack={() => {
+							clearVerification();
+							setPath("login");
+						}}
+						pending={fetching}
 					/>
 				) : null}
 			</DialogContent>
 		</Dialog>
 	);
-};
-
-// got error in hook
-const AuthBaseButtonImpl: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
-	defaultState,
-	...props
-}) => {
-	const { setPath } = usePath();
-	useEffect(() => {
-		setPath(defaultState);
-	}, [defaultState, setPath]);
-
-	return <AuthModelBaseButton defaultState={defaultState} {...props} />;
 };
 
 const AuthBaseButton: FC<AuthBaseButtonPropsType> = ({
@@ -79,7 +106,7 @@ const AuthBaseButton: FC<AuthBaseButtonPropsType> = ({
 		return <Button {...props} />;
 	}
 
-	return <AuthBaseButtonImpl defaultState={defaultState} {...props} />;
+	return <AuthModelBaseButton defaultState={defaultState} {...props} />;
 };
 
 export type { AuthBaseButtonPropsType };

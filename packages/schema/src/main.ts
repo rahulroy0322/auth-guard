@@ -5,7 +5,7 @@ export {
 	registerSchema,
 	resetPasswordSchema,
 	updatePasswordSchema,
-	verifieSchema,
+	verifySchema,
 } from "./auth";
 export type { UpdateProfileSchemaType } from "./file";
 
