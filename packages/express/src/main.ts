@@ -405,7 +405,9 @@ const init: AuthExpressType = <T extends ProviderType>({
 		const state = req.cookies?.[authState];
 
 		if (typeof state !== "string" || typeof codeVerifier !== "string") {
-			throw new AuthServerError("misconfigured");
+			throw new AuthServerError(
+				"OAuth flow failed: missing state or verifier cookie.",
+			);
 		}
 
 		const {
