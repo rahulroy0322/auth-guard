@@ -1,12 +1,12 @@
+import { useGuard } from "@auth-guard/react";
+import { VerifyForm } from "@auth-guard/react/diy";
 import { createFileRoute, Navigate, useNavigate } from "@tanstack/react-router";
 import { type FC, useEffect } from "react";
-import { VerifyForm } from "shared";
-import { useGuard } from "../../provider";
 
 const VerifyRoute: FC = () => {
 	const navigate = useNavigate();
 	const { config } = useGuard();
-	
+
 	const {
 		verification,
 		verifyAccount,
@@ -48,6 +48,8 @@ const VerifyRoute: FC = () => {
 	);
 };
 
-export const Route = createFileRoute("/(auth)/verify")({
+const Route = createFileRoute("/(auth)/verify")({
 	component: VerifyRoute,
 });
+
+export { Route };

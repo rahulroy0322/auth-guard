@@ -1,7 +1,7 @@
+import { useGuard } from "@auth-guard/react";
 import { createFileRoute, Navigate, Outlet } from "@tanstack/react-router";
 import { type FC, useEffect } from "react";
 import { toast } from "ui/components/ui/sonner";
-import { useGuard } from "../../provider";
 
 const AuthRoute: FC = () => {
 	const { user, error } = useGuard();

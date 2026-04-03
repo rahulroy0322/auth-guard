@@ -44,18 +44,12 @@ importers:
       '@tanstack/react-router-devtools':
         specifier: ^1.166.10
         version: 1.166.10(@tanstack/react-router@1.168.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@tanstack/router-core@1.168.1)(csstype@3.2.3)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      form:
-        specifier: workspace:^
-        version: link:../../packages/form
       react:
         specifier: ^19.2.4
         version: 19.2.4
       react-dom:
         specifier: ^19.2.4
         version: 19.2.4(react@19.2.4)
-      schema:
-        specifier: workspace:^
-        version: link:../../packages/schema
       shared:
         specifier: workspace:^
         version: link:../../packages/shared
@@ -322,12 +316,21 @@ importers:
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
+      base:
+        specifier: workspace:^
+        version: link:../base
+      form:
+        specifier: workspace:^
+        version: link:../form
       react:
         specifier: ^18 || ^19
         version: 19.2.4
       react-dom:
         specifier: ^18 || ^19
         version: 19.2.4(react@19.2.4)
+      schema:
+        specifier: workspace:^
+        version: link:../schema
       shared:
         specifier: workspace:^
         version: link:../shared

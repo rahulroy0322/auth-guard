@@ -1,11 +1,11 @@
+import { useGuard } from "@auth-guard/react";
+import { LoginForm } from "@auth-guard/react/diy";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { type FC, useEffect } from "react";
-import { LoginForm } from "shared";
-import { useGuard } from "../../provider";
 
 const LoginRoute: FC = () => {
 	const navigate = useNavigate();
-	const { login, fetching, verification, oauthProviders,config } = useGuard();
+	const { login, fetching, verification, oauthProviders, config } = useGuard();
 
 	useEffect(() => {
 		if (!verification) {
@@ -19,8 +19,8 @@ const LoginRoute: FC = () => {
 
 	return (
 		<LoginForm
-		appName={config.appName}
-		src={config.images.login}
+			appName={config.appName}
+			src={config.images.login}
 			nativeButton={false}
 			render={<Link to="/register" />}
 			forgotPasswordProps={{

@@ -1,11 +1,12 @@
+import { useGuard } from "@auth-guard/react";
+import { RegisterForm } from "@auth-guard/react/diy";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { type FC, useEffect } from "react";
-import { RegisterForm } from "shared";
-import { useGuard } from "../../provider";
 
 const RegisterRoute: FC = () => {
 	const navigate = useNavigate();
-	const { register, fetching, verification, oauthProviders, config } = useGuard();
+	const { register, fetching, verification, oauthProviders, config } =
+		useGuard();
 
 	useEffect(() => {
 		if (!verification) {
@@ -30,6 +31,8 @@ const RegisterRoute: FC = () => {
 	);
 };
 
-export const Route = createFileRoute("/(auth)/register")({
+const Route = createFileRoute("/(auth)/register")({
 	component: RegisterRoute,
 });
+
+export { Route };
