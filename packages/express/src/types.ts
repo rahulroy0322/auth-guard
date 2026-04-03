@@ -34,6 +34,9 @@ type ResType = {
 		| {
 				authenticated: false;
 				user: null;
+		  }
+		| {
+				url: string;
 		  };
 };
 
