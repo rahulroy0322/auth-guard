@@ -1,10 +1,22 @@
 import { createContext, type FC, type ReactNode, use, useState } from "react";
 
-type AuthPathsType = "register" | "login" | "verify";
+type AuthPathsType =
+	| "register"
+	| "login"
+	| "verify"
+	| "forgot-password"
+	| "reset-password";
+
+type ResetPasswordStateType = {
+	id: string;
+	email?: string;
+};
 
 type AuthPathContextType = {
 	path: AuthPathsType;
 	setPath: (path: AuthPathsType) => void;
+	resetPasswordState: ResetPasswordStateType | null;
+	setResetPasswordState: (state: ResetPasswordStateType | null) => void;
 };
 
 const AuthPathContext = createContext<AuthPathContextType | null>(null);
@@ -15,12 +27,16 @@ type GuardProviderPropsType = {
 
 const PathProvider: FC<GuardProviderPropsType> = ({ children }) => {
 	const [path, setPath] = useState<AuthPathContextType["path"]>("login");
+	const [resetPasswordState, setResetPasswordState] =
+		useState<AuthPathContextType["resetPasswordState"]>(null);
 
 	return (
 		<AuthPathContext
 			value={{
 				path,
 				setPath,
+				resetPasswordState,
+				setResetPasswordState,
 			}}
 		>
 			{children}
@@ -38,6 +54,6 @@ const usePath = () => {
 	return context;
 };
 
-export type { AuthPathsType };
+export type { AuthPathsType, ResetPasswordStateType };
 
 export { PathProvider, usePath };

@@ -21,6 +21,10 @@ const LoginRoute: FC = () => {
 		<LoginForm
 			nativeButton={false}
 			render={<Link to="/register" />}
+			forgotPasswordProps={{
+				nativeButton: false,
+				render: <Link to="/forgot-password" />,
+			}}
 			handleSubmit={login}
 			pending={fetching}
 			oauthProviders={oauthProviders}

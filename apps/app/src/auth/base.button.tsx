@@ -1,5 +1,11 @@
 import { type FC, type ReactNode, useEffect } from "react";
-import { LoginForm, RegisterForm, VerifyForm } from "shared";
+import {
+	ForgotPasswordForm,
+	LoginForm,
+	RegisterForm,
+	ResetPasswordForm,
+	VerifyForm,
+} from "shared";
 import { Button } from "ui/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "ui/components/ui/dialog";
 import { toast } from "ui/components/ui/sonner";
@@ -24,11 +30,14 @@ const AuthModelBaseButton: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 		error,
 		oauthProviders,
 		verification,
+		forgotPassword,
 		verifyAccount,
+		resetPassword,
 		startVerification,
 		clearVerification,
 	} = useGuard();
-	const { path, setPath } = usePath();
+	const { path, setPath, resetPasswordState, setResetPasswordState } =
+		usePath();
 
 	useEffect(() => {
 		if (error) {
@@ -66,6 +75,11 @@ const AuthModelBaseButton: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 						onClick={() => {
 							setPath("register");
 						}}
+						forgotPasswordProps={{
+							onClick: () => {
+								setPath("forgot-password");
+							},
+						}}
 						handleSubmit={login}
 						pending={fetching}
 						oauthProviders={oauthProviders}
@@ -81,6 +95,38 @@ const AuthModelBaseButton: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 						oauthProviders={oauthProviders}
 					/>
 				) : null}
+				{path === "forgot-password" ? (
+					<ForgotPasswordForm
+						onClick={() => {
+							setPath("login");
+						}}
+						handleSubmit={async ({ email }) => {
+							const { id } = await forgotPassword(email);
+							setResetPasswordState({
+								email,
+								id,
+							});
+							setPath("reset-password");
+						}}
+						pending={fetching}
+					/>
+				) : null}
+				{path === "reset-password" && resetPasswordState ? (
+					<ResetPasswordForm
+						onClick={() => {
+							setPath("login");
+						}}
+						email={resetPasswordState.email}
+						handleSubmit={async ({ code, password }) => {
+							await resetPassword({
+								id: resetPasswordState.id,
+								code,
+								password,
+							});
+						}}
+						pending={fetching}
+					/>
+				) : null}
 				{path === "verify" && verification ? (
 					<VerifyForm
 						email={verification.email}
@@ -90,6 +136,7 @@ const AuthModelBaseButton: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 						}}
 						handleBack={() => {
 							clearVerification();
+							setResetPasswordState(null);
 							setPath("login");
 						}}
 						pending={fetching}
