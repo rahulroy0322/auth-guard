@@ -5,7 +5,7 @@ import { useGuard } from "../../provider";
 
 const RegisterRoute: FC = () => {
 	const navigate = useNavigate();
-	const { register, fetching, verification, oauthProviders } = useGuard();
+	const { register, fetching, verification, oauthProviders, config } = useGuard();
 
 	useEffect(() => {
 		if (!verification) {
@@ -19,6 +19,8 @@ const RegisterRoute: FC = () => {
 
 	return (
 		<RegisterForm
+			appName={config.appName}
+			src={config.images.register}
 			nativeButton={false}
 			render={<Link to="/login" />}
 			handleSubmit={register}

@@ -4,6 +4,7 @@ import { verifySchema } from "schema";
 import { Button } from "ui/components/ui/button";
 import { Field, FieldDescription } from "ui/components/ui/field";
 import { Base } from "./base";
+import type { BrandingOnlySrcType } from "./types";
 
 type VerifyFormPropsType = {
 	email: string;
@@ -11,7 +12,7 @@ type VerifyFormPropsType = {
 	handleSubmit: (code: string) => void | Promise<void>;
 	handleResend: () => void | Promise<void>;
 	handleBack?: () => void;
-};
+} & BrandingOnlySrcType;
 
 type VerifySchemaType = {
 	code: string;
@@ -20,6 +21,7 @@ type VerifySchemaType = {
 const VerifyForm: FC<VerifyFormPropsType> = ({
 	email,
 	pending,
+	src,
 	handleSubmit,
 	handleResend,
 	handleBack,
@@ -48,7 +50,7 @@ const VerifyForm: FC<VerifyFormPropsType> = ({
 
 	return (
 		<Base
-			src="/favicon.svg"
+			src={src}
 			alt="Verify account"
 			title="Verify your account"
 			description={`Enter the 6-digit code sent to ${email}`}

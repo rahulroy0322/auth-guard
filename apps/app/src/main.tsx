@@ -36,7 +36,18 @@ const oauthProviders = [
 ] as Omit<OAuthProviderOptionType, "onClick">[];
 
 const App: FC = () => (
-	<GuardProvider oauth={oauthProviders}>
+	<GuardProvider
+		config={{
+			images: {
+				forgot: "https://cdn.undraw.co/illustration/forgot-password_nttj.svg",
+				login: "https://cdn.undraw.co/illustration/login_weas.svg",
+				register: "https://cdn.undraw.co/illustration/onboarding_dcq2.svg",
+				reset: "https://cdn.undraw.co/illustration/forgot-password_nttj.svg",
+				verify: "https://cdn.undraw.co/illustration/verify-data_k0y1.svg",
+			},
+		}}
+		oauth={oauthProviders}
+	>
 		<RouterProvider router={router} />
 	</GuardProvider>
 );

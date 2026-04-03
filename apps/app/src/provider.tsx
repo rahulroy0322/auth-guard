@@ -94,13 +94,24 @@ type GuardContextType = {
 	logout: () => Promise<void>;
 	refreshToken: () => Promise<{ token: string }>;
 	reqWithToken: <T>(cb: (token: string) => Promise<T>) => Promise<T>;
-};
+} & Pick<GuardProviderPropsType, "config">;
 
 const GuardContext = createContext<GuardContextType | null>(null);
 
 type GuardProviderPropsType = {
 	children: ReactNode;
 	oauth?: Omit<OAuthProviderOptionType, "onClick">[];
+
+	config: {
+		appName?: string;
+		images: {
+			login: string;
+			register: string;
+			verify: string;
+			reset: string;
+			forgot: string;
+		};
+	};
 };
 
 const startOAuth = async (provider: OAuthProviderOptionType["provider"]) => {
@@ -117,6 +128,7 @@ const startOAuth = async (provider: OAuthProviderOptionType["provider"]) => {
 const GuardProviderImpl: FC<GuardProviderPropsType> = ({
 	children,
 	oauth = [],
+	config: authConfig,
 }) => {
 	const oauthProviders = useMemo(() => {
 		return oauth.map((val) => ({
@@ -466,6 +478,7 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({
 	return (
 		<GuardContext
 			value={{
+				config: authConfig,
 				user,
 				token,
 				error,
@@ -491,8 +504,8 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({
 	);
 };
 
-const GuardProvider: FC<GuardProviderPropsType> = ({ children, oauth }) => (
-	<GuardProviderImpl oauth={oauth}>
+const GuardProvider: FC<GuardProviderPropsType> = ({ children, ...props }) => (
+	<GuardProviderImpl {...props}>
 		<PathProvider>{children}</PathProvider>
 	</GuardProviderImpl>
 );

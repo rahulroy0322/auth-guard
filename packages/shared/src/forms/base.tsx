@@ -24,7 +24,7 @@ const Base: FC<BasePropsType> = ({
 		<CardContent className="grid p-0 md:grid-cols-2 overflow-hidden items-center">
 			<FieldGroup className="p-6 md:p-8">
 				<Field className="text-center">
-					<h1 className="text-2xl font-bold">{title}</h1>
+					<h1 className="text-2xl font-bold text-balance">{title}</h1>
 					<p className="text-balance text-muted-foreground">{description}</p>
 				</Field>
 
@@ -33,7 +33,7 @@ const Base: FC<BasePropsType> = ({
 				<OAuthButtons providers={oauthProviders} />
 			</FieldGroup>
 
-			<figure className="hidden bg-muted md:block">
+			<figure className="hidden bg-muted md:block p-2">
 				<img src={src} alt={alt} />
 			</figure>
 		</CardContent>
