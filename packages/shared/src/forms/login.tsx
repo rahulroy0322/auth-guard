@@ -5,6 +5,7 @@ import { loginSchema } from "schema";
 import { Button } from "ui/components/ui/button";
 import { Field, FieldDescription } from "ui/components/ui/field";
 import { Base } from "./base";
+import type { OAuthProviderOptionType } from "./oauth";
 
 type LoginSchemaType = Pick<UserType, "email" | "password"> & {
 	password: string;
@@ -13,11 +14,13 @@ type LoginSchemaType = Pick<UserType, "email" | "password"> & {
 type LoginFormPropsType = Parameters<typeof Button>[0] & {
 	handleSubmit: (value: LoginSchemaType) => void;
 	pending: boolean;
+	oauthProviders?: OAuthProviderOptionType[];
 };
 
 const LoginForm: FC<LoginFormPropsType> = ({
 	handleSubmit: parentSubmit,
 	pending,
+	oauthProviders,
 	...props
 }) => {
 	const { AppField, handleSubmit: submit } = useAppForm({
@@ -48,6 +51,7 @@ const LoginForm: FC<LoginFormPropsType> = ({
 			title="Welcome back"
 			// TODO!
 			description="Login to your Auth Guard account"
+			oauthProviders={oauthProviders}
 		>
 			<form
 				className="space-y-2"

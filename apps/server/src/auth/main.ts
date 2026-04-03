@@ -63,7 +63,7 @@ const guard = auth({
 	},
 
 	OAuth: {
-		callbackUri: `${ENV.BACKEND_URL}/auth/oauth/callback/`,
+		callbackUri: `${ENV.APP_URL}/oauth/callback/`,
 		providers: {
 			google: {
 				clientId: ENV.GOOGLE_CLIENT_ID,

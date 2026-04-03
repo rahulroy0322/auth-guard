@@ -5,7 +5,7 @@ import { useGuard } from "../../provider";
 
 const LoginRoute: FC = () => {
 	const navigate = useNavigate();
-	const { login, fetching, verification } = useGuard();
+	const { login, fetching, verification, oauthProviders } = useGuard();
 
 	useEffect(() => {
 		if (!verification) {
@@ -23,6 +23,7 @@ const LoginRoute: FC = () => {
 			render={<Link to="/register" />}
 			handleSubmit={login}
 			pending={fetching}
+			oauthProviders={oauthProviders}
 		/>
 	);
 };
