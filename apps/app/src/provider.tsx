@@ -96,9 +96,14 @@ type GuardProviderPropsType = {
 };
 
 const startOAuth = async (provider: OAuthProviderOptionType["provider"]) => {
-	const { url } = await startLoginWithOAuthProvider(config.base, provider);
+	try {
+		const { url } = await startLoginWithOAuthProvider(config.base, provider);
 
-	window.location.assign(url);
+		window.location.assign(url);
+	} catch (e) {
+		toast.error("Failed to initiate OAuth login");
+		console.error(e);
+	}
 };
 
 const GuardProviderImpl: FC<GuardProviderPropsType> = ({
