@@ -15,11 +15,8 @@
 		"@tailwindcss/vite": "^4.2.2",
 		"@tanstack/react-router": "^1.168.1",
 		"@tanstack/react-router-devtools": "^1.166.10",
-		"form": "workspace:^",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4",
-		"schema": "workspace:^",
-		"shared": "workspace:^",
 		"ui": "workspace:^"
 	},
 	"devDependencies": {

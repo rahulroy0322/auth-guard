@@ -8,6 +8,11 @@
 			"module": "./dist/main.mjs",
 			"types": "./dist/main.d.ts"
 		},
+		"./diy": {
+			"main": "./dist/diy.js",
+			"module": "./dist/diy.mjs",
+			"types": "./dist/diy.d.ts"
+		},
 		"./styles.css": "./dist/main.css"
 	},
 	"files": [
@@ -36,6 +41,9 @@
 		"@remixicon/react": "^4.9.0",
 		"@tailwindcss/postcss": "^4.2.2",
 		"autoprefixer": "^10.4.27",
+		"base": "workspace:^",
+		"form": "workspace:^",
+		"schema": "workspace:^",
 		"shared": "workspace:^",
 		"tailwindcss": "^4.2.2",
 		"ui": "workspace:^"

@@ -1,15 +1,15 @@
+import { useGuard } from "@auth-guard/react";
+import { ForgotPasswordForm } from "@auth-guard/react/diy";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import type { FC } from "react";
-import { ForgotPasswordForm } from "shared";
-import { useGuard } from "../../provider";
 
 const ForgotPasswordRoute: FC = () => {
 	const navigate = useNavigate();
-	const { forgotPassword, fetching,config } = useGuard();
+	const { forgotPassword, fetching, config } = useGuard();
 
 	return (
 		<ForgotPasswordForm
-		src={config.images.forgot}
+			src={config.images.forgot}
 			nativeButton={false}
 			render={<Link to="/login" />}
 			handleSubmit={async ({ email }) => {

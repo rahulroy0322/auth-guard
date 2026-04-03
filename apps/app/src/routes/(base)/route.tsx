@@ -1,13 +1,11 @@
+import {
+	LoginButton,
+	ProfileButton,
+	RegisterButton,
+	Show,
+} from "@auth-guard/react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import type { FC } from "react";
-import { LoginButton } from "../../auth/login.button";
-import { ProfileButton } from "../../auth/profile.button";
-import { RegisterButton } from "../../auth/register.button";
-import { Show } from "../../utils";
-
-export const Route = createFileRoute("/(base)")({
-	component: RouteComponent,
-});
 
 const Header: FC = () => {
 	return (
@@ -29,11 +27,15 @@ const Header: FC = () => {
 	);
 };
 
-function RouteComponent() {
-	return (
-		<>
-			<Header />
-			<Outlet />
-		</>
-	);
-}
+const RootLayout: FC = () => (
+	<>
+		<Header />
+		<Outlet />
+	</>
+);
+
+const Route = createFileRoute("/(base)")({
+	component: RootLayout,
+});
+
+export { Route };

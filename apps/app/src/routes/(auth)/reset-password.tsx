@@ -1,3 +1,5 @@
+import { useGuard } from "@auth-guard/react";
+import { ResetPasswordForm } from "@auth-guard/react/diy";
 import {
 	createFileRoute,
 	Link,
@@ -5,12 +7,10 @@ import {
 	useNavigate,
 } from "@tanstack/react-router";
 import type { FC } from "react";
-import { ResetPasswordForm } from "shared";
-import { useGuard } from "../../provider";
 
 const ResetPasswordRoute: FC = () => {
 	const navigate = useNavigate();
-	const { fetching, resetPassword,config } = useGuard();
+	const { fetching, resetPassword, config } = useGuard();
 	const search = new URLSearchParams(window.location.search);
 	const id = search.get("id");
 	const email = search.get("email") ?? undefined;

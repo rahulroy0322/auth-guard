@@ -1,16 +1,17 @@
 import type { FC } from "react";
-import { DialogTrigger } from "ui/components/ui/dialog";
-import { AuthBaseButton } from "./base.button";
+import { AuthBaseButton, type AuthBaseButtonPropsType } from "./base.button";
 
-type LoginButtonPropsType = Parameters<typeof DialogTrigger>[0];
+type LoginButtonPropsType = Omit<AuthBaseButtonPropsType, "defaultState">;
 
 const LoginButton: FC<LoginButtonPropsType> = ({
 	children = "Login",
 	...props
 }) => (
-	<AuthBaseButton defaultState={"login"}>
-		<DialogTrigger {...props}>{children}</DialogTrigger>
+	<AuthBaseButton defaultState={"login"} {...props}>
+		{children}
 	</AuthBaseButton>
 );
+
+export type { LoginButtonPropsType };
 
 export { LoginButton };

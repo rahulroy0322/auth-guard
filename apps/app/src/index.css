@@ -1,5 +1,2 @@
 @import "tailwindcss";
 @import "../../../packages/ui/src/index.css";
-
-@source "../../../packages/ui/src/components/**/*.{ts,tsx}";
-@source "../../../packages/shared/src/forms/**/*.{ts,tsx}";

@@ -21,11 +21,11 @@ type AuthPathContextType = {
 
 const AuthPathContext = createContext<AuthPathContextType | null>(null);
 
-type GuardProviderPropsType = {
+type PathProviderPropsType = {
 	children: ReactNode;
 };
 
-const PathProvider: FC<GuardProviderPropsType> = ({ children }) => {
+const PathProvider: FC<PathProviderPropsType> = ({ children }) => {
 	const [path, setPath] = useState<AuthPathContextType["path"]>("login");
 	const [resetPasswordState, setResetPasswordState] =
 		useState<AuthPathContextType["resetPasswordState"]>(null);
