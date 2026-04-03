@@ -122,10 +122,12 @@ class OAuth<T> {
 
 		if (!res.ok) {
 			logger.error({
-				msg: "Uuer responce is not ok",
+				msg: "User response is not ok",
 				user: null,
+				reqId,
 				extra: {
-					res,
+					status: res.status,
+					statusText: res.statusText,
 				},
 			});
 			throw new AuthInvalidUserError();
@@ -136,10 +138,13 @@ class OAuth<T> {
 		const { data, success, error } = this.userInfo.schema.safeParse(rawData);
 		if (!success) {
 			logger.error({
-				msg: "Invalid User responce",
+				msg: "Invalid User response",
 				user: null,
+				reqId,
 				extra: {
-					error,
+					cause: error.cause,
+					message: error.message,
+					errors: z.treeifyError(error).errors,
 				},
 			});
 			throw new AuthInvalidUserError();
@@ -176,11 +181,12 @@ class OAuth<T> {
 
 		if (!res.ok) {
 			logger.error({
-				msg: "Token responce is not ok",
+				msg: "Token response is not ok",
 				user: null,
 				reqId,
 				extra: {
-					res,
+					status: res.status,
+					statusText: res.statusText,
 				},
 			});
 			throw new AuthInvalidTokenError();
@@ -191,11 +197,13 @@ class OAuth<T> {
 		const { data, success, error } = this.tokenSchema.safeParse(rawData);
 		if (!success) {
 			logger.error({
-				msg: "Invalid token responce",
+				msg: "Invalid token response",
 				user: null,
 				reqId,
 				extra: {
-					error,
+					cause: error.cause,
+					message: error.message,
+					errors: z.treeifyError(error).errors,
 				},
 			});
 			throw new AuthInvalidTokenError();
