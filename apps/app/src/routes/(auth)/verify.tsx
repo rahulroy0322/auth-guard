@@ -4,7 +4,9 @@ import { VerifyForm } from "shared";
 import { useGuard } from "../../provider";
 
 const VerifyRoute: FC = () => {
-	const navigate = useNavigate(); const { config } = useGuard()
+	const navigate = useNavigate();
+	const { config } = useGuard();
+	
 	const {
 		verification,
 		verifyAccount,
