@@ -12,9 +12,6 @@ import { toast } from "ui/components/ui/sonner";
 import { useGuard } from "../provider";
 import { type AuthPathsType, usePath } from "./provider";
 
-// just to get those in prod
-("hidden bg-muted md:block");
-
 type AuthBaseButtonPropsType = {
 	children: ReactNode;
 	defaultState: AuthPathsType;
