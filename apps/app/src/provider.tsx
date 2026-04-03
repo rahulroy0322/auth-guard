@@ -395,15 +395,25 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({
 		setError(null);
 
 		try {
-			setUser(null);
-			setToken(null);
-			clearVerification();
+			// Call backend logout endpoint
+			await post({
+				base: config.base,
+				body: {},
+				url: "logout",
+			});
+			toast.success("Logout successful");
 		} catch (e) {
 			if (e instanceof Error) {
 				setError(e);
 			}
+			console.error(e);
+			toast.error("Logout failed");
 		} finally {
 			setLoading(false);
+			// Clear client-side state
+			setUser(null);
+			setToken(null);
+			clearVerification();
 		}
 	}, [clearVerification]);
 
