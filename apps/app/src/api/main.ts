@@ -128,9 +128,17 @@ type StartVerificationReturnType = {
 	id: string;
 };
 
+type ForgotPasswordPayloadType = {
+	email: string;
+};
+
 type VerifyAccountPayloadType = {
 	id: string;
 	code: string;
+};
+
+type ResetPasswordPayloadType = VerifyAccountPayloadType & {
+	password: string;
 };
 
 const startVerification = (base: string, email: string) =>
@@ -142,10 +150,24 @@ const startVerification = (base: string, email: string) =>
 		},
 	});
 
+const forgotPassword = (base: string, body: ForgotPasswordPayloadType) =>
+	post<StartVerificationReturnType>({
+		base,
+		url: "forgot-password",
+		body,
+	});
+
 const verifyAccount = (base: string, body: VerifyAccountPayloadType) =>
 	patch<AuthResType>({
 		base,
 		url: "verify",
+		body,
+	});
+
+const resetPassword = (base: string, body: ResetPasswordPayloadType) =>
+	patch<AuthResType>({
+		base,
+		url: "reset-password",
 		body,
 	});
 
@@ -175,16 +197,20 @@ const loginWithOAuthProvider = (
 export type {
 	AuthResType,
 	AuthStatusReturnType,
+	ForgotPasswordPayloadType,
+	ResetPasswordPayloadType,
 	StartVerificationReturnType,
 	VerifyAccountPayloadType,
 };
 
 export {
+	forgotPassword,
 	get,
 	loginWithOAuthProvider,
 	patch,
 	patchMultiPart,
 	post,
+	resetPassword,
 	startLoginWithOAuthProvider,
 	startVerification,
 	verifyAccount,

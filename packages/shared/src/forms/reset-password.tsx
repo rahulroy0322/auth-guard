@@ -1,37 +1,40 @@
-import type { UserType } from "base";
 import { useAppForm } from "form";
 import { type FC, type SubmitEvent, useCallback } from "react";
-import { loginSchema } from "schema";
+import { updatePasswordSchema, verifySchema } from "schema";
 import { Button } from "ui/components/ui/button";
 import { Field, FieldDescription } from "ui/components/ui/field";
 import { Base } from "./base";
-import type { OAuthProviderOptionType } from "./oauth";
 
-type LoginSchemaType = Pick<UserType, "email" | "password"> & {
+const resetPasswordFormSchema = updatePasswordSchema.extend({
+	code: verifySchema.shape.code,
+});
+
+type ResetPasswordSchemaType = {
+	code: string;
 	password: string;
+	confirm: string;
 };
 
-type LoginFormPropsType = Parameters<typeof Button>[0] & {
-	handleSubmit: (value: LoginSchemaType) => void;
+type ResetPasswordFormPropsType = Parameters<typeof Button>[0] & {
+	email?: string;
+	handleSubmit: (value: ResetPasswordSchemaType) => void | Promise<void>;
 	pending: boolean;
-	oauthProviders?: OAuthProviderOptionType[];
-	forgotPasswordProps?: Parameters<typeof Button>[0];
 };
 
-const LoginForm: FC<LoginFormPropsType> = ({
+const ResetPasswordForm: FC<ResetPasswordFormPropsType> = ({
+	email,
 	handleSubmit: parentSubmit,
 	pending,
-	oauthProviders,
-	forgotPasswordProps,
 	...props
 }) => {
 	const { AppField, handleSubmit: submit } = useAppForm({
 		defaultValues: {
-			email: "",
+			code: "",
 			password: "",
-		} satisfies LoginSchemaType as LoginSchemaType,
+			confirm: "",
+		} satisfies ResetPasswordSchemaType as ResetPasswordSchemaType,
 		validators: {
-			onSubmit: loginSchema,
+			onSubmit: resetPasswordFormSchema,
 		},
 		onSubmit: ({ value }) => {
 			parentSubmit(value);
@@ -49,42 +52,39 @@ const LoginForm: FC<LoginFormPropsType> = ({
 	return (
 		<Base
 			src="/favicon.svg"
-			alt="Login"
-			title="Welcome back"
-			// TODO!
-			description="Login to your Auth Guard account"
-			oauthProviders={oauthProviders}
+			alt="Reset password"
+			title="Reset your password"
+			description={
+				email
+					? `Enter the code sent to ${email} and choose a new password`
+					: "Enter the reset code and choose a new password"
+			}
 		>
 			<form
 				className="space-y-2"
 				onSubmit={handleSubmit}
 				aria-disabled={pending}
 			>
-				<AppField name="email">
-					{({ Input }) => (
-						<Input
-							label="Email"
-							type="email"
-							placeholder="jhondoe@example.com"
-							required
-						/>
+				<AppField name="code">
+					{({ InputOTP }) => (
+						<InputOTP label="Reset Code" placeholder={"*".repeat(6)} required />
 					)}
 				</AppField>
 				<AppField name="password">
 					{({ Password }) => (
 						<Password
-							addon={
-								<Button
-									variant="link"
-									type="button"
-									className="ml-auto"
-									{...forgotPasswordProps}
-								>
-									Forgot your password?
-								</Button>
-							}
 							className="cursor-pointer!"
-							label="Password"
+							label="New Password"
+							placeholder={"*".repeat(8)}
+							required
+						/>
+					)}
+				</AppField>
+				<AppField name="confirm">
+					{({ Password }) => (
+						<Password
+							className="cursor-pointer!"
+							label="Confirm Password"
 							placeholder={"*".repeat(8)}
 							required
 						/>
@@ -93,13 +93,14 @@ const LoginForm: FC<LoginFormPropsType> = ({
 
 				<Field>
 					<Button type="submit" disabled={pending} aria-disabled={pending}>
-						Login
+						Reset password
 					</Button>
 				</Field>
+
 				<FieldDescription>
-					Don&apos;t have an account?{" "}
+					Back to sign in?{" "}
 					<Button variant="link" type="button" className="p-0" {...props}>
-						Register Here
+						Login Here
 					</Button>
 				</FieldDescription>
 			</form>
@@ -107,4 +108,4 @@ const LoginForm: FC<LoginFormPropsType> = ({
 	);
 };
 
-export { LoginForm };
+export { ResetPasswordForm };

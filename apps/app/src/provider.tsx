@@ -14,9 +14,11 @@ import { toast } from "ui/components/ui/sonner";
 import {
 	type AuthResType,
 	type AuthStatusReturnType,
+	forgotPassword as forgotPasswordRequest,
 	get,
 	loginWithOAuthProvider,
 	post,
+	resetPassword as resetPasswordRequest,
 	type StartVerificationReturnType,
 	startLoginWithOAuthProvider,
 	startVerification as startVerificationRequest,
@@ -81,7 +83,13 @@ type GuardContextType = {
 		signal: Request["signal"],
 	) => Promise<void>;
 	startVerification: (email: string) => Promise<StartVerificationReturnType>;
+	forgotPassword: (email: string) => Promise<StartVerificationReturnType>;
 	verifyAccount: (code: string) => Promise<void>;
+	resetPassword: (value: {
+		id: string;
+		code: string;
+		password: string;
+	}) => Promise<void>;
 	clearVerification: () => void;
 	logout: () => Promise<void>;
 	refreshToken: () => Promise<{ token: string }>;
@@ -223,6 +231,24 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({
 		}
 	}, []);
 
+	const forgotPassword = useCallback(async (email: string) => {
+		setFetching(true);
+		setError(null);
+
+		try {
+			return await forgotPasswordRequest(config.base, {
+				email,
+			});
+		} catch (e) {
+			if (isError(e)) {
+				setError(e);
+			}
+			throw e;
+		} finally {
+			setFetching(false);
+		}
+	}, []);
+
 	const reqWithToken = useCallback(
 		async <T,>(cb: (token: string) => Promise<T>) => {
 			setFetching(true);
@@ -291,6 +317,26 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({
 			}
 		},
 		[applyAuthState, verification],
+	);
+
+	const resetPassword = useCallback(
+		async (value: { id: string; code: string; password: string }) => {
+			setFetching(true);
+			setError(null);
+
+			try {
+				const auth = await resetPasswordRequest(config.base, value);
+				applyAuthState(auth);
+			} catch (e) {
+				if (isError(e)) {
+					setError(e);
+				}
+				throw e;
+			} finally {
+				setFetching(false);
+			}
+		},
+		[applyAuthState],
 	);
 
 	const startVerificationIfError = useCallback(
@@ -431,7 +477,9 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({
 				register,
 				finishOAuth,
 				startVerification,
+				forgotPassword,
 				verifyAccount,
+				resetPassword,
 				clearVerification,
 				logout,
 				refreshToken,

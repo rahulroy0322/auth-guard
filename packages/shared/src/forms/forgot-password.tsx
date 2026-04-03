@@ -1,37 +1,32 @@
-import type { UserType } from "base";
 import { useAppForm } from "form";
 import { type FC, type SubmitEvent, useCallback } from "react";
 import { loginSchema } from "schema";
 import { Button } from "ui/components/ui/button";
 import { Field, FieldDescription } from "ui/components/ui/field";
 import { Base } from "./base";
-import type { OAuthProviderOptionType } from "./oauth";
 
-type LoginSchemaType = Pick<UserType, "email" | "password"> & {
-	password: string;
+type ForgotPasswordSchemaType = {
+	email: string;
 };
 
-type LoginFormPropsType = Parameters<typeof Button>[0] & {
-	handleSubmit: (value: LoginSchemaType) => void;
+type ForgotPasswordFormPropsType = Parameters<typeof Button>[0] & {
+	handleSubmit: (value: ForgotPasswordSchemaType) => void | Promise<void>;
 	pending: boolean;
-	oauthProviders?: OAuthProviderOptionType[];
-	forgotPasswordProps?: Parameters<typeof Button>[0];
 };
 
-const LoginForm: FC<LoginFormPropsType> = ({
+const ForgotPasswordForm: FC<ForgotPasswordFormPropsType> = ({
 	handleSubmit: parentSubmit,
 	pending,
-	oauthProviders,
-	forgotPasswordProps,
 	...props
 }) => {
 	const { AppField, handleSubmit: submit } = useAppForm({
 		defaultValues: {
 			email: "",
-			password: "",
-		} satisfies LoginSchemaType as LoginSchemaType,
+		} satisfies ForgotPasswordSchemaType as ForgotPasswordSchemaType,
 		validators: {
-			onSubmit: loginSchema,
+			onSubmit: loginSchema.pick({
+				email: true,
+			}),
 		},
 		onSubmit: ({ value }) => {
 			parentSubmit(value);
@@ -49,11 +44,9 @@ const LoginForm: FC<LoginFormPropsType> = ({
 	return (
 		<Base
 			src="/favicon.svg"
-			alt="Login"
-			title="Welcome back"
-			// TODO!
-			description="Login to your Auth Guard account"
-			oauthProviders={oauthProviders}
+			alt="Forgot password"
+			title="Forgot your password?"
+			description="Enter your email and we will send you a reset code"
 		>
 			<form
 				className="space-y-2"
@@ -70,36 +63,17 @@ const LoginForm: FC<LoginFormPropsType> = ({
 						/>
 					)}
 				</AppField>
-				<AppField name="password">
-					{({ Password }) => (
-						<Password
-							addon={
-								<Button
-									variant="link"
-									type="button"
-									className="ml-auto"
-									{...forgotPasswordProps}
-								>
-									Forgot your password?
-								</Button>
-							}
-							className="cursor-pointer!"
-							label="Password"
-							placeholder={"*".repeat(8)}
-							required
-						/>
-					)}
-				</AppField>
 
 				<Field>
 					<Button type="submit" disabled={pending} aria-disabled={pending}>
-						Login
+						Send reset code
 					</Button>
 				</Field>
+
 				<FieldDescription>
-					Don&apos;t have an account?{" "}
+					Remembered your password?{" "}
 					<Button variant="link" type="button" className="p-0" {...props}>
-						Register Here
+						Back to login
 					</Button>
 				</FieldDescription>
 			</form>
@@ -107,4 +81,4 @@ const LoginForm: FC<LoginFormPropsType> = ({
 	);
 };
 
-export { LoginForm };
+export { ForgotPasswordForm };

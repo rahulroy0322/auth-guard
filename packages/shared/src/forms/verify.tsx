@@ -1,17 +1,8 @@
-import { type FC, type SubmitEvent, useMemo, useState } from "react";
+import { useAppForm } from "form";
+import { type FC, type SubmitEvent, useCallback } from "react";
 import { verifySchema } from "schema";
 import { Button } from "ui/components/ui/button";
-import {
-	Field,
-	FieldDescription,
-	FieldError,
-	FieldLabel,
-} from "ui/components/ui/field";
-import {
-	InputOTP,
-	InputOTPGroup,
-	InputOTPSlot,
-} from "ui/components/ui/input-otp";
+import { Field, FieldDescription } from "ui/components/ui/field";
 import { Base } from "./base";
 
 type VerifyFormPropsType = {
@@ -22,6 +13,10 @@ type VerifyFormPropsType = {
 	handleBack?: () => void;
 };
 
+type VerifySchemaType = {
+	code: string;
+};
+
 const VerifyForm: FC<VerifyFormPropsType> = ({
 	email,
 	pending,
@@ -29,26 +24,27 @@ const VerifyForm: FC<VerifyFormPropsType> = ({
 	handleResend,
 	handleBack,
 }) => {
-	const [code, setCode] = useState("");
-	const [error, setError] = useState<string | null>(null);
+	const { AppField, handleSubmit: submit } = useAppForm({
+		defaultValues: {
+			code: "",
+		} satisfies VerifySchemaType as VerifySchemaType,
+		validators: {
+			onSubmit: verifySchema.pick({
+				code: true,
+			}),
+		},
+		onSubmit: async ({ value }) => {
+			await handleSubmit(value.code);
+		},
+	});
 
-	const isValidCode = useMemo(
-		() => verifySchema.shape.code.safeParse(code).success,
-		[code],
+	const onSubmit = useCallback(
+		(event: SubmitEvent<HTMLFormElement>) => {
+			event.preventDefault();
+			submit();
+		},
+		[submit],
 	);
-
-	const onSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
-		event.preventDefault();
-
-		const parsed = verifySchema.shape.code.safeParse(code);
-		if (!parsed.success) {
-			setError(parsed.error.issues[0]?.message ?? "Invalid code");
-			return;
-		}
-
-		setError(null);
-		await handleSubmit(parsed.data);
-	};
 
 	return (
 		<Base
@@ -58,36 +54,20 @@ const VerifyForm: FC<VerifyFormPropsType> = ({
 			description={`Enter the 6-digit code sent to ${email}`}
 		>
 			<form className="space-y-4" onSubmit={onSubmit} aria-disabled={pending}>
-				<Field data-invalid={!!error}>
-					<FieldLabel>Verification Code</FieldLabel>
-					<FieldDescription>
-						Use the one-time password from your email to finish signing in.
-					</FieldDescription>
-					<InputOTP
-						value={code}
-						onChange={(value) => {
-							setCode(value);
-							if (error) {
-								setError(null);
-							}
-						}}
-						maxLength={6}
-						disabled={pending}
-					>
-						<InputOTPGroup className="mx-auto">
-							<InputOTPSlot index={0} aria-invalid={!!error} />
-							<InputOTPSlot index={1} aria-invalid={!!error} />
-							<InputOTPSlot index={2} aria-invalid={!!error} />
-							<InputOTPSlot index={3} aria-invalid={!!error} />
-							<InputOTPSlot index={4} aria-invalid={!!error} />
-							<InputOTPSlot index={5} aria-invalid={!!error} />
-						</InputOTPGroup>
-					</InputOTP>
-					{error ? <FieldError>{error}</FieldError> : null}
-				</Field>
+				<AppField name="code">
+					{({ InputOTP }) => (
+						<InputOTP
+							label="Verification Code"
+							description="Use the one-time password from your email to finish signing in."
+							placeholder={"*".repeat(6)}
+							disabled={pending}
+							required
+						/>
+					)}
+				</AppField>
 
 				<Field>
-					<Button type="submit" disabled={pending || !isValidCode}>
+					<Button type="submit" disabled={pending}>
 						Verify Account
 					</Button>
 				</Field>
