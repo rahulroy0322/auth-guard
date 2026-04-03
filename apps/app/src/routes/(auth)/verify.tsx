@@ -4,7 +4,7 @@ import { VerifyForm } from "shared";
 import { useGuard } from "../../provider";
 
 const VerifyRoute: FC = () => {
-	const navigate = useNavigate();
+	const navigate = useNavigate(); const { config } = useGuard()
 	const {
 		verification,
 		verifyAccount,
@@ -29,6 +29,7 @@ const VerifyRoute: FC = () => {
 
 	return (
 		<VerifyForm
+			src={config.images.verify}
 			email={verification.email}
 			handleSubmit={verifyAccount}
 			handleResend={async () => {

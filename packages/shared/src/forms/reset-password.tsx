@@ -4,6 +4,7 @@ import { updatePasswordSchema, verifySchema } from "schema";
 import { Button } from "ui/components/ui/button";
 import { Field, FieldDescription } from "ui/components/ui/field";
 import { Base } from "./base";
+import type { BrandingOnlySrcType } from "./types";
 
 const resetPasswordFormSchema = updatePasswordSchema.extend({
 	code: verifySchema.shape.code,
@@ -19,12 +20,13 @@ type ResetPasswordFormPropsType = Parameters<typeof Button>[0] & {
 	email?: string;
 	handleSubmit: (value: ResetPasswordSchemaType) => void | Promise<void>;
 	pending: boolean;
-};
+} & BrandingOnlySrcType;
 
 const ResetPasswordForm: FC<ResetPasswordFormPropsType> = ({
 	email,
 	handleSubmit: parentSubmit,
 	pending,
+	src,
 	...props
 }) => {
 	const { AppField, handleSubmit: submit } = useAppForm({
@@ -51,7 +53,7 @@ const ResetPasswordForm: FC<ResetPasswordFormPropsType> = ({
 
 	return (
 		<Base
-			src="/favicon.svg"
+			src={src}
 			alt="Reset password"
 			title="Reset your password"
 			description={

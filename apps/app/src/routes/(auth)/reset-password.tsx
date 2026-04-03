@@ -10,7 +10,7 @@ import { useGuard } from "../../provider";
 
 const ResetPasswordRoute: FC = () => {
 	const navigate = useNavigate();
-	const { fetching, resetPassword } = useGuard();
+	const { fetching, resetPassword,config } = useGuard();
 	const search = new URLSearchParams(window.location.search);
 	const id = search.get("id");
 	const email = search.get("email") ?? undefined;
@@ -21,6 +21,7 @@ const ResetPasswordRoute: FC = () => {
 
 	return (
 		<ResetPasswordForm
+			src={config.images.reset}
 			nativeButton={false}
 			render={<Link to="/login" />}
 			email={email}

@@ -6,6 +6,7 @@ import { Button } from "ui/components/ui/button";
 import { Field, FieldDescription } from "ui/components/ui/field";
 import { Base } from "./base";
 import type { OAuthProviderOptionType } from "./oauth";
+import type { BrandingType } from "./types";
 
 type LoginSchemaType = Pick<UserType, "email" | "password"> & {
 	password: string;
@@ -16,13 +17,15 @@ type LoginFormPropsType = Parameters<typeof Button>[0] & {
 	pending: boolean;
 	oauthProviders?: OAuthProviderOptionType[];
 	forgotPasswordProps?: Parameters<typeof Button>[0];
-};
+} & BrandingType;
 
 const LoginForm: FC<LoginFormPropsType> = ({
 	handleSubmit: parentSubmit,
 	pending,
 	oauthProviders,
 	forgotPasswordProps,
+	src,
+	appName = "Auth Guard",
 	...props
 }) => {
 	const { AppField, handleSubmit: submit } = useAppForm({
@@ -48,11 +51,10 @@ const LoginForm: FC<LoginFormPropsType> = ({
 
 	return (
 		<Base
-			src="/favicon.svg"
+			src={src}
 			alt="Login"
 			title="Welcome back"
-			// TODO!
-			description="Login to your Auth Guard account"
+			description={`Login to your ${appName} account`}
 			oauthProviders={oauthProviders}
 		>
 			<form

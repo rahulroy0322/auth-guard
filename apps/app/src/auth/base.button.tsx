@@ -12,6 +12,9 @@ import { toast } from "ui/components/ui/sonner";
 import { useGuard } from "../provider";
 import { type AuthPathsType, usePath } from "./provider";
 
+// just to get those in prod
+("hidden bg-muted md:block");
+
 type AuthBaseButtonPropsType = {
 	children: ReactNode;
 	defaultState: AuthPathsType;
@@ -24,6 +27,7 @@ const AuthModelBaseButton: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 	...props
 }) => {
 	const {
+		config,
 		fetching,
 		login,
 		register,
@@ -67,11 +71,13 @@ const AuthModelBaseButton: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 				{children}
 			</DialogTrigger>
 			<DialogContent
-				className="max-w-sm md:max-w-4xl p-0"
+				className="max-w-sm md:max-w-4xl p-0 "
 				showCloseButton={false}
 			>
 				{path === "login" ? (
 					<LoginForm
+						src={config.images.login}
+						appName={config.appName}
 						onClick={() => {
 							setPath("register");
 						}}
@@ -87,6 +93,8 @@ const AuthModelBaseButton: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 				) : null}
 				{path === "register" ? (
 					<RegisterForm
+						src={config.images.register}
+						appName={config.appName}
 						onClick={() => {
 							setPath("login");
 						}}
@@ -97,6 +105,7 @@ const AuthModelBaseButton: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 				) : null}
 				{path === "forgot-password" ? (
 					<ForgotPasswordForm
+						src={config.images.forgot}
 						onClick={() => {
 							setPath("login");
 						}}
@@ -113,6 +122,7 @@ const AuthModelBaseButton: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 				) : null}
 				{path === "reset-password" && resetPasswordState ? (
 					<ResetPasswordForm
+						src={config.images.reset}
 						onClick={() => {
 							clearVerification();
 							setResetPasswordState(null);
@@ -131,6 +141,7 @@ const AuthModelBaseButton: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 				) : null}
 				{path === "verify" && verification ? (
 					<VerifyForm
+						src={config.images.verify}
 						email={verification.email}
 						handleSubmit={verifyAccount}
 						handleResend={async () => {

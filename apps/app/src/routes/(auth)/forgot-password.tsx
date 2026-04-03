@@ -5,10 +5,11 @@ import { useGuard } from "../../provider";
 
 const ForgotPasswordRoute: FC = () => {
 	const navigate = useNavigate();
-	const { forgotPassword, fetching } = useGuard();
+	const { forgotPassword, fetching,config } = useGuard();
 
 	return (
 		<ForgotPasswordForm
+		src={config.images.forgot}
 			nativeButton={false}
 			render={<Link to="/login" />}
 			handleSubmit={async ({ email }) => {

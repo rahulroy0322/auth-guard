@@ -5,7 +5,7 @@ import { useGuard } from "../../provider";
 
 const LoginRoute: FC = () => {
 	const navigate = useNavigate();
-	const { login, fetching, verification, oauthProviders } = useGuard();
+	const { login, fetching, verification, oauthProviders,config } = useGuard();
 
 	useEffect(() => {
 		if (!verification) {
@@ -19,6 +19,8 @@ const LoginRoute: FC = () => {
 
 	return (
 		<LoginForm
+		appName={config.appName}
+		src={config.images.login}
 			nativeButton={false}
 			render={<Link to="/register" />}
 			forgotPasswordProps={{

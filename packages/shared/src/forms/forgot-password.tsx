@@ -4,6 +4,7 @@ import { loginSchema } from "schema";
 import { Button } from "ui/components/ui/button";
 import { Field, FieldDescription } from "ui/components/ui/field";
 import { Base } from "./base";
+import type { BrandingOnlySrcType } from "./types";
 
 type ForgotPasswordSchemaType = {
 	email: string;
@@ -12,11 +13,12 @@ type ForgotPasswordSchemaType = {
 type ForgotPasswordFormPropsType = Parameters<typeof Button>[0] & {
 	handleSubmit: (value: ForgotPasswordSchemaType) => void | Promise<void>;
 	pending: boolean;
-};
+} & BrandingOnlySrcType;
 
 const ForgotPasswordForm: FC<ForgotPasswordFormPropsType> = ({
 	handleSubmit: parentSubmit,
 	pending,
+	src,
 	...props
 }) => {
 	const { AppField, handleSubmit: submit } = useAppForm({
@@ -43,7 +45,7 @@ const ForgotPasswordForm: FC<ForgotPasswordFormPropsType> = ({
 
 	return (
 		<Base
-			src="/favicon.svg"
+			src={src}
 			alt="Forgot password"
 			title="Forgot your password?"
 			description="Enter your email and we will send you a reset code"

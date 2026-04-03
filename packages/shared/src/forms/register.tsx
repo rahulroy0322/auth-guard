@@ -6,6 +6,7 @@ import { Button } from "ui/components/ui/button";
 import { Field, FieldDescription } from "ui/components/ui/field";
 import { Base } from "./base";
 import type { OAuthProviderOptionType } from "./oauth";
+import type { BrandingType } from "./types";
 
 const registerFrontendSchema = registerSchema
 	.extend({
@@ -27,12 +28,14 @@ type RegisterFormPropsType = Parameters<typeof Button>[0] & {
 	handleSubmit: (value: RegisterSchemaType) => void;
 	pending: boolean;
 	oauthProviders?: OAuthProviderOptionType[];
-};
+} & BrandingType;
 
 const RegisterForm: FC<RegisterFormPropsType> = ({
 	handleSubmit: parentSubmit,
 	pending,
 	oauthProviders,
+	src,
+	appName = "Auth Guard",
 	...props
 }) => {
 	const { AppField, handleSubmit: submit } = useAppForm({
@@ -60,9 +63,9 @@ const RegisterForm: FC<RegisterFormPropsType> = ({
 
 	return (
 		<Base
-			src="/favicon.svg"
-			alt="Login"
-			title="Create your account"
+			src={src}
+			alt="Register"
+			title={`Create your account on ${appName}`}
 			description="Enter your details below to create your account"
 			oauthProviders={oauthProviders}
 		>
