@@ -114,6 +114,8 @@ const AuthModelBaseButton: FC<Omit<AuthBaseButtonPropsType, "mode">> = ({
 				{path === "reset-password" && resetPasswordState ? (
 					<ResetPasswordForm
 						onClick={() => {
+							clearVerification();
+							setResetPasswordState(null);
 							setPath("login");
 						}}
 						email={resetPasswordState.email}
