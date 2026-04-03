@@ -6,6 +6,7 @@ import {
 	AuthInvalidTokenError,
 	AuthInvalidUserError,
 } from "../error";
+import type { SmartLogger } from "../utils/smart-logger";
 
 class OAuth<T> {
 	constructor(
@@ -81,21 +82,36 @@ class OAuth<T> {
 	}) => expected === got;
 
 	public fetchUser = async (
+		logger: SmartLogger,
 		code: string,
 		state: {
 			expected: string;
 			got: string | undefined;
 		},
 		codeVerifier: string,
+		{
+			reqId,
+		}: {
+			reqId: string;
+		},
 	) => {
 		const isValidState = this.validateState(state);
 		if (!isValidState) {
+			logger.error({
+				msg: "Invalid state",
+				user: null,
+				reqId,
+			});
 			throw new AuthInvalidStateError();
 		}
 
 		const { accessToken, tokenType } = await this.fetchToken(
+			logger,
 			code,
 			codeVerifier,
+			{
+				reqId,
+			},
 		);
 
 		const res = await fetch(this.urls.user, {
@@ -105,19 +121,48 @@ class OAuth<T> {
 		});
 
 		if (!res.ok) {
+			logger.error({
+				msg: "User response is not ok",
+				user: null,
+				reqId,
+				extra: {
+					status: res.status,
+					statusText: res.statusText,
+				},
+			});
 			throw new AuthInvalidUserError();
 		}
 
 		const rawData = await res.json();
-		const { data, success } = this.userInfo.schema.safeParse(rawData);
+
+		const { data, success, error } = this.userInfo.schema.safeParse(rawData);
 		if (!success) {
+			logger.error({
+				msg: "Invalid User response",
+				user: null,
+				reqId,
+				extra: {
+					cause: error.cause,
+					message: error.message,
+					errors: z.treeifyError(error).errors,
+				},
+			});
 			throw new AuthInvalidUserError();
 		}
 
 		return this.userInfo.parser(data);
 	};
 
-	private fetchToken = async (code: string, codeVerifier: string) => {
+	private fetchToken = async (
+		logger: SmartLogger,
+		code: string,
+		codeVerifier: string,
+		{
+			reqId,
+		}: {
+			reqId: string;
+		},
+	) => {
 		const res = await fetch(this.urls.token, {
 			method: "POST",
 			headers: {
@@ -135,12 +180,32 @@ class OAuth<T> {
 		});
 
 		if (!res.ok) {
+			logger.error({
+				msg: "Token response is not ok",
+				user: null,
+				reqId,
+				extra: {
+					status: res.status,
+					statusText: res.statusText,
+				},
+			});
 			throw new AuthInvalidTokenError();
 		}
 
 		const rawData = await res.json();
-		const { data, success } = this.tokenSchema.safeParse(rawData);
+
+		const { data, success, error } = this.tokenSchema.safeParse(rawData);
 		if (!success) {
+			logger.error({
+				msg: "Invalid token response",
+				user: null,
+				reqId,
+				extra: {
+					cause: error.cause,
+					message: error.message,
+					errors: z.treeifyError(error).errors,
+				},
+			});
 			throw new AuthInvalidTokenError();
 		}
 		return {
