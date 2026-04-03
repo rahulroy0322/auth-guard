@@ -407,7 +407,7 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({
 				setError(e);
 			}
 			console.error(e);
-			toast.success("Logout failed");
+			toast.error("Logout failed");
 		} finally {
 			setLoading(false);
 			// Clear client-side state
