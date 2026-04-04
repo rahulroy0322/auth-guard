@@ -1,0 +1,1 @@
+export { authEmailTemplate } from "./auth";

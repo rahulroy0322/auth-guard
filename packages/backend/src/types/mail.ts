@@ -1,7 +1,14 @@
 import type { CodeType } from "./code";
 
-type MailConfigType = {
-	sendMail: (code: CodeType) => Promise<void>;
+type SendMailPropsType = {
+	email: string;
+} & {
+	type: "verification" | "forgot" | "register";
+	code: CodeType;
 };
 
-export type { MailConfigType };
+type MailConfigType = {
+	sendMail: (props: SendMailPropsType) => Promise<void>;
+};
+
+export type { MailConfigType, SendMailPropsType };

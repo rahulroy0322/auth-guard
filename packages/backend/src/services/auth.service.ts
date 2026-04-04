@@ -76,7 +76,7 @@ class AuthService {
 		}
 		this.codeService.sendCode({
 			reqId,
-			kind: "verification",
+			kind: "register",
 			user,
 		});
 
