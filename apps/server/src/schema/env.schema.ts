@@ -22,7 +22,6 @@ const envSchema = z.object({
 		.default("dev")
 		.describe("which env running?"),
 	APP_URL: z.url(),
-	ADMIN_URL: z.url(),
 	// DB
 	DB_HOST: z.string(),
 	DB_USER: z.string(),
@@ -47,6 +46,12 @@ const envSchema = z.object({
 			return invalidUrls.length === 0;
 		})
 		.transform((value) => transformToArray(value)),
+
+	// Email
+	MAIL_HOST: z.string(),
+	MAIL_PORT: z.coerce.number(),
+	MAIL_USER: z.email(),
+	MAIL_PASS: z.string(),
 
 	// OAuth
 

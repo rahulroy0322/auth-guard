@@ -1,0 +1,34 @@
+{
+	"name": "@auth-guard/mail",
+	"version": "0.0.0",
+	"description": "",
+	"main": "index.js",
+	"exports": {
+		".": {
+			"import": "./dist/main.d.ts",
+			"default": "./dist/main.js"
+		},
+		"./*": {
+			"import": "./dist/*.d.ts",
+			"default": "./dist/*.js"
+		}
+	},
+	"scripts": {
+		"build": "tsc -b",
+		"check": "biome check",
+		"check:fix": "biome check --fix"
+	},
+	"author": "Rahul Roy",
+	"license": "MIT",
+	"dependencies": {
+		"ejs": "^5.0.1",
+		"nodemailer": "^8.0.4"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.4.8",
+		"@types/ejs": "^3.1.5",
+		"@types/nodemailer": "^7.0.11",
+		"biome-config": "workspace:^",
+		"ts-config": "workspace:^"
+	}
+}

@@ -50,9 +50,6 @@ importers:
       react-dom:
         specifier: ^19.2.4
         version: 19.2.4(react@19.2.4)
-      shared:
-        specifier: workspace:^
-        version: link:../../packages/shared
       ui:
         specifier: workspace:^
         version: link:../../packages/ui
@@ -111,6 +108,9 @@ importers:
       '@auth-guard/express':
         specifier: workspace:^
         version: link:../../packages/express
+      '@auth-guard/mail':
+        specifier: workspace:^
+        version: link:../../packages/mail
       biome-config:
         specifier: workspace:^
         version: link:../../packages/biome-config
@@ -304,6 +304,31 @@ importers:
       ui:
         specifier: workspace:^
         version: link:../ui
+
+  packages/mail:
+    dependencies:
+      ejs:
+        specifier: ^5.0.1
+        version: 5.0.1
+      nodemailer:
+        specifier: ^8.0.4
+        version: 8.0.4
+    devDependencies:
+      '@biomejs/biome':
+        specifier: 2.4.8
+        version: 2.4.8
+      '@types/ejs':
+        specifier: ^3.1.5
+        version: 3.1.5
+      '@types/nodemailer':
+        specifier: ^7.0.11
+        version: 7.0.11
+      biome-config:
+        specifier: workspace:^
+        version: link:../biome-config
+      ts-config:
+        specifier: workspace:^
+        version: link:../ts-config
 
   packages/react:
     dependencies:
@@ -2188,6 +2213,9 @@ packages:
   '@types/cors@2.8.19':
     resolution: {integrity: sha512-mFNylyeyqN93lfe/9CSxOGREz8cpzAhH+E93xJ4xWQf62V8sQ/24reV2nyzUWM6H6Xji+GGHpkbLe7pVoUEskg==}
 
+  '@types/ejs@3.1.5':
+    resolution: {integrity: sha512-nv+GSx77ZtXiJzwKdsASqi+YQ5Z7vwHsTP0JY2SiQgjGckkBRKZnk8nIM+7oUZ1VCtuTz0+By4qVR7fqzp/Dfg==}
+
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
 
@@ -2211,6 +2239,9 @@ packages:
 
   '@types/node@24.12.0':
     resolution: {integrity: sha512-GYDxsZi3ChgmckRT9HPU0WEhKLP08ev/Yfcq2AstjrDASOYCSXeyjDsHg4v5t4jOj7cyDX3vmprafKlWIG9MXQ==}
+
+  '@types/nodemailer@7.0.11':
+    resolution: {integrity: sha512-E+U4RzR2dKrx+u3N4DlsmLaDC6mMZOM/TPROxA0UAPiTgI0y4CEFBmZE+coGWTjakDriRsXG368lNk1u9Q0a2g==}
 
   '@types/pg@8.18.0':
     resolution: {integrity: sha512-gT+oueVQkqnj6ajGJXblFR4iavIXWsGAFCk3dP4Kki5+a9R4NMt0JARdk6s8cUKcfUoqP5dAtDSLU8xYUTFV+Q==}
@@ -2763,6 +2794,11 @@ packages:
 
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
+
+  ejs@5.0.1:
+    resolution: {integrity: sha512-COqBPFMxuPTPspXl2DkVYaDS3HtrD1GpzOGkNTJ1IYkifq/r9h8SVEFrjA3D9/VJGOEoMQcrlhpntcSUrM8k6A==}
+    engines: {node: '>=0.12.18'}
+    hasBin: true
 
   electron-to-chromium@1.5.321:
     resolution: {integrity: sha512-L2C7Q279W2D/J4PLZLk7sebOILDSWos7bMsMNN06rK482umHUrh/3lM8G7IlHFOYip2oAg5nha1rCMxr/rs6ZQ==}
@@ -3547,6 +3583,10 @@ packages:
 
   node-releases@2.0.36:
     resolution: {integrity: sha512-TdC8FSgHz8Mwtw9g5L4gR/Sh9XhSP/0DEkQxfEFXOpiul5IiHgHan2VhYYb6agDSfp4KuvltmGApc8HMgUrIkA==}
+
+  nodemailer@8.0.4:
+    resolution: {integrity: sha512-k+jf6N8PfQJ0Fe8ZhJlgqU5qJU44Lpvp2yvidH3vp1lPnVQMgi4yEEMPXg5eJS1gFIJTVq1NHBk7Ia9ARdSBdQ==}
+    engines: {node: '>=6.0.0'}
 
   normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
@@ -5910,6 +5950,8 @@ snapshots:
     dependencies:
       '@types/node': 24.12.0
 
+  '@types/ejs@3.1.5': {}
+
   '@types/estree@1.0.8': {}
 
   '@types/express-serve-static-core@5.1.1':
@@ -5941,6 +5983,10 @@ snapshots:
   '@types/node@24.12.0':
     dependencies:
       undici-types: 7.16.0
+
+  '@types/nodemailer@7.0.11':
+    dependencies:
+      '@types/node': 24.12.0
 
   '@types/pg@8.18.0':
     dependencies:
@@ -6352,6 +6398,8 @@ snapshots:
       '@noble/hashes': 1.8.0
 
   ee-first@1.1.1: {}
+
+  ejs@5.0.1: {}
 
   electron-to-chromium@1.5.321: {}
 
@@ -7136,6 +7184,8 @@ snapshots:
   node-gyp-build@4.8.4: {}
 
   node-releases@2.0.36: {}
+
+  nodemailer@8.0.4: {}
 
   normalize-path@3.0.0: {}
 

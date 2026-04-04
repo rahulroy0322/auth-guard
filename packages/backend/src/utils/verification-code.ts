@@ -1,7 +1,7 @@
 import type { UserType } from "base";
 import { nanoid } from "nanoid";
 import { AuthBadError } from "../error";
-import type { CacheConfigType } from "../types";
+import type { CacheConfigType, SendMailPropsType } from "../types";
 import { keys } from "./cache";
 import type { SmartLogger } from "./smart-logger";
 
@@ -21,7 +21,7 @@ class CodeManager {
 	}: {
 		user: Pick<UserType, "id">;
 		reqId: string;
-		kind: "verification" | "forgot";
+		kind: SendMailPropsType["type"];
 	}): Promise<string> {
 		this.logger.trace({
 			reqId,

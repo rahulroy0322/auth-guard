@@ -1,12 +1,23 @@
 import { auth } from "@auth-guard/express";
+import { initMail } from "@auth-guard/mail";
 import type { Request } from "express";
 import { redis } from "../cache/main";
-import ENV from "../config/env.config";
+import ENV, { isDev } from "../config/env.config";
 import { logger } from "../logger/pino";
 import * as Avatar from "../services/avatar.service";
 import * as Profile from "../services/profile.service";
 import * as Session from "../services/session.service";
 import * as User from "../services/user.service";
+
+const mail = initMail({
+	host: ENV.MAIL_HOST,
+	port: ENV.MAIL_PORT,
+	secure: !isDev,
+	auth: {
+		user: ENV.MAIL_USER,
+		pass: ENV.MAIL_PASS,
+	},
+});
 
 const extractAccessToken = (req: Request) =>
 	req.headers.authorization || (req.headers.token as string) || null;
@@ -56,10 +67,7 @@ const guard = auth({
 		remove: (key) => redis.del(key) as unknown as Promise<void>,
 	},
 	Mail: {
-		sendMail: async (code) => {
-			// TODO! temp not prod ready
-			logger.error({ code }, "TODO");
-		},
+		sendMail: mail,
 	},
 
 	OAuth: {
