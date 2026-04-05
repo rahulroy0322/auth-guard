@@ -1,16 +1,7 @@
 {
 	"$schema": "https://biomejs.dev/schemas/2.4.8/schema.json",
-	"extends": ["biome-config/react.json"],
+	"extends": ["biome-config/nextjs.json"],
 	"files": {
 		"includes": ["**", "!!**/dist", "!!node_modules", "!!.next/**/*"]
-	},
-	"linter": {
-		"rules": {
-			"a11y": "off"
-		},
-		"domains": {
-			"next": "recommended",
-			"react": "recommended"
-		}
 	}
 }
