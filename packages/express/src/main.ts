@@ -141,7 +141,7 @@ const init: AuthExpressType = <T extends ProviderType>({
 
 		const { id } = await coreApi.startVerification(data);
 
-		res.status(201).json({
+		res.status(200).json({
 			success: true,
 			data: {
 				id,
@@ -226,7 +226,10 @@ const init: AuthExpressType = <T extends ProviderType>({
 	};
 
 	const logout: RequestHandler = async (req, res) => {
-		if (props.extractToken.access(req) || props.extractToken.refresh(req)) {
+		if (
+			(await props.extractToken.access(req)) ||
+			(await props.extractToken.refresh(req))
+		) {
 			await coreApi.logout(req);
 		}
 

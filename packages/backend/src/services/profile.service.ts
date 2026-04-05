@@ -68,8 +68,12 @@ class ProfileService {
 		await this.userModel.updateById(user.id, { password });
 
 		this.logger.trace({ reqId, msg: "Extracting tokens to ban" });
-		const [, accessToken] = (this.tokenConfig.access(req) || "").split(" ");
-		const [, refreshToken] = (this.tokenConfig.refresh(req) || "").split(" ");
+		const [, accessToken] = ((await this.tokenConfig.access(req)) || "").split(
+			" ",
+		);
+		const [, refreshToken] = (
+			(await this.tokenConfig.refresh(req)) || ""
+		).split(" ");
 
 		const tokensToBan: Array<{ token: string; expirySeconds: number }> = [];
 

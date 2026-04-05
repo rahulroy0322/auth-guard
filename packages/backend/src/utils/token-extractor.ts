@@ -7,15 +7,19 @@ class TokenExtractor {
 		private readonly jwtConfig: JwtConfigType,
 	) {}
 
-	public extractTokens = (req: IncomingMessage) => {
-		const [, accessToken] = (this.tokenConfig.access(req) || "").split(" ");
-		const [, refreshToken] = (this.tokenConfig.refresh(req) || "").split(" ");
+	public extractTokens = async (req: IncomingMessage) => {
+		const [, accessToken] = ((await this.tokenConfig.access(req)) || "").split(
+			" ",
+		);
+		const [, refreshToken] = (
+			(await this.tokenConfig.refresh(req)) || ""
+		).split(" ");
 
 		return { accessToken, refreshToken };
 	};
 
-	public prepareTokensForBan = (req: IncomingMessage) => {
-		const { accessToken, refreshToken } = this.extractTokens(req);
+	public prepareTokensForBan = async (req: IncomingMessage) => {
+		const { accessToken, refreshToken } = await this.extractTokens(req);
 		const tokens: Array<{
 			token: string;
 			expirySeconds: number;

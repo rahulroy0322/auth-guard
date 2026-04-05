@@ -50,7 +50,7 @@ class SessionService {
 
 		this.logger.trace({ reqId, msg: "Checking authentication" });
 
-		const [, token] = (this.tokenConfig.access(req) || "").split(" ");
+		const [, token] = ((await this.tokenConfig.access(req)) || "").split(" ");
 
 		if (!token) {
 			return { user: null };
@@ -100,7 +100,7 @@ class SessionService {
 
 		this.logger.trace({ reqId, msg: "Starting token refresh" });
 
-		const [, token] = (this.tokenConfig.refresh(req) || "").split(" ");
+		const [, token] = ((await this.tokenConfig.refresh(req)) || "").split(" ");
 
 		if (!token) {
 			this.logger.error({
@@ -162,7 +162,7 @@ class SessionService {
 
 		this.logger.trace({ reqId, msg: "Starting Auth Status" });
 
-		const [, token] = (this.tokenConfig.refresh(req) || "").split(" ");
+		const [, token] = ((await this.tokenConfig.refresh(req)) || "").split(" ");
 
 		if (!token) {
 			return {
@@ -221,7 +221,7 @@ class SessionService {
 		this.logger.trace({ reqId, msg: "Processing logout" });
 
 		const { tokens: tokensToBan, refreshToken } =
-			this.tokenExtractor.prepareTokensForBan(req);
+			await this.tokenExtractor.prepareTokensForBan(req);
 
 		if (tokensToBan.length > 0) {
 			await this.banManager.banMultiple(tokensToBan, reqId);
