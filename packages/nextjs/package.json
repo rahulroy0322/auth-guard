@@ -1,0 +1,45 @@
+{
+	"name": "@auth-guard/nextjs",
+	"version": "0.0.0",
+	"description": "",
+	"exports": {
+		".": {
+			"main": "./dist/main.js",
+			"module": "./dist/main.mjs",
+			"types": "./dist/main.d.ts"
+		},
+		"./diy": {
+			"main": "./dist/diy.js",
+			"module": "./dist/diy.mjs",
+			"types": "./dist/diy.d.ts"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "tsc -b && tsup",
+		"check": "biome check",
+		"check:fix": "biome check --fix",
+		"dev": "tsup --watch"
+	},
+	"author": "Rahul Roy",
+	"license": "MIT",
+	"devDependencies": {
+		"@biomejs/biome": "2.4.8",
+		"biome-config": "workspace:^",
+		"ts-config": "workspace:^",
+		"tsup": "^8.5.1"
+	},
+	"peerDependencies": {
+		"next": "^15 || ^16",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
+	},
+	"dependencies": {
+		"@auth-guard/react": "workspace:^",
+		"@tailwindcss/postcss": "^4.2.2",
+		"autoprefixer": "^10.4.27",
+		"tailwindcss": "^4.2.2"
+	}
+}

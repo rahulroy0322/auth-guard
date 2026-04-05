@@ -1,6 +1,5 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { Toaster } from "ui/components/ui/sonner";
 
 export const Route = createRootRoute({
 	component: RootComponent,
@@ -12,7 +11,6 @@ function RootComponent() {
 			<div className="h-svh w-svw overflow-x-auto">
 				<Outlet />
 			</div>
-			<Toaster richColors closeButton />
 			<TanStackRouterDevtools />
 		</>
 	);
