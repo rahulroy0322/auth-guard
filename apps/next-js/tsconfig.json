@@ -1,11 +1,6 @@
 {
 	"extends": "ts-config/nextjs",
 	"compilerOptions": {
-		"skipLibCheck": true,
-		"incremental": true,
-
-		"jsx": "react-jsx",
-
 		"paths": {
 			"@/*": ["./src/*"]
 		}
