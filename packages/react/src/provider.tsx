@@ -10,7 +10,7 @@ import {
 	useState,
 } from "react";
 import type { OAuthProviderOptionType } from "shared";
-import { toast } from "ui/components/ui/sonner";
+import { Toaster, toast } from "ui/components/ui/sonner";
 import {
 	type AuthResType,
 	type AuthStatusReturnType,
@@ -61,6 +61,9 @@ const isError = (value: unknown): value is Error =>
 		"name" in value);
 
 const readVerificationState = (): VerificationStateType | null => {
+	if (typeof window === "undefined") {
+		return null;
+	}
 	const stored = sessionStorage.getItem(VERIFICATION_STORAGE_KEY);
 
 	if (!stored) {
@@ -70,7 +73,9 @@ const readVerificationState = (): VerificationStateType | null => {
 	try {
 		return JSON.parse(stored) as VerificationStateType;
 	} catch {
-		sessionStorage.removeItem(VERIFICATION_STORAGE_KEY);
+		if (typeof window !== "undefined") {
+			sessionStorage.removeItem(VERIFICATION_STORAGE_KEY);
+		}
 		return null;
 	}
 };
@@ -176,6 +181,9 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({
 	}, [config.baseUrl]);
 
 	useEffect(() => {
+		if (typeof window === "undefined") {
+			return;
+		}
 		if (!verification) {
 			sessionStorage.removeItem(VERIFICATION_STORAGE_KEY);
 			return;
@@ -514,9 +522,12 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({
 };
 
 const GuardProvider: FC<GuardProviderPropsType> = ({ children, ...props }) => (
-	<GuardProviderImpl {...props}>
-		<PathProvider>{children}</PathProvider>
-	</GuardProviderImpl>
+	<>
+		<GuardProviderImpl {...props}>
+			<PathProvider>{children}</PathProvider>
+		</GuardProviderImpl>
+		<Toaster richColors closeButton />
+	</>
 );
 
 const useGuard = () => {

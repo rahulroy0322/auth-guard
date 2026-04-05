@@ -1,0 +1,15 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"extends": "./react.json",
+	"compilerOptions": {
+		"skipLibCheck": true,
+		"incremental": true,
+
+		"jsx": "react-jsx",
+		"plugins": [
+			{
+				"name": "next"
+			}
+		]
+	}
+}
