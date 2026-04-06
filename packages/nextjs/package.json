@@ -12,6 +12,11 @@
 			"main": "./dist/diy.js",
 			"module": "./dist/diy.mjs",
 			"types": "./dist/diy.d.ts"
+		},
+		"./server": {
+			"main": "./dist/server/main.js",
+			"module": "./dist/server/main.mjs",
+			"types": "./dist/server/main.d.ts"
 		}
 	},
 	"files": [
@@ -37,9 +42,12 @@
 		"react-dom": "^18 || ^19"
 	},
 	"dependencies": {
+		"@auth-guard/backend": "workspace:^",
 		"@auth-guard/react": "workspace:^",
 		"@tailwindcss/postcss": "^4.2.2",
 		"autoprefixer": "^10.4.27",
+		"base": "workspace:^",
+		"schema": "workspace:^",
 		"tailwindcss": "^4.2.2"
 	}
 }

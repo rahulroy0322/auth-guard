@@ -5,11 +5,15 @@
 	"main": "index.js",
 	"exports": {
 		".": {
-			"import": "./dist/main.d.ts",
+			"types": "./dist/main.d.ts",
+			"import": "./dist/main.js",
+			"require": "./dist/main.js",
 			"default": "./dist/main.js"
 		},
 		"./*": {
-			"import": "./dist/*.d.ts",
+			"types": "./dist/*.d.ts",
+			"import": "./dist/*.js",
+			"require": "./dist/*.js",
 			"default": "./dist/*.js"
 		}
 	},

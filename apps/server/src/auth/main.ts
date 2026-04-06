@@ -19,10 +19,10 @@ const mail = initMail({
 	},
 });
 
-const extractAccessToken = (req: Request) =>
+const extractAccessToken = async (req: Request) =>
 	req.headers.authorization || (req.headers.token as string) || null;
 
-const extractRefreshToken = (req: Request) => {
+const extractRefreshToken = async (req: Request) => {
 	const token: string | null = req.cookies?.["auth-refresh"];
 
 	if (!token) {
@@ -46,8 +46,8 @@ const guard = auth({
 		secret: ENV.JWT_SECRET,
 	},
 	extractToken: {
-		access: extractAccessToken as () => string | null,
-		refresh: extractRefreshToken as () => string | null,
+		access: extractAccessToken as () => Promise<string | null>,
+		refresh: extractRefreshToken as () => Promise<string | null>,
 	},
 	logger,
 	User,

@@ -1,5 +1,6 @@
 import { GuardProvider } from "@auth-guard/nextjs";
 import type { FC, ReactNode } from "react";
+import { ENV } from "@/config/env.config";
 
 type MainProviderPropsType = {
 	children: ReactNode;
@@ -8,7 +9,7 @@ type MainProviderPropsType = {
 const MainProvider: FC<MainProviderPropsType> = ({ children }) => (
 	<GuardProvider
 		config={{
-			baseUrl: "http://localhost:8000",
+			baseUrl: ENV.NEXT_PUBLIC_API_URL,
 			images: {
 				forgot: "https://cdn.undraw.co/illustration/forgot-password_nttj.svg",
 				login: "https://cdn.undraw.co/illustration/login_weas.svg",
@@ -17,7 +18,14 @@ const MainProvider: FC<MainProviderPropsType> = ({ children }) => (
 				verify: "https://cdn.undraw.co/illustration/verify-data_k0y1.svg",
 			},
 		}}
-		oauth={[]}
+		oauth={[
+			{
+				provider: "google",
+			},
+			{
+				provider: "github",
+			},
+		]}
 	>
 		{children}
 	</GuardProvider>

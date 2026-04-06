@@ -1,6 +1,7 @@
 {
 	"extends": "ts-config/nextjs",
 	"compilerOptions": {
+		"tsBuildInfoFile": "node_modules/.tsbuildinfo",
 		"paths": {
 			"@/*": ["./src/*"]
 		}
@@ -13,5 +14,5 @@
 		".next/dev/types/**/*.ts",
 		"**/*.mts"
 	],
-	"exclude": ["node_modules"]
+	"exclude": ["node_modules", "drizzle.config.ts"]
 }
