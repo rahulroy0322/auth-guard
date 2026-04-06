@@ -132,7 +132,7 @@ const getError = (e: unknown): AuthError => {
 		return {
 			name: e.name,
 			message: e.message,
-			status: 500,
+			status: e.status,
 		};
 	}
 

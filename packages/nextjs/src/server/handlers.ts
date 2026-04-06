@@ -185,7 +185,7 @@ const startVerification: HandlerType = async (coreApi, req) => {
 };
 const verifieAccount: HandlerType = async (coreApi, req) => {
 	const data = verifySchema.parse({
-		...req.nextUrl.searchParams,
+		...Object.fromEntries(req.nextUrl.searchParams) ,
 		...(await req.json()),
 	});
 
