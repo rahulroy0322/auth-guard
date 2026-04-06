@@ -19,6 +19,16 @@ const ENV = createEnv({
 		MAIL_PORT: z.coerce.number(),
 		MAIL_USER: z.email(),
 		MAIL_PASS: z.string(),
+
+		// OAuth
+
+		// google
+		GOOGLE_CLIENT_ID: z.string(),
+		GOOGLE_CLIENT_SECRET: z.string(),
+
+		// github
+		GITHUB_CLIENT_ID: z.string(),
+		GITHUB_CLIENT_SECRET: z.string(),
 	},
 	client: {
 		NEXT_PUBLIC_API_URL: z.url(),

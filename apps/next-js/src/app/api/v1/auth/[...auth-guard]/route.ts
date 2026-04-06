@@ -25,19 +25,28 @@ const handler = handleAuth({
 	Profile,
 	Session,
 	Cache: {
-		set: async () => { },
+		set: async () => {},
 
 		get: async () => null,
 
-		remove: async () => { },
+		remove: async () => {},
 	},
 	Mail: {
 		sendMail: mail,
 	},
 
 	OAuth: {
-		callbackUri: `${ENV.NEXT_PUBLIC_API_URL}/api/v1/oauth/callback/`,
-		providers: {},
+		callbackUri: `${ENV.NEXT_PUBLIC_API_URL}/api/v1/auth/oauth/callback/`,
+		providers: {
+			google: {
+				clientId: ENV.GOOGLE_CLIENT_ID,
+				clientSecret: ENV.GOOGLE_CLIENT_SECRET,
+			},
+			github: {
+				clientId: ENV.GITHUB_CLIENT_ID,
+				clientSecret: ENV.GITHUB_CLIENT_SECRET,
+			},
+		},
 	},
 });
 

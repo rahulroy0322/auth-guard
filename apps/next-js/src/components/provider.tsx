@@ -18,7 +18,14 @@ const MainProvider: FC<MainProviderPropsType> = ({ children }) => (
 				verify: "https://cdn.undraw.co/illustration/verify-data_k0y1.svg",
 			},
 		}}
-		oauth={[]}
+		oauth={[
+			{
+				provider: "google",
+			},
+			{
+				provider: "github",
+			},
+		]}
 	>
 		{children}
 	</GuardProvider>

@@ -1,5 +1,5 @@
-const provider = /\/oauth\/([^/?]+)/g;
+const provider = /\/oauth\/([^/?]+)/;
 
-const providerCallback = /\/oauth\/callback\/([^/?]+)/g;
+const providerCallback = /\/oauth\/callback\/([^/?]+)/;
 
 export { provider, providerCallback };

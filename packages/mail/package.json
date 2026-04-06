@@ -1,6 +1,6 @@
 {
 	"name": "@auth-guard/mail",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "Mail utilities for Auth Guard with Nodemailer and EJS email templates.",
 	"sideEffects": false,
 	"main": "dist/main.js",

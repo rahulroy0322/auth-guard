@@ -110,10 +110,6 @@ const extractRefreshToken = async () => {
 
 	const token: string | null = cookieStore.get(cookie.refresh)?.value || null;
 
-	console.log({
-		cookieStore,
-		token,
-	});
 	if (!token) {
 		return null;
 	}
@@ -121,7 +117,7 @@ const extractRefreshToken = async () => {
 	return `Bearer ${token}`;
 };
 
-const register: HandlerType = (coreApi) => async (req) => {
+const register: HandlerType = async (coreApi, req) => {
 	const data = registerSchema.parse((await req.json()) || {});
 
 	const { id } = await coreApi.register(data);
@@ -139,7 +135,7 @@ const register: HandlerType = (coreApi) => async (req) => {
 		},
 	);
 };
-const login: HandlerType = (coreApi) => async (req) => {
+const login: HandlerType = async (coreApi, req) => {
 	const data = loginSchema.parse((await req.json()) || {});
 
 	const {
@@ -165,7 +161,7 @@ const login: HandlerType = (coreApi) => async (req) => {
 		},
 	);
 };
-const startVerification: HandlerType = (coreApi) => async (req) => {
+const startVerification: HandlerType = async (coreApi, req) => {
 	const data = loginSchema
 		.pick({
 			email: true,
@@ -187,7 +183,7 @@ const startVerification: HandlerType = (coreApi) => async (req) => {
 		},
 	);
 };
-const verifieAccount: HandlerType = (coreApi) => async (req) => {
+const verifieAccount: HandlerType = async (coreApi, req) => {
 	const data = verifySchema.parse({
 		...req.nextUrl.searchParams,
 		...(await req.json()),
@@ -217,7 +213,7 @@ const verifieAccount: HandlerType = (coreApi) => async (req) => {
 	);
 };
 
-const tokenRefresh: HandlerType = (coreApi) => async (req) => {
+const tokenRefresh: HandlerType = async (coreApi, req) => {
 	const {
 		token: { access, refresh },
 	} = await coreApi.tokenRefresh(req as unknown as IncomingMessage);
@@ -239,14 +235,12 @@ const tokenRefresh: HandlerType = (coreApi) => async (req) => {
 	);
 };
 
-// const checkAuth = async <T extends ProviderType>(coreApi: AuthReturnType<T>, req: NextRequest) => coreApi.checkAuth(req as unknown as IncomingMessage);
-
 const loginRequired = async <T extends ProviderType>(
 	coreApi: AuthReturnType<T>,
 	req: NextRequest,
 ) => await coreApi.loginRequired(req as unknown as IncomingMessage);
 
-const me: HandlerType = (coreApi) => async (req) => {
+const me: HandlerType = async (coreApi, req) => {
 	const { user } = await loginRequired(coreApi, req);
 
 	return NextResponse.json(
@@ -261,7 +255,7 @@ const me: HandlerType = (coreApi) => async (req) => {
 		},
 	);
 };
-const logout: HandlerType = (coreApi) => async (req) => {
+const logout: HandlerType = async (coreApi, req) => {
 	if ((await extractAccessToken()) || (await extractRefreshToken())) {
 		await coreApi.logout(req as unknown as IncomingMessage);
 	}
@@ -281,7 +275,7 @@ const logout: HandlerType = (coreApi) => async (req) => {
 	);
 };
 
-const forgotPassword: HandlerType = (coreApi) => async (req) => {
+const forgotPassword: HandlerType = async (coreApi, req) => {
 	const data = loginSchema
 		.pick({
 			email: true,
@@ -304,7 +298,7 @@ const forgotPassword: HandlerType = (coreApi) => async (req) => {
 	);
 };
 
-const resetPassword: HandlerType = (coreApi) => async (req) => {
+const resetPassword: HandlerType = async (coreApi, req) => {
 	const data = resetPasswordSchema.parse({
 		...req.nextUrl.searchParams,
 		...(await req.json()),
@@ -334,7 +328,7 @@ const resetPassword: HandlerType = (coreApi) => async (req) => {
 	);
 };
 
-const changePassword: HandlerType = (coreApi) => async (req) => {
+const changePassword: HandlerType = async (coreApi, req) => {
 	const data = loginSchema
 		.pick({
 			password: true,
@@ -365,11 +359,11 @@ const changePassword: HandlerType = (coreApi) => async (req) => {
 	);
 };
 
-const updateProfile: HandlerType = () => () => {
+const updateProfile: HandlerType = () => {
 	throw new AuthServerError("not implemented");
 };
 
-const authStatus: HandlerType = (coreApi) => async (req) => {
+const authStatus: HandlerType = async (coreApi, req) => {
 	const status = await coreApi.authStatus(req as unknown as IncomingMessage);
 
 	let data: ResType = {
@@ -400,7 +394,7 @@ const authStatus: HandlerType = (coreApi) => async (req) => {
 	});
 };
 
-const removeAvatar: HandlerType = (coreApi) => async (req) => {
+const removeAvatar: HandlerType = async (coreApi, req) => {
 	const { user } = await coreApi.removeAvatar(
 		req as unknown as IncomingMessage,
 	);
@@ -413,88 +407,83 @@ const removeAvatar: HandlerType = (coreApi) => async (req) => {
 	} satisfies ResType);
 };
 
-const oAuthStart: HandlerType =
-	<T extends ProviderType>(coreApi: AuthReturnType<T>) =>
-	async (req) => {
-		const [, _provider] = provider.exec(req.url) || [];
+const oAuthStart: HandlerType = async <T extends ProviderType>(
+	coreApi: AuthReturnType<T>,
+	req: NextRequest,
+) => {
+	const [, _provider] = provider.exec(req.url) || [];
 
-		const { url, state, codeVerifier } = coreApi.oAuthStart(_provider as T);
+	const { url, state, codeVerifier } = coreApi.oAuthStart(_provider as T);
 
-		await setOAuthStateCookie({
+	await setOAuthStateCookie({
+		state,
+		codeVerifier,
+	});
+
+	return NextResponse.json({
+		success: true,
+		data: {
+			url,
+		},
+	} satisfies ResType);
+};
+
+const loginWithProvider: HandlerType = async <T extends ProviderType>(
+	coreApi: AuthReturnType<T>,
+	req: NextRequest,
+) => {
+	const cookieStore = await cookies();
+
+	const codeVerifier = cookieStore.get(cookie.authVerifier)?.value;
+	const state = cookieStore.get(cookie.authState)?.value;
+
+	if (typeof state !== "string" || typeof codeVerifier !== "string") {
+		throw new AuthServerError(
+			"OAuth flow failed: missing state or verifier cookie.",
+		);
+	}
+
+	const [, provider] = providerCallback.exec(req.nextUrl.toString()) || [];
+
+	const code = req.nextUrl.searchParams.get("code") as string,
+		queryState = req.nextUrl.searchParams.get("state") as string;
+
+	const {
+		token: { refresh },
+	} = await coreApi.loginWithProvider(
+		{
+			code,
+			state: queryState,
+		},
+		{
+			provider: provider as T,
 			state,
 			codeVerifier,
-		});
+			...(await getDeviceInfo()),
+		},
+	);
 
-		return NextResponse.json({
-			success: true,
-			data: {
-				url,
-			},
-		} satisfies ResType);
-	};
+	await clearOAuthStateCookie();
+	await setAuthCookie(refresh);
 
-const loginWithProvider: HandlerType =
-	<T extends ProviderType>(coreApi: AuthReturnType<T>) =>
-	async (req) => {
-		const cookieStore = await cookies();
-
-		const codeVerifier = cookieStore.get(cookie.authVerifier)?.value;
-		const state = cookieStore.get(cookie.authState)?.value;
-
-		if (typeof state !== "string" || typeof codeVerifier !== "string") {
-			throw new AuthServerError(
-				"OAuth flow failed: missing state or verifier cookie.",
-			);
-		}
-
-		const [, provider] = providerCallback.exec(req.url) || [];
-
-		const {
-			token: { access, refresh },
-			user,
-		} = await coreApi.loginWithProvider(
-			req.nextUrl.searchParams as unknown as Record<string, string>,
-			{
-				provider: provider as T,
-				state,
-				codeVerifier,
-				...(await getDeviceInfo()),
-			},
-		);
-
-		await clearOAuthStateCookie();
-		await setAuthCookie(refresh);
-
-		return NextResponse.json({
-			success: true,
-			data: {
-				user,
-				token: access,
-			},
-		} satisfies ResType);
-	};
+	return NextResponse.redirect(req.nextUrl.origin);
+};
 
 export {
 	authStatus,
-	// logged-in
 	changePassword,
 	extractAccessToken,
 	extractRefreshToken,
-	// pass
 	forgotPassword,
 	login,
-	// token
-	// checkAuth,
 	loginRequired,
 	loginWithProvider,
 	logout,
 	me,
 	oAuthStart,
-	// auth
 	register,
 	removeAvatar,
 	resetPassword,
-	// register
 	startVerification,
 	tokenRefresh,
 	updateProfile,

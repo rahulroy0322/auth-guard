@@ -34,13 +34,13 @@ type RouteType = {
 const routes = [
 	{
 		methods: ["GET"],
-		pattern: provider,
-		handler: oAuthStart,
+		pattern: providerCallback,
+		handler: loginWithProvider,
 	},
 	{
 		methods: ["GET"],
-		pattern: providerCallback,
-		handler: loginWithProvider,
+		pattern: provider,
+		handler: oAuthStart,
 	},
 	{
 		methods: ["GET"],
@@ -170,10 +170,6 @@ const handleAuth = <T extends ProviderType>(props: HandleAuthPropsType<T>) => {
 	});
 
 	return async (req: NextRequest) => {
-		// console.log(
-		// 	req
-		// );
-
 		const route = findAuthRoute(req.nextUrl.pathname, req.method);
 
 		if (!route) {
@@ -181,7 +177,7 @@ const handleAuth = <T extends ProviderType>(props: HandleAuthPropsType<T>) => {
 		}
 
 		try {
-			return await route.handler(coreApi)(req);
+			return await route.handler(coreApi, req);
 		} catch (e) {
 			const { status, ...error } = getError(e);
 
@@ -200,6 +196,5 @@ const handleAuth = <T extends ProviderType>(props: HandleAuthPropsType<T>) => {
 
 const auth = handleAuth;
 
+export * from "./types";
 export { auth, handleAuth };
-
-export * from './types'
