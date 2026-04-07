@@ -1,5 +1,5 @@
 import type { IncomingMessage } from "node:http";
-import type { SessionType, UserType } from "base";
+import type { SessionFormatedType, SessionType, UserType } from "base";
 import type { CodeType } from "./code";
 
 type _UserType = Omit<UserType, "avatar" | "profiles">;
@@ -102,12 +102,22 @@ type AuthStatusReturnType =
 	  };
 type AuthStatusType = (req: IncomingMessage) => Promise<AuthStatusReturnType>;
 
+type GetSessionsReturnType = {
+	sessions: SessionFormatedType[];
+};
+type GetSessionsType = (
+	req: IncomingMessage,
+	props: Pick<SessionType, "deviceId">,
+) => Promise<GetSessionsReturnType>;
+
 export type {
 	_UserType,
 	AuthStatusReturnType,
 	AuthStatusType,
 	CheckAuthReturnType,
 	CheckAuthType,
+	GetSessionsReturnType,
+	GetSessionsType,
 	LoginPropsType,
 	LoginRequiredReturnType,
 	LoginRequiredType,

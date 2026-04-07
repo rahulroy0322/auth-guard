@@ -2,17 +2,20 @@ import type { SessionType } from "base";
 
 type SessionModelType = {
 	findByToken: (token: SessionType["token"]) => Promise<SessionType | null>;
+	findByUserId: (userId: SessionType["userId"]) => Promise<SessionType[]>;
 
-	create: (data: Omit<SessionType, "id">) => Promise<SessionType | null>;
+	create: (
+		data: Omit<SessionType, "createdAt" | "id">,
+	) => Promise<SessionType | null>;
 
 	updateByToken: (
 		token: SessionType["token"],
-		data: Partial<SessionType>,
+		data: Partial<Omit<SessionType, "createdAt" | "id" | "userId">>,
 	) => Promise<SessionType | null>;
 
 	updateAllByUserId: (
 		userId: SessionType["userId"],
-		data: Partial<SessionType>,
+		data: Partial<Omit<SessionType, "createdAt" | "id" | "userId">>,
 	) => Promise<boolean>;
 };
 

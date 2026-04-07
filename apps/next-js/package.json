@@ -3,7 +3,7 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
-		"build": "next build",
+		"build:prod": "next build",
 		"check": "biome check",
 		"check:fix": "biome check --fix",
 		"dev": "next dev",

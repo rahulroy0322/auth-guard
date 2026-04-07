@@ -24,6 +24,7 @@ const findSessions = ({
 			deviceType: true,
 			deviceName: true,
 			isActive: true,
+			createdAt: true,
 		},
 		limit,
 	});
@@ -38,6 +39,15 @@ const findByToken: SessionModelType["findByToken"] = async (token) => {
 
 	return session;
 };
+
+const findByUserId: SessionModelType["findByUserId"] = (userId) =>
+	findSessions({
+		filter: checkNull({
+			data: userId,
+			key: Session.userId,
+		}),
+	});
+
 const create: SessionModelType["create"] = async (data) => {
 	const [session = null] = await db.insert(Session).values(data).returning();
 
@@ -79,4 +89,4 @@ const updateAllByUserId: SessionModelType["updateAllByUserId"] = async (
 	return !!_data.rowCount;
 };
 
-export { create, findByToken, updateAllByUserId, updateByToken };
+export { create, findByToken, findByUserId, updateAllByUserId, updateByToken };

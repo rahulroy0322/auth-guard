@@ -2,7 +2,7 @@ import type {
 	AuthPropsType,
 	AuthReturnType,
 } from "@auth-guard/backend/types/main";
-import type { ProviderType, UserType } from "base";
+import type { ProviderType, SessionFormatedType, UserType } from "base";
 import type { NextRequest, NextResponse } from "next/server";
 
 type ResType = {
@@ -27,6 +27,9 @@ type ResType = {
 		  }
 		| {
 				url: string;
+		  }
+		| {
+				sessions: SessionFormatedType[];
 		  };
 };
 

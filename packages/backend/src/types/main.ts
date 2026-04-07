@@ -2,6 +2,7 @@ import type { ProviderType } from "base";
 import type {
 	AuthStatusType,
 	CheckAuthType,
+	GetSessionsType,
 	LoginRequiredType,
 	LoginType,
 	LogoutType,
@@ -60,6 +61,7 @@ type AuthReturnType<T extends ProviderType> = {
 	logout: LogoutType;
 	tokenRefresh: TokenRefreshType;
 	authStatus: AuthStatusType;
+	getSessions: GetSessionsType;
 	// avatar
 	removeAvatar: RemoveAvatarType;
 	// profile

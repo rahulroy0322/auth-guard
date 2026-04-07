@@ -1,11 +1,25 @@
 import {
+	RiComputerLine,
+	RiDeleteBin2Line,
+	RiLoader2Line,
 	RiLogoutBoxRLine,
 	RiSettings2Line,
 	RiShieldCheckFill,
+	RiSmartphoneLine,
 	RiUser2Line,
+	RiWindowsLine,
 } from "@remixicon/react";
+import type { SessionFormatedType } from "base";
 import { useAppForm } from "form";
-import { type FC, type ReactNode, useEffect, useState } from "react";
+import {
+	type FC,
+	type ReactNode,
+	Suspense,
+	use,
+	useCallback,
+	useEffect,
+	useState,
+} from "react";
 import {
 	type UpdatePasswordSchemaType,
 	updatePasswordSchema,
@@ -58,7 +72,8 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "ui/components/ui/tabs";
-import { patch, patchMultiPart } from "../../api/main";
+import { cn } from "ui/lib/utils";
+import { get, patch, patchMultiPart } from "../../api/main";
 import { useGuard } from "../../provider";
 import { ProfileAvatar } from "./avatar";
 
@@ -147,6 +162,117 @@ const UpdatePassword: FC<UpdatePasswordPropsType> = ({ closeModal }) => {
 	);
 };
 
+type DevicePropsType = SessionFormatedType;
+
+const { format } = Intl.DateTimeFormat(undefined, {
+	dateStyle: "medium",
+});
+
+const check = (str: string, init: string) =>
+	str.toLowerCase().startsWith(init.toLowerCase());
+
+const getIcon = (device: string) => {
+	if (check(device, "win")) {
+		return RiWindowsLine;
+	}
+
+	if (check(device, "and")) {
+		return RiSmartphoneLine;
+	}
+
+	return RiComputerLine;
+};
+
+const Device: FC<DevicePropsType> = ({
+	createdAt,
+	deviceType,
+	deviceName,
+	isActive,
+	currentDevice,
+}) => {
+	const Icon = getIcon(deviceType);
+
+	return (
+		<div
+			className={cn("outline p-1 relative", {
+				"opacity-70": !isActive,
+			})}
+		>
+			<Icon
+				className={cn("size-5", {
+					"text-primary": currentDevice,
+				})}
+			/>
+			<h2>
+				<b>{deviceName}</b>
+				{currentDevice ? (
+					<span className="ml-2 capitalize">This Device</span>
+				) : null}
+			</h2>
+			<h3>
+				{deviceType}
+				<span className="ml-2">200.0.0</span>
+			</h3>
+			<time dateTime={createdAt}>{format(new Date(createdAt))}</time>
+			<Button
+				size={"icon-sm"}
+				variant={"destructive"}
+				className="absolute right-2 bottom-2"
+			>
+				<RiDeleteBin2Line />
+			</Button>
+		</div>
+	);
+};
+
+type SessionsImplPropsType = {
+	promise: Promise<DevicePropsType[]>;
+};
+
+const SessionsImpl: FC<SessionsImplPropsType> = ({ promise }) => {
+	const sessions = use(promise);
+
+	return sessions.map((session) => <Device {...session} key={session.id} />);
+};
+
+const Sessions: FC = () => {
+	const { config, reqWithToken } = useGuard();
+
+	const fetchSessions = useCallback(async () => {
+		try {
+			const { sessions } = await reqWithToken(async (token) =>
+				get<{
+					sessions: SessionFormatedType[];
+				}>({
+					base: config.baseUrl,
+					url: "sessions",
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}),
+			);
+			return sessions;
+		} catch (error) {
+			console.error("Failed to fetch sessions:", error);
+			toast.error((error as Error).name, {
+				description: (error as Error).message,
+			});
+
+			return [];
+		}
+	}, [config.baseUrl, reqWithToken]);
+
+	return (
+		<Suspense
+			fallback={
+				<RiLoader2Line className="animate-spin animation-duration-[2.5s] size-8" />
+			}
+		>
+			<SessionsImpl promise={fetchSessions()} />
+		</Suspense>
+	);
+};
+
 const Security: FC = () => {
 	const { user, loading } = useGuard();
 	const [isEditing, setIsEditing] = useState(false);
@@ -195,9 +321,10 @@ const Security: FC = () => {
 
 			<div className="grid grid-cols-3 p-2 py-4">
 				<b>Active devices</b>
-				<span className="bg-destructive/10 text-destructive hover:bg-destructive/20 p-1 col-span-2">
-					TODO Coming soon
-				</span>
+
+				<div className="col-span-2 p-1 max-h-40 overflow-auto space-y-2">
+					<Sessions />
+				</div>
 			</div>
 
 			<Separator />

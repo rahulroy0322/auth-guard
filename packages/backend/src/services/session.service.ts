@@ -1,4 +1,5 @@
 import type { IncomingMessage } from "node:http";
+import type { SessionFormatedType } from "base";
 import type { UserCacheModel } from "../cache/user";
 import {
 	AuthBadError,
@@ -8,6 +9,8 @@ import {
 import type {
 	AuthStatusReturnType,
 	CheckAuthType,
+	GetSessionsReturnType,
+	GetSessionsType,
 	LoginRequiredReturnType,
 	LoginRequiredType,
 	ReturnUserType,
@@ -29,7 +32,7 @@ class SessionService {
 		private readonly logger: SmartLogger,
 		private readonly sessionModel: Pick<
 			SessionModelType,
-			"updateByToken" | "findByToken"
+			"updateByToken" | "findByToken" | "findByUserId"
 		>,
 		private readonly userService: UserService,
 		private readonly userCache: UserCacheModel,
@@ -256,6 +259,34 @@ class SessionService {
 			msg: "Logout successful",
 			user: null,
 		});
+	};
+
+	public getSessions: GetSessionsType = async (
+		req,
+		{ deviceId },
+	): Promise<GetSessionsReturnType> => {
+		const reqId = genReqId();
+
+		this.logger.trace({ reqId, msg: "Starting getSessions" });
+		const { user } = await this.loginRequired(req);
+
+		const sessions = await this.sessionModel.findByUserId(user.id);
+
+		this.logger.info({
+			reqId,
+			msg: "Sessions fetch succesfully",
+			user,
+		});
+
+		return {
+			sessions: sessions.map(
+				({ deviceId: dID, token, userId, ...session }) =>
+					({
+						...session,
+						currentDevice: deviceId === dID,
+					}) satisfies SessionFormatedType,
+			),
+		};
 	};
 
 	private findUserAndCheckBan = async (
