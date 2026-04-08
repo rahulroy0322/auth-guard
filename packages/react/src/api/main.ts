@@ -31,26 +31,20 @@ type ReqPostMultiPartType = Omit<ReqPostType, "body"> & {
 	body: FormData;
 };
 
-type ReqParamsType = ReqGetType | ReqPostType;
+type RawRequestParamsType = {
+	base: string;
+	body?: FormData | string;
+	headers?: Record<string, string>;
+	method: ReqGetType["method"] | ReqPostType["method"];
+	signal?: Request["signal"];
+	url: string;
+};
 
-const reqImpl = async <T>({
-	base,
-	url,
-	method,
-	headers,
-	body,
-	signal,
-}: Omit<ReqParamsType, "body"> & {
-	body?: string | FormData;
-}) => {
-	const res = await fetch(`${base}/api/v1/auth/${url}`, {
-		headers,
-		credentials: "include",
-		method,
-		body,
-		signal,
-	});
-	const data = (await res.json()) as ResType<T>;
+const buildAuthUrl = (base: string, url: string) =>
+	`${base}/api/v1/auth/${url}`;
+
+const parseResponse = async <T>(response: Response) => {
+	const data = (await response.json()) as ResType<T>;
 
 	if (!data.success) {
 		throw data.error;
@@ -59,28 +53,58 @@ const reqImpl = async <T>({
 	return data.data;
 };
 
-const reqMultiPart = <T>(props: ReqPostMultiPartType) =>
-	reqImpl<T>(
-		props as ReqPostType & {
-			body: FormData;
-		},
-	);
+const reqImpl = async <T>({
+	base,
+	url,
+	method,
+	headers,
+	body,
+	signal,
+}: RawRequestParamsType) => {
+	const response = await fetch(buildAuthUrl(base, url), {
+		headers,
+		credentials: "include",
+		method,
+		body,
+		signal,
+	});
 
-const req = <T>({ headers, ...props }: ReqParamsType) =>
+	return parseResponse<T>(response);
+};
+
+const reqMultiPart = <T>({
+	body,
+	...props
+}: Omit<ReqPostMultiPartType, "method"> & {
+	method: ReqPostMultiPartType["method"];
+}) =>
 	reqImpl<T>({
 		...props,
+		body,
+	});
+
+const req = <T>(params: ReqGetType | ReqPostType) => {
+	if (params.method === "GET") {
+		const { method, ...rest } = params;
+
+		return reqImpl<T>({
+			...rest,
+			method,
+		});
+	}
+
+	const { body, headers, method, ...rest } = params;
+
+	return reqImpl<T>({
+		...rest,
+		method,
 		headers: {
 			"content-type": "application/json",
 			...(headers || {}),
 		},
-		...((props as ReqPostType).body
-			? {
-					body: JSON.stringify((props as ReqPostType).body),
-				}
-			: {}),
-	} as Omit<ReqParamsType, "body"> & {
-		body?: string;
+		body: JSON.stringify(body),
 	});
+};
 
 type SafeUserType = Omit<UserType, "password">;
 

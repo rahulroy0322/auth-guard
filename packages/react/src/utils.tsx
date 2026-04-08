@@ -2,7 +2,7 @@ import type { FC, ReactNode } from "react";
 import { useGuard } from "./provider";
 
 type ShowPropsType = {
-	when: "loged-in" | "loged-out";
+	when: "logged-in" | "logged-out";
 	fallback?: ReactNode;
 	children: ReactNode;
 };
@@ -14,7 +14,7 @@ const Show: FC<ShowPropsType> = ({ children, when, fallback = null }) => {
 		return fallback;
 	}
 
-	if (when === "loged-out") {
+	if (when === "logged-out") {
 		if (user) {
 			return null;
 		}

@@ -10,17 +10,17 @@ import type { FC } from "react";
 const Header: FC = () => {
 	return (
 		<header className="flex items-center justify-between p-2">
-			<Show when="loged-out">
+			<Show when="logged-out">
 				<div className="flex gap-4">
-					<LoginButton mode="model" variant="link">
+					<LoginButton mode="modal" variant="link">
 						Login
 					</LoginButton>
-					<RegisterButton mode="model" variant="link">
+					<RegisterButton mode="modal" variant="link">
 						Register
 					</RegisterButton>
 				</div>
 			</Show>
-			<Show when="loged-in">
+			<Show when="logged-in">
 				<ProfileButton />
 			</Show>
 		</header>
