@@ -49,23 +49,23 @@ const useAccountActions = () => {
 			previousName: string;
 			avatarFile: File | null;
 		}) => {
-			if (avatarFile) {
-				const validation = updateProfileSchema.safeParse({
-					name,
-					profileImage: {
-						originalname: avatarFile.name,
-						mimetype: avatarFile.type,
-						size: avatarFile.size,
-					},
-				});
+			const validation = updateProfileSchema.safeParse({
+				name,
+				profileImage: avatarFile
+					? {
+							originalname: avatarFile.name,
+							mimetype: avatarFile.type,
+							size: avatarFile.size,
+						}
+					: undefined,
+			});
 
-				if (!validation.success) {
-					throw new Error(
-						validation.error.issues
-							.map((issue) => `"${issue.path.join(".")}" - ${issue.message}`)
-							.join(", "),
-					);
-				}
+			if (!validation.success) {
+				throw new Error(
+					validation.error.issues
+						.map((issue) => `"${issue.path.join(".")}" - ${issue.message}`)
+						.join(", "),
+				);
 			}
 
 			const formData = new FormData();

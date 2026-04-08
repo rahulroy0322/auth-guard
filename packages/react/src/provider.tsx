@@ -123,39 +123,40 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({
 		});
 	}, []);
 
-	const { refreshToken, reqWithToken } = createAuthClient({
-		baseUrl: config.baseUrl,
-		setError,
-		setFetching,
-		setToken,
-		setUser,
-		token,
-		withFetchingState,
-	});
+	const authClient = useMemo(
+		() =>
+			createAuthClient({
+				baseUrl: config.baseUrl,
+				setError,
+				setFetching,
+				setToken,
+				setUser,
+				token,
+				withFetchingState,
+			}),
+		[config.baseUrl, token, withFetchingState],
+	);
 
-	const {
-		finishOAuth,
-		forgotPassword,
-		login,
-		logout,
-		register,
-		resetPassword,
-		startVerification,
-		verifyAccount,
-	} = createAuthActions({
-		applyAuthState,
-		baseUrl: config.baseUrl,
-		setError,
-		setLoading,
-		setToken,
-		setUser,
-		setVerification,
-		verification,
-		withFetchingState,
-	});
+	const authActions = useMemo(
+		() =>
+			createAuthActions({
+				applyAuthState,
+				baseUrl: config.baseUrl,
+				setError,
+				setLoading,
+				setToken,
+				setUser,
+				setVerification,
+				verification,
+				withFetchingState,
+			}),
+		[applyAuthState, config.baseUrl, verification, withFetchingState],
+	);
 
 	const value = useMemo<GuardContextType>(
 		() => ({
+			...authActions,
+			...authClient,
 			config,
 			user,
 			token,
@@ -164,38 +165,20 @@ const GuardProviderImpl: FC<GuardProviderPropsType> = ({
 			fetching,
 			verification,
 			oauthProviders,
-			login,
-			register,
-			finishOAuth,
-			startVerification,
-			forgotPassword,
-			verifyAccount,
-			resetPassword,
 			clearVerification,
-			logout,
-			refreshToken,
-			reqWithToken,
 		}),
 		[
 			clearVerification,
 			config,
 			error,
 			fetching,
-			finishOAuth,
-			forgotPassword,
 			loading,
-			login,
-			logout,
 			oauthProviders,
-			refreshToken,
-			register,
-			reqWithToken,
-			resetPassword,
-			startVerification,
 			token,
 			user,
 			verification,
-			verifyAccount,
+			authActions,
+			authClient,
 		],
 	);
 
