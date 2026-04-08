@@ -18,6 +18,7 @@ import {
 	use,
 	useCallback,
 	useEffect,
+	useMemo,
 	useState,
 } from "react";
 import {
@@ -209,10 +210,7 @@ const Device: FC<DevicePropsType> = ({
 					<span className="ml-2 capitalize">This Device</span>
 				) : null}
 			</h2>
-			<h3>
-				{deviceType}
-				<span className="ml-2">200.0.0</span>
-			</h3>
+			<h3>{deviceType}</h3>
 			<time dateTime={createdAt}>{format(new Date(createdAt))}</time>
 			<Button
 				size={"icon-sm"}
@@ -262,13 +260,15 @@ const Sessions: FC = () => {
 		}
 	}, [config.baseUrl, reqWithToken]);
 
+	const promise = useMemo(() => fetchSessions(), [fetchSessions]);
+
 	return (
 		<Suspense
 			fallback={
 				<RiLoader2Line className="animate-spin animation-duration-[2.5s] size-8" />
 			}
 		>
-			<SessionsImpl promise={fetchSessions()} />
+			<SessionsImpl promise={promise} />
 		</Suspense>
 	);
 };
