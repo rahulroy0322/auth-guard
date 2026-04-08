@@ -35,6 +35,14 @@ type SessionType = {
   deviceType: string
   deviceName: string
   isActive: boolean
+  createdAt: string
+}
+
+type SessionFormatedType = Pick<
+  SessionType,
+  'id' | 'deviceName' | 'deviceType' | 'isActive' | 'createdAt'
+> & {
+  currentDevice: boolean
 }
 
 export type {
@@ -42,6 +50,7 @@ export type {
   ProfileType,
   ProviderType,
   RoleType,
+  SessionFormatedType,
   SessionType,
   UserType,
 }

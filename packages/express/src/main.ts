@@ -438,6 +438,19 @@ const init: AuthExpressType = <T extends ProviderType>({
 		} satisfies ResType);
 	};
 
+	const getSessions: RequestHandler = async (req, res) => {
+		const { sessions } = await coreApi.getSessions(req, {
+			deviceId: getDeviceId(req, res),
+		});
+
+		res.status(200).json({
+			success: true,
+			data: {
+				sessions,
+			},
+		} satisfies ResType);
+	};
+
 	return {
 		removeAvatar,
 		login,
@@ -456,6 +469,7 @@ const init: AuthExpressType = <T extends ProviderType>({
 		authStatus,
 		oAuthStart,
 		loginWithProvider,
+		getSessions,
 	} satisfies AuthExpressReturnType<T>;
 };
 

@@ -82,6 +82,8 @@ const authRouter = <T extends ProviderType>(
 
 	authRouter.post("/logout", props.logout);
 
+	authRouter.get("/sessions", props.getSessions);
+
 	return authRouter;
 };
 

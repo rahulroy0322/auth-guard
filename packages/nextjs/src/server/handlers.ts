@@ -185,7 +185,7 @@ const startVerification: HandlerType = async (coreApi, req) => {
 };
 const verifieAccount: HandlerType = async (coreApi, req) => {
 	const data = verifySchema.parse({
-		...Object.fromEntries(req.nextUrl.searchParams) ,
+		...Object.fromEntries(req.nextUrl.searchParams),
 		...(await req.json()),
 	});
 
@@ -469,12 +469,37 @@ const loginWithProvider: HandlerType = async <T extends ProviderType>(
 	return NextResponse.redirect(req.nextUrl.origin);
 };
 
+const getSessions: HandlerType = async <T extends ProviderType>(
+	coreApi: AuthReturnType<T>,
+	req: NextRequest,
+) => {
+	const { sessions } = await coreApi.getSessions(
+		req as unknown as IncomingMessage,
+		{
+			deviceId: await getDeviceId(),
+		},
+	);
+
+	return NextResponse.json(
+		{
+			success: true,
+			data: {
+				sessions,
+			},
+		} satisfies ResType,
+		{
+			status: 200,
+		},
+	);
+};
+
 export {
 	authStatus,
 	changePassword,
 	extractAccessToken,
 	extractRefreshToken,
 	forgotPassword,
+	getSessions,
 	login,
 	loginRequired,
 	loginWithProvider,

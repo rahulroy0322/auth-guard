@@ -175,6 +175,7 @@ const init: AuthType = <T extends ProviderType>({
 		authStatus: sessionService.authStatus,
 		removeAvatar: avatarService.removeAvatar,
 		updateProfile: profileService.updateProfile,
+		getSessions: sessionService.getSessions,
 
 		// register
 		startVerification: verificationService.startVerification,

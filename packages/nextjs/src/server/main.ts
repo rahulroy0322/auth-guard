@@ -9,6 +9,7 @@ import {
 	extractAccessToken,
 	extractRefreshToken,
 	forgotPassword,
+	getSessions,
 	login,
 	loginWithProvider,
 	logout,
@@ -106,6 +107,11 @@ const routes = [
 		methods: ["POST"],
 		pattern: /\/logout\/?$/,
 		handler: logout,
+	},
+	{
+		methods: ["GET"],
+		pattern: /\/sessions\/?$/,
+		handler: getSessions,
 	},
 ] as const satisfies RouteType[];
 
