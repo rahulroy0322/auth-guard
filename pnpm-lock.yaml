@@ -108,18 +108,21 @@ importers:
       '@auth-guard/nextjs':
         specifier: workspace:^
         version: link:../../packages/nextjs
+      '@t3-oss/env-nextjs':
+        specifier: ^0.13.11
+        version: 0.13.11(typescript@5.9.3)(zod@4.3.6)
       dotenv:
         specifier: ^17.3.1
         version: 17.3.1
       drizzle-orm:
         specifier: ^0.45.1
         version: 0.45.1(@types/pg@8.18.0)(pg@8.20.0)
+      nanoid:
+        specifier: ^5.1.7
+        version: 5.1.7
       next:
         specifier: 16.2.2
         version: 16.2.2(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      next-env-safe:
-        specifier: ^1.0.2
-        version: 1.0.2(zod@4.3.6)
       pg:
         specifier: ^8.20.0
         version: 8.20.0
@@ -262,19 +265,6 @@ importers:
         version: 5.9.2
 
   packages/backend:
-    dependencies:
-      bcrypt:
-        specifier: ^6.0.0
-        version: 6.0.0
-      jsonwebtoken:
-        specifier: ^9.0.3
-        version: 9.0.3
-      nanoid:
-        specifier: ^5.1.7
-        version: 5.1.7
-      zod:
-        specifier: ^4.3.6
-        version: 4.3.6
     devDependencies:
       '@biomejs/biome':
         specifier: 2.4.8
@@ -291,9 +281,18 @@ importers:
       biome-config:
         specifier: workspace:^
         version: link:../biome-config
+      nanoid:
+        specifier: ^5.1.7
+        version: 5.1.7
       ts-config:
         specifier: workspace:^
         version: link:../ts-config
+      tsup:
+        specifier: ^8.5.1
+        version: 8.5.1(@microsoft/api-extractor@7.57.7(@types/node@24.12.0))(jiti@2.6.1)(postcss@8.5.8)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
 
   packages/base:
     devDependencies:
@@ -414,21 +413,15 @@ importers:
 
   packages/nextjs:
     dependencies:
-      '@auth-guard/backend':
-        specifier: workspace:^
-        version: link:../backend
-      '@auth-guard/react':
-        specifier: workspace:^
-        version: link:../react
-      '@tailwindcss/postcss':
-        specifier: ^4.2.2
-        version: 4.2.2
-      autoprefixer:
-        specifier: ^10.4.27
-        version: 10.4.27(postcss@8.5.8)
-      base:
-        specifier: workspace:^
-        version: link:../base
+      bcrypt:
+        specifier: ^6
+        version: 6.0.0
+      jsonwebtoken:
+        specifier: ^9
+        version: 9.0.3
+      nanoid:
+        specifier: ^5
+        version: 5.1.7
       next:
         specifier: ^15 || ^16
         version: 16.2.2(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -438,19 +431,29 @@ importers:
       react-dom:
         specifier: ^18 || ^19
         version: 19.2.4(react@19.2.4)
-      schema:
-        specifier: workspace:^
-        version: link:../schema
-      tailwindcss:
-        specifier: ^4.2.2
-        version: 4.2.2
+      zod:
+        specifier: ^4
+        version: 4.3.6
+    optionalDependencies:
+      use-sync-external-store:
+        specifier: ^1
+        version: 1.6.0(react@19.2.4)
     devDependencies:
+      '@auth-guard/backend':
+        specifier: workspace:^
+        version: link:../backend
+      '@auth-guard/react':
+        specifier: workspace:^
+        version: link:../react
       '@biomejs/biome':
         specifier: 2.4.8
         version: 2.4.8
       biome-config:
         specifier: workspace:^
         version: link:../biome-config
+      schema:
+        specifier: workspace:^
+        version: link:../schema
       ts-config:
         specifier: workspace:^
         version: link:../ts-config
@@ -2272,6 +2275,40 @@ packages:
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
 
+  '@t3-oss/env-core@0.13.11':
+    resolution: {integrity: sha512-sM7GYY+KL7H/Hl0BE0inWfk3nRHZOLhmVn7sHGxaZt9FAR6KqREXAE+6TqKfiavfXmpRxO/OZ2QgKRd+oiBYRQ==}
+    peerDependencies:
+      arktype: ^2.1.0
+      typescript: '>=5.0.0'
+      valibot: ^1.0.0-beta.7 || ^1.0.0
+      zod: ^3.24.0 || ^4.0.0
+    peerDependenciesMeta:
+      arktype:
+        optional: true
+      typescript:
+        optional: true
+      valibot:
+        optional: true
+      zod:
+        optional: true
+
+  '@t3-oss/env-nextjs@0.13.11':
+    resolution: {integrity: sha512-NC+3j7YWgpzdFu1t5y/8wqibTK0lm5RS4bjXA1n8uwik3wIR4iZM4Fa+U2BaMa5k3Qk8RZiYhoAIX0WogmGkzg==}
+    peerDependencies:
+      arktype: ^2.1.0
+      typescript: '>=5.0.0'
+      valibot: ^1.0.0-beta.7 || ^1.0.0
+      zod: ^3.24.0 || ^4.0.0
+    peerDependenciesMeta:
+      arktype:
+        optional: true
+      typescript:
+        optional: true
+      valibot:
+        optional: true
+      zod:
+        optional: true
+
   '@tailwindcss/node@4.2.2':
     resolution: {integrity: sha512-pXS+wJ2gZpVXqFaUEjojq7jzMpTGf8rU6ipJz5ovJV6PUGmlJ+jvIwGrzdHdQ80Sg+wmQxUFuoW1UAAwHNEdFA==}
 
@@ -3887,11 +3924,6 @@ packages:
     resolution: {integrity: sha512-8Ofs/AUQh8MaEcrlq5xOX0CQ9ypTF5dl78mjlMNfOK08fzpgTHQRQPBxcPlEtIw0yRpws+Zo/3r+5WRby7u3Gg==}
     engines: {node: '>= 0.6'}
 
-  next-env-safe@1.0.2:
-    resolution: {integrity: sha512-rG+n6xWGPu9fE3ebmGx+mD3F7sj1LhMQO89lvKI5TKnM8qEIzCVL1mRXouuxfIzV2YQ16g3nYlyGWm8r3N44Mw==}
-    peerDependencies:
-      zod: '>=3.22.0'
-
   next@16.2.2:
     resolution: {integrity: sha512-i6AJdyVa4oQjyvX/6GeER8dpY/xlIV+4NMv/svykcLtURJSy/WzDnnUk/TM4d0uewFHK7xSQz4TbIwPgjky+3A==}
     engines: {node: '>=20.9.0'}
@@ -3913,8 +3945,8 @@ packages:
       sass:
         optional: true
 
-  node-addon-api@8.6.0:
-    resolution: {integrity: sha512-gBVjCaqDlRUk0EwoPNKzIr9KkS9041G/q31IBShPs1Xz6UTA+EXdZADbzqAJQrpDRq71CIMnOP5VMut3SL0z5Q==}
+  node-addon-api@8.7.0:
+    resolution: {integrity: sha512-9MdFxmkKaOYVTV+XVRG8ArDwwQ77XIgIPyKASB1k3JPq3M8fGQQQE3YpMOrKm6g//Ktx8ivZr8xo1Qmtqub+GA==}
     engines: {node: ^18 || ^20 || >= 21}
 
   node-domexception@1.0.0:
@@ -6195,6 +6227,18 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
+  '@t3-oss/env-core@0.13.11(typescript@5.9.3)(zod@4.3.6)':
+    optionalDependencies:
+      typescript: 5.9.3
+      zod: 4.3.6
+
+  '@t3-oss/env-nextjs@0.13.11(typescript@5.9.3)(zod@4.3.6)':
+    dependencies:
+      '@t3-oss/env-core': 0.13.11(typescript@5.9.3)(zod@4.3.6)
+    optionalDependencies:
+      typescript: 5.9.3
+      zod: 4.3.6
+
   '@tailwindcss/node@4.2.2':
     dependencies:
       '@jridgewell/remapping': 2.3.5
@@ -6634,7 +6678,7 @@ snapshots:
 
   bcrypt@6.0.0:
     dependencies:
-      node-addon-api: 8.6.0
+      node-addon-api: 8.7.0
       node-gyp-build: 4.8.4
 
   binary-extensions@2.3.0: {}
@@ -7686,10 +7730,6 @@ snapshots:
 
   negotiator@1.0.0: {}
 
-  next-env-safe@1.0.2(zod@4.3.6):
-    dependencies:
-      zod: 4.3.6
-
   next@16.2.2(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
       '@next/env': 16.2.2
@@ -7715,7 +7755,7 @@ snapshots:
       - '@babel/core'
       - babel-plugin-macros
 
-  node-addon-api@8.6.0: {}
+  node-addon-api@8.7.0: {}
 
   node-domexception@1.0.0: {}
 

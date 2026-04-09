@@ -1,6 +1,6 @@
 import { init } from "@auth-guard/backend";
 import { AuthError } from "@auth-guard/backend/error";
-import type { ProviderType } from "base";
+import type { ProviderType } from "@auth-guard/react";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import {

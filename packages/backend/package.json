@@ -2,40 +2,42 @@
 	"name": "@auth-guard/backend",
 	"version": "0.0.0",
 	"description": "",
-	"main": "index.js",
+	"files": [
+		"dist"
+	],
+	"main": "./dist/main.js",
+	"module": "./dist/main.mjs",
+	"types": "./dist/main.d.ts",
 	"exports": {
 		".": {
 			"types": "./dist/main.d.ts",
-			"import": "./dist/main.js",
+			"import": "./dist/main.mjs",
 			"require": "./dist/main.js",
-			"default": "./dist/main.js"
+			"default": "./dist/main.mjs"
 		},
 		"./*": {
 			"types": "./dist/*.d.ts",
-			"import": "./dist/*.js",
+			"import": "./dist/*.mjs",
 			"require": "./dist/*.js",
-			"default": "./dist/*.js"
+			"default": "./dist/*.mjs"
 		}
 	},
 	"scripts": {
-		"build": "tsc -b",
+		"build": "tsc -b && tsup",
 		"check": "biome check",
 		"check:fix": "biome check --fix"
 	},
 	"author": "Rahul Roy",
 	"license": "MIT",
-	"dependencies": {
-		"bcrypt": "^6.0.0",
-		"jsonwebtoken": "^9.0.3",
-		"nanoid": "^5.1.7",
-		"zod": "^4.3.6"
-	},
 	"devDependencies": {
 		"@biomejs/biome": "2.4.8",
 		"@types/bcrypt": "^6.0.0",
 		"@types/jsonwebtoken": "^9.0.10",
 		"base": "workspace:^",
 		"biome-config": "workspace:^",
-		"ts-config": "workspace:^"
+		"nanoid": "^5.1.7",
+		"ts-config": "workspace:^",
+		"tsup": "^8.5.1",
+		"zod": "^4.3.6"
 	}
 }

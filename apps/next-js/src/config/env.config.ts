@@ -1,10 +1,10 @@
-import { createEnv } from "next-env-safe";
+import { createEnv } from "@t3-oss/env-nextjs";
 import pino from "pino";
 import { z } from "zod";
 
 const ENV = createEnv({
 	server: {
-		LEBEL: z
+		LABEL: z
 			.enum(Object.keys(pino.levels.values) as pino.LevelWithSilent[])
 			.default("debug"),
 		JWT_SECRET: z.string().min(25),
@@ -33,7 +33,33 @@ const ENV = createEnv({
 	client: {
 		NEXT_PUBLIC_API_URL: z.url(),
 	},
-	runtimeEnv: process.env,
+	runtimeEnv: {
+		LABEL: process.env.LABEL,
+		JWT_SECRET: process.env.JWT_SECRET,
+		// db
+		DB_HOST: process.env.DB_HOST,
+		DB_USER: process.env.DB_USER,
+		DB_PASSWORD: process.env.DB_PASSWORD,
+		DB_DATABASE: process.env.DB_DATABASE,
+
+		// Email
+		MAIL_HOST: process.env.MAIL_HOST,
+		MAIL_PORT: process.env.MAIL_PORT,
+		MAIL_USER: process.env.MAIL_USER,
+		MAIL_PASS: process.env.MAIL_PASS,
+
+		// OAuth
+		// google
+		GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+		GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+
+		// github
+		GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
+		GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
+
+		// client
+		NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+	},
 });
 
 const isDev = process.env.NODE_ENV === "development";

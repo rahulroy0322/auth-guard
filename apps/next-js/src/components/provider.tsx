@@ -1,3 +1,4 @@
+"use client";
 import { GuardProvider } from "@auth-guard/nextjs";
 import type { FC, ReactNode } from "react";
 import { ENV } from "@/config/env.config";
