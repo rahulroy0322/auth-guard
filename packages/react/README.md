@@ -21,7 +21,7 @@ npm install @auth-guard/react
 Wrap your app with `GuardProvider` and load the package styles once.
 
 ```tsx
-import { GuardProvider,type OAuthProviderType } from "@auth-guard/react";
+import { GuardProvider, type OAuthProviderType } from "@auth-guard/react";
 import "@auth-guard/react/styles.css";
 
 const oauthProviders = [
