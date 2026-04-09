@@ -330,7 +330,7 @@ import { Link, navigate } from "<router>";
 import { useGuard } from "@auth-guard/react";
 import { ForgotPasswordForm } from "@auth-guard/react/diy";
 
-function ResetPasswordRoute() {
+function ForgotPasswordRoute() {
     const { forgotPassword, fetching, config } = useGuard();
 
     return (
