@@ -6,8 +6,36 @@ export default defineConfig({
 	outDir: "dist",
 	splitting: false,
 	dts: true,
-	sourcemap: true,
+	sourcemap: false,
 	clean: true,
 	minify: true,
-	external: ["react", "react-dom"],
+	external: [
+		"react",
+		"react-dom",
+		"react/jsx-runtime",
+		"react/compiler-runtime",
+		"use-sync-external-store",
+		"use-sync-external-store/shim",
+		"use-sync-external-store/shim/with-selector",
+	],
+	noExternal: [
+		"base",
+		"form",
+		"schema",
+		"shared",
+		"ui",
+		"@base-ui/react",
+		"sonner",
+		"input-otp",
+		"@remixicon/react",
+		"class-variance-authority",
+		"clsx",
+		"tailwind-merge",
+	],
+	esbuildOptions(options) {
+		options.loader = {
+			...options.loader,
+			".css": "css",
+		};
+	},
 });

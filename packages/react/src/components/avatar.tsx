@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import { Avatar } from "ui/components/avatar";
-import type { GuardUserType } from "../provider";
+import type { GuardUserType } from "../provider.types";
 
 type ProfileAvatarPropsType = {
 	baseUrl: string;

@@ -2,6 +2,17 @@ import { RiShieldCheckFill } from "@remixicon/react";
 import { useAppForm } from "form";
 import { type FC, useState } from "react";
 import { type UpdatePasswordSchemaType, updatePasswordSchema } from "schema";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "ui/components/ui/alert-dialog";
 import { Button } from "ui/components/ui/button";
 import {
 	Card,
@@ -138,14 +149,32 @@ const SecurityPanel: FC = () => {
 			<Separator />
 			<div className="grid grid-cols-3 p-2 py-4">
 				<b>Delete account</b>
-				<div className="col-span-2 flex items-center justify-between gap-4 rounded-md border border-dashed p-4">
-					<p className="text-sm text-muted-foreground">
-						Account deletion is not wired to an endpoint yet.
-					</p>
-					<Button variant="destructive" disabled>
-						Unavailable
-					</Button>
-				</div>
+				<AlertDialog>
+					<AlertDialogTrigger render={<Button variant="destructive" />}>
+						Delete account
+					</AlertDialogTrigger>
+					<AlertDialogContent>
+						<AlertDialogHeader>
+							<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+							<AlertDialogDescription>
+								This action cannot be undone. This will permanently delete your
+								account from our servers.
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel // disabled={loading}
+								variant={"default"}
+							>
+								Cancel
+							</AlertDialogCancel>
+							<AlertDialogAction
+								variant="destructive" //disabled={loading}
+							>
+								Continue
+							</AlertDialogAction>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
 			</div>
 		</TabsContent>
 	);

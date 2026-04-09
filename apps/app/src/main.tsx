@@ -1,9 +1,8 @@
-import { GuardProvider } from "@auth-guard/react";
+import { GuardProvider, type OAuthProviderType } from "@auth-guard/react";
 import { type FC, StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "@auth-guard/react/styles.css";
 import "./index.css";
-import type { OAuthProviderOptionType } from "@auth-guard/react/diy";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { config } from "./config";
 import { routeTree } from "./routeTree.gen";
@@ -34,7 +33,7 @@ const oauthProviders = [
 	{
 		provider: "github",
 	},
-] as Omit<OAuthProviderOptionType, "onClick">[];
+] as OAuthProviderType[];
 
 const App: FC = () => (
 	<GuardProvider
