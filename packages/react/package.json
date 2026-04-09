@@ -1,51 +1,86 @@
 {
 	"name": "@auth-guard/react",
-	"version": "0.0.0",
-	"description": "",
-	"exports": {
-		".": {
-			"main": "./dist/main.js",
-			"module": "./dist/main.mjs",
-			"types": "./dist/main.d.ts"
-		},
-		"./diy": {
-			"main": "./dist/diy.js",
-			"module": "./dist/diy.mjs",
-			"types": "./dist/diy.d.ts"
-		},
-		"./styles.css": "./dist/main.css"
+	"version": "0.1.0",
+	"description": "React client library for Auth Guard with provider state, auth UI, account panels, and DIY auth forms.",
+	"sideEffects": false,
+	"private": false,
+	"publishConfig": {
+		"access": "public"
 	},
 	"files": [
 		"dist"
 	],
+	"main": "./dist/main.js",
+	"module": "./dist/main.mjs",
+	"types": "./dist/main.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/main.d.ts",
+			"import": "./dist/main.mjs",
+			"require": "./dist/main.js"
+		},
+		"./diy": {
+			"types": "./dist/diy.d.ts",
+			"import": "./dist/diy.mjs",
+			"require": "./dist/diy.js"
+		},
+		"./styles.css": "./dist/main.css"
+	},
 	"scripts": {
 		"build": "tsc -b && tsup",
 		"check": "biome check",
 		"check:fix": "biome check --fix",
-		"dev": "tsup --watch"
+		"dev": "tsup --watch",
+		"prepublishOnly": "npm run build"
 	},
-	"author": "Rahul Roy",
+	"author": {
+		"name": "Rahul Roy",
+		"email": "rahulroyapd80@gmail.com",
+		"url": "https://github.com/rahulroy0322"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/rahulroy0322/auth-guard.git",
+		"directory": "packages/react"
+	},
 	"license": "MIT",
+	"bugs": "https://github.com/rahulroy0322/auth-guard/issues",
+	"homepage": "https://github.com/rahulroy0322/auth-guard/blob/main/packages/react/README.md",
+	"keywords": [
+		"auth",
+		"authentication",
+		"react",
+		"react-auth",
+		"auth-provider",
+		"oauth",
+		"login",
+		"register",
+		"account"
+	],
+	"engines": {
+		"node": ">=18"
+	},
 	"devDependencies": {
 		"@biomejs/biome": "2.4.8",
+		"@remixicon/react": "^4.9.0",
+		"@tailwindcss/postcss": "^4.2.2",
 		"@types/react": "^19.2.14",
+		"autoprefixer": "^10.4.27",
+		"base": "workspace:^",
 		"biome-config": "workspace:^",
+		"form": "workspace:^",
+		"schema": "workspace:^",
+		"shared": "workspace:^",
+		"tailwindcss": "^4.2.2",
 		"ts-config": "workspace:^",
-		"tsup": "^8.5.1"
+		"tsup": "^8.5.1",
+		"ui": "workspace:^"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",
 		"react-dom": "^18 || ^19"
 	},
-	"dependencies": {
-		"@remixicon/react": "^4.9.0",
-		"@tailwindcss/postcss": "^4.2.2",
-		"autoprefixer": "^10.4.27",
-		"base": "workspace:^",
-		"form": "workspace:^",
-		"schema": "workspace:^",
-		"shared": "workspace:^",
-		"tailwindcss": "^4.2.2",
-		"ui": "workspace:^"
+	"optionalDependencies": {
+		"use-sync-external-store": "^1"
 	}
 }

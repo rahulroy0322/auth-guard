@@ -15,11 +15,7 @@ import { createAuthClient } from "./core/client";
 import { applyAuthState as applyResolvedAuthState } from "./core/state";
 import type {
 	GuardContextType,
-	GuardProviderConfigType,
 	GuardProviderPropsType,
-	GuardUserType,
-	LoginSchemaType,
-	RegisterSchemaType,
 	VerificationStateType,
 } from "./provider.types";
 import {
@@ -204,15 +200,6 @@ const useGuard = () => {
 	}
 
 	return context;
-};
-
-export type {
-	GuardProviderConfigType,
-	GuardProviderPropsType,
-	GuardUserType,
-	LoginSchemaType,
-	RegisterSchemaType,
-	VerificationStateType,
 };
 
 export { GuardProvider, useGuard };

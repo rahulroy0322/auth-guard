@@ -44,3 +44,4 @@ routeTree.gen.ts
 *.rest
 !sample.api.rest
 .codex
+*tgz
