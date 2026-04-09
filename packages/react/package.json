@@ -60,21 +60,18 @@
 	"engines": {
 		"node": ">=18"
 	},
-
-	"dependencies": {
-		"@remixicon/react": "^4.9.0",
-		"@tailwindcss/postcss": "^4.2.2",
-		"autoprefixer": "^10.4.27",
-		"tailwindcss": "^4.2.2"
-	},
 	"devDependencies": {
 		"@biomejs/biome": "2.4.8",
+		"@remixicon/react": "^4.9.0",
+		"@tailwindcss/postcss": "^4.2.2",
 		"@types/react": "^19.2.14",
+		"autoprefixer": "^10.4.27",
 		"base": "workspace:^",
 		"biome-config": "workspace:^",
 		"form": "workspace:^",
 		"schema": "workspace:^",
 		"shared": "workspace:^",
+		"tailwindcss": "^4.2.2",
 		"ts-config": "workspace:^",
 		"tsup": "^8.5.1",
 		"ui": "workspace:^"

@@ -460,24 +460,12 @@ importers:
 
   packages/react:
     dependencies:
-      '@remixicon/react':
-        specifier: ^4.9.0
-        version: 4.9.0(react@19.2.4)
-      '@tailwindcss/postcss':
-        specifier: ^4.2.2
-        version: 4.2.2
-      autoprefixer:
-        specifier: ^10.4.27
-        version: 10.4.27(postcss@8.5.8)
       react:
         specifier: ^18 || ^19
         version: 19.2.4
       react-dom:
         specifier: ^18 || ^19
         version: 19.2.4(react@19.2.4)
-      tailwindcss:
-        specifier: ^4.2.2
-        version: 4.2.2
     optionalDependencies:
       use-sync-external-store:
         specifier: ^1
@@ -486,9 +474,18 @@ importers:
       '@biomejs/biome':
         specifier: 2.4.8
         version: 2.4.8
+      '@remixicon/react':
+        specifier: ^4.9.0
+        version: 4.9.0(react@19.2.4)
+      '@tailwindcss/postcss':
+        specifier: ^4.2.2
+        version: 4.2.2
       '@types/react':
         specifier: ^19.2.14
         version: 19.2.14
+      autoprefixer:
+        specifier: ^10.4.27
+        version: 10.4.27(postcss@8.5.8)
       base:
         specifier: workspace:^
         version: link:../base
@@ -504,6 +501,9 @@ importers:
       shared:
         specifier: workspace:^
         version: link:../shared
+      tailwindcss:
+        specifier: ^4.2.2
+        version: 4.2.2
       ts-config:
         specifier: workspace:^
         version: link:../ts-config
