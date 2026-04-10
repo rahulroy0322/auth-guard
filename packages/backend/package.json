@@ -1,7 +1,26 @@
 {
 	"name": "@auth-guard/backend",
-	"version": "0.0.0",
-	"description": "",
+	"version": "0.1.0",
+	"description": "Authentication backend library with OAuth, JWT, session management, and more",
+	"keywords": [
+		"auth",
+		"authentication",
+		"oauth",
+		"jwt",
+		"session",
+		"bcrypt",
+		"login",
+		"register",
+		"password",
+		"token",
+		"authorization",
+		"security"
+	],
+	"sideEffects": false,
+	"private": false,
+	"publishConfig": {
+		"access": "public"
+	},
 	"files": [
 		"dist"
 	],
@@ -25,10 +44,28 @@
 	"scripts": {
 		"build": "tsc -b && tsup",
 		"check": "biome check",
-		"check:fix": "biome check --fix"
+		"check:fix": "biome check --fix",
+		"prepublishOnly": "npm run build"
 	},
-	"author": "Rahul Roy",
+	"author": {
+		"name": "Rahul Roy",
+		"email": "rahulroyapd80@gmail.com",
+		"url": "https://github.com/rahulroy0322"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/rahulroy0322/auth-guard.git",
+		"directory": "packages/backend"
+	},
 	"license": "MIT",
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "https://github.com/rahulroy0322/auth-guard/tree/main?tab=MIT-1-ov-file"
+		}
+	],
+	"bugs": "https://github.com/rahulroy0322/auth-guard/issues",
+	"homepage": "https://github.com/rahulroy0322/auth-guard/tree/main/packages/backend#readme",
 	"devDependencies": {
 		"@biomejs/biome": "2.4.8",
 		"@types/bcrypt": "^6.0.0",
@@ -38,6 +75,12 @@
 		"nanoid": "^5.1.7",
 		"ts-config": "workspace:^",
 		"tsup": "^8.5.1",
+		"zod": "^4.3.6"
+	},
+	"peerDependencies": {
+		"bcrypt": "^6",
+		"jsonwebtoken": "^9",
+		"nanoid": "^5",
 		"zod": "^4.3.6"
 	}
 }

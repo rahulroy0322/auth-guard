@@ -45,7 +45,7 @@
 	},
 	"license": "MIT",
 	"bugs": "https://github.com/rahulroy0322/auth-guard/issues",
-	"homepage": "https://github.com/rahulroy0322/auth-guard/blob/main/packages/react/README.md",
+	"homepage": "https://github.com/rahulroy0322/auth-guard/tree/main/packages/react#readme",
 	"keywords": [
 		"auth",
 		"authentication",

@@ -50,7 +50,7 @@
 	},
 	"license": "MIT",
 	"bugs": "https://github.com/rahulroy0322/auth-guard/issues",
-	"homepage": "https://github.com/rahulroy0322/auth-guard/blob/main/packages/nextjs/README.md",
+	"homepage": "https://github.com/rahulroy0322/auth-guard/tree/main/packages/nextjs#readme",
 	"keywords": [
 		"auth",
 		"authentication",

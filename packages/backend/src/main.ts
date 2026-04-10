@@ -12,7 +12,7 @@ import { ProfileService } from "./services/profile.service";
 import { SessionService } from "./services/session.service";
 import { UserService } from "./services/user.service";
 import { VerificationService } from "./services/verification.service";
-import type { AuthPropsType, AuthReturnType, AuthType } from "./types/index";
+import type { AuthPropsType, AuthReturnType, AuthType } from "./types";
 import { CodeFlowHelper } from "./utils/code-flow";
 import { SmartLogger } from "./utils/smart-logger";
 import { TokenBanManager } from "./utils/token-ban";

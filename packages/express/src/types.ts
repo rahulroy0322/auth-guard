@@ -1,7 +1,4 @@
-import type {
-	AuthPropsType,
-	AuthReturnType,
-} from "@auth-guard/backend/types/index";
+import type { AuthPropsType, AuthReturnType } from "@auth-guard/backend/types";
 import type { ProviderType, SessionFormatedType, UserType } from "base";
 import type { Request, RequestHandler } from "express";
 
@@ -66,7 +63,7 @@ declare global {
 	}
 }
 
-export type * from "@auth-guard/backend/types/index";
+export type * from "@auth-guard/backend/types";
 export type {
 	AuthExpressPropsType,
 	AuthExpressReturnType,

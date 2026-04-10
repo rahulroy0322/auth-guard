@@ -49,5 +49,5 @@ type HandleAuthType = <T extends ProviderType>(
 	props: HandleAuthPropsType<T>,
 ) => (req: NextRequest, res: NextResponse) => NextResponse;
 
-export * from "@auth-guard/backend/types/index";
+export * from "@auth-guard/backend/types";
 export type { HandleAuthPropsType, HandleAuthType, HandlerType, ResType };
