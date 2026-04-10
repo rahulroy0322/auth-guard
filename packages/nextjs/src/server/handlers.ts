@@ -2,7 +2,7 @@ import type { IncomingMessage } from "node:http";
 import { AuthServerError } from "@auth-guard/backend/error";
 import type { AuthReturnType } from "@auth-guard/backend/types/main";
 import { genReqId } from "@auth-guard/backend/utils/request-id";
-import type { ProviderType } from "base";
+import type { ProviderType } from "@auth-guard/react";
 import { cookies, headers } from "next/headers";
 import { type NextRequest, NextResponse, userAgent } from "next/server";
 import {

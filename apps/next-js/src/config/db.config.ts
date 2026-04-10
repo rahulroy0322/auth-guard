@@ -1,3 +1,4 @@
+import "server-only";
 import { ENV } from "./env.config";
 
 const DB_CONFIG = {

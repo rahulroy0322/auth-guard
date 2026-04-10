@@ -5,6 +5,7 @@ const scopeMax = 7
 
 const typeEnum = [
   'build', //Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
+  'chore', // changes in version
   'docs', //Documentation only changes
   'feat', //A new feature
   'fix', //A bug fix

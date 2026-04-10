@@ -1,8 +1,8 @@
 import pino from "pino";
 import { ENV, isDev } from "@/config/env.config";
 
-const level: pino.LevelWithSilentOrString = process.env.LEBEL
-	? ENV.LEBEL
+const level: pino.LevelWithSilentOrString = process.env.LABEL
+	? ENV.LABEL
 	: isDev
 		? "trace"
 		: "info";
