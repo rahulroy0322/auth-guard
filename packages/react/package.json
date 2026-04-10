@@ -1,6 +1,6 @@
 {
 	"name": "@auth-guard/react",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "React client library for Auth Guard with provider state, auth UI, account panels, and DIY auth forms.",
 	"sideEffects": false,
 	"private": false,

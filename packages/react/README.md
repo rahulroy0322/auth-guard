@@ -34,7 +34,7 @@ export function App() {
 	return (
 		<GuardProvider
 			config={{
-				baseUrl: "http://localhost:3000/auth",
+				baseUrl: "http://localhost:8000",
 				images: {
 					login: "https://cdn.example.com/login.svg",
 					register: "https://cdn.example.com/register.svg",
