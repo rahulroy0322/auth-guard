@@ -35,7 +35,7 @@ export default defineConfig([
 		splitting: false,
 		dts: true,
 		sourcemap: false,
-		clean: false,
+		clean: true,
 		minify: true,
 		platform: "node",
 		external: [/next/, "bcrypt", "jsonwebtoken", "nanoid", "zod"],
