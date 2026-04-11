@@ -1,5 +1,4 @@
-import type { UserType } from "base";
-import type { LoggerType, LogType } from "../types";
+import type { LoggerType, LogType, UserType } from "../types";
 
 type SmartLogData = Omit<LogType, "who" | "userId"> & {
 	user: Pick<UserType, "email" | "id" | "name"> | null;

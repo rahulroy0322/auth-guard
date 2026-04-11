@@ -10,5 +10,6 @@ export default defineConfig({
 	clean: true,
 	minify: true,
 	platform: "node",
-	external: ["bcrypt", "jsonwebtoken", "nanoid", "zod"],
+	external: ["@auth-guard/backend", "multer", "ua-parser-js", "zod", "express"],
+	noExternal: ["schema"],
 });

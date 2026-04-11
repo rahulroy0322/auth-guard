@@ -1,5 +1,4 @@
-import type { ProfileType } from "base";
-import type { CacheConfigType, CacheKeysType } from "../types";
+import type { CacheConfigType, CacheKeysType, ProfileType } from "../types";
 import type { ProfileModelType } from "../types/profile";
 import type { SmartLogger } from "../utils/smart-logger";
 import { CacheModel } from "./base";

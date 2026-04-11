@@ -36,7 +36,6 @@ const guard = auth({
 	cookie: {
 		access: "auth-access",
 		refresh: "auth-refresh",
-		// @ts-expect-error
 		extract: (req, key) => req.cookies?.[key] || null,
 	},
 	jwt: {
@@ -56,7 +55,6 @@ const guard = auth({
 	Profile,
 	Session,
 	Cache: {
-		// @ts-expect-error
 		set: (key, value, seconds) =>
 			redis.set(
 				key,
@@ -64,10 +62,8 @@ const guard = auth({
 				...(["EX", seconds] as const),
 			) as unknown as Promise<void>,
 
-		// @ts-expect-error
 		get: (key) => redis.get(key),
 
-		// @ts-expect-error
 		remove: (key) => redis.del(key) as unknown as Promise<void>,
 	},
 	Mail: {

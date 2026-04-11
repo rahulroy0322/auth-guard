@@ -4,8 +4,8 @@ import type {
 	StartVerificationPropsType,
 	StartVerificationReturnType,
 	UserModelType,
-	VerifieAccountPropsType,
-	VerifieAccountReturnType,
+	VerifyAccountPropsType,
+	VerifyAccountReturnType,
 } from "../types";
 import type { SessionModelType } from "../types/session";
 import type { CodeFlowHelper } from "../utils/code-flow";
@@ -70,13 +70,13 @@ class VerificationService {
 		return { id: verifiedUser.id };
 	};
 
-	public verifieAccount = async ({
+	public verifyAccount = async ({
 		id,
 		code,
 		deviceId,
 		deviceName,
 		deviceType,
-	}: VerifieAccountPropsType): Promise<VerifieAccountReturnType> => {
+	}: VerifyAccountPropsType): Promise<VerifyAccountReturnType> => {
 		const reqId = genReqId();
 
 		this.logger.trace({

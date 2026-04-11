@@ -1,7 +1,7 @@
-import type { UserType } from "base";
 import type { ReactNode } from "react";
 import type { OAuthProviderOptionType } from "shared";
 import type { StartVerificationReturnType } from "./api/main";
+import type { UserType } from "./types";
 
 type GuardUserType = Omit<UserType, "password">;
 

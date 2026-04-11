@@ -1,5 +1,4 @@
 import type { IncomingMessage } from "node:http";
-import type { SessionFormatedType } from "base";
 import type { UserCacheModel } from "../cache/user";
 import {
 	AuthBadError,
@@ -14,6 +13,7 @@ import type {
 	LoginRequiredReturnType,
 	LoginRequiredType,
 	ReturnUserType,
+	SessionType,
 	TokenConfigType,
 	TokenRefreshReturnType,
 } from "../types";
@@ -274,7 +274,7 @@ class SessionService {
 
 		this.logger.info({
 			reqId,
-			msg: "Sessions fetch succesfully",
+			msg: "Sessions fetched successfully",
 			user,
 		});
 
@@ -284,7 +284,7 @@ class SessionService {
 					({
 						...session,
 						currentDevice: deviceId === dID,
-					}) satisfies SessionFormatedType,
+					}) satisfies SessionType,
 			),
 		};
 	};

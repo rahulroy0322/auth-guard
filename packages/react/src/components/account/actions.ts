@@ -1,8 +1,8 @@
-import type { SessionFormatedType } from "base";
 import { useCallback } from "react";
 import { updateProfileSchema } from "schema";
 import { get, patch, patchMultiPart } from "../../api/main";
 import { useGuard } from "../../provider";
+import type { SessionType } from "../../types";
 
 const useAccountActions = () => {
 	const { config, reqWithToken } = useGuard();
@@ -26,7 +26,7 @@ const useAccountActions = () => {
 	const fetchSessions = useCallback(async () => {
 		const { sessions } = await reqWithToken((token) =>
 			get<{
-				sessions: SessionFormatedType[];
+				sessions: SessionType[];
 			}>({
 				base: config.baseUrl,
 				url: "sessions",

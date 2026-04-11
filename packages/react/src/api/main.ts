@@ -1,4 +1,4 @@
-import type { ProviderType, UserType } from "base";
+import type { ProviderType, UserType } from "@auth-guard/types";
 
 type SuccessType<T> = {
 	success: true;

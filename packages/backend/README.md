@@ -138,12 +138,12 @@ await startVerification({
 });
 ```
 
-#### `verifieAccount`
+#### `verifyAccount`
 
 ```ts
-const { verifieAccount } = authGuard;
+const { verifyAccount } = authGuard;
 
-await verifieAccount({
+await verifyAccount({
 	email: "user@example.com",
 	code: <verification-code>,
 	deviceId,

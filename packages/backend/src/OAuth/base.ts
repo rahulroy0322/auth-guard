@@ -1,11 +1,11 @@
 import { hash, randomBytes } from "node:crypto";
-import type { ProviderType } from "base";
 import { z } from "zod";
 import {
 	AuthInvalidStateError,
 	AuthInvalidTokenError,
 	AuthInvalidUserError,
 } from "../error";
+import type { ProviderType } from "../types";
 import type { SmartLogger } from "../utils/smart-logger";
 
 class OAuth<T> {

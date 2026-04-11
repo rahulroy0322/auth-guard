@@ -1,40 +1,89 @@
 {
 	"name": "@auth-guard/express",
-	"version": "0.0.0",
-	"description": "",
-	"main": "index.js",
+	"version": "0.1.0",
+	"description": "Express middleware for Auth Guard authentication system. Provides ready-to-use authentication routes and middleware for Express.js applications.",
+	"keywords": [
+		"auth",
+		"authentication",
+		"express",
+		"middleware",
+		"oauth",
+		"jwt",
+		"session",
+		"login",
+		"register",
+		"password",
+		"security",
+		"auth-guard"
+	],
+	"sideEffects": false,
+	"private": false,
+	"publishConfig": {
+		"access": "public"
+	},
+	"files": [
+		"dist"
+	],
+	"main": "./dist/main.js",
+	"module": "./dist/main.mjs",
+	"types": "./dist/main.d.ts",
 	"exports": {
 		".": {
-			"import": "./dist/main.d.ts",
-			"default": "./dist/main.js"
+			"types": "./dist/main.d.ts",
+			"import": "./dist/main.mjs",
+			"require": "./dist/main.js",
+			"default": "./dist/main.mjs"
 		},
 		"./*": {
-			"import": "./dist/*.d.ts",
-			"default": "./dist/*.js"
+			"types": "./dist/*.d.ts",
+			"import": "./dist/*.mjs",
+			"require": "./dist/*.js",
+			"default": "./dist/*.mjs"
 		}
 	},
 	"scripts": {
-		"build": "tsc -b",
+		"build": "tsc -b && tsup",
 		"check": "biome check",
-		"check:fix": "biome check --fix"
+		"check:fix": "biome check --fix",
+		"prepublishOnly": "npm run build"
 	},
-	"author": "Rahul Roy",
+	"author": {
+		"name": "Rahul Roy",
+		"email": "rahulroyapd80@gmail.com",
+		"url": "https://github.com/rahulroy0322"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/rahulroy0322/auth-guard.git",
+		"directory": "packages/express"
+	},
 	"license": "MIT",
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "https://github.com/rahulroy0322/auth-guard/tree/main?tab=MIT-1-ov-file"
+		}
+	],
+	"bugs": "https://github.com/rahulroy0322/auth-guard/issues",
+	"homepage": "https://github.com/rahulroy0322/auth-guard/tree/main/packages/express#readme",
 	"devDependencies": {
+		"@auth-guard/backend": "workspace:^",
 		"@biomejs/biome": "2.4.8",
 		"@types/bcrypt": "^6.0.0",
 		"@types/express": "^5.0.6",
 		"@types/jsonwebtoken": "^9.0.10",
 		"@types/multer": "^2.1.0",
-		"base": "workspace:^",
 		"biome-config": "workspace:^",
-		"ts-config": "workspace:^"
-	},
-	"dependencies": {
-		"@auth-guard/backend": "workspace:^",
-		"multer": "^2.1.1",
 		"schema": "workspace:^",
-		"ua-parser-js": "^2.0.9",
-		"zod": "^4.3.6"
+		"ts-config": "workspace:^",
+		"tsup": "^8.5.1",
+		"ua-parser-js": "^2.0.9"
+	},
+	"peerDependencies": {
+		"@auth-guard/backend": "^0",
+		"express": "^5",
+		"multer": "^2",
+		"ua-parser-js": "^2",
+		"zod": "^4"
 	}
 }

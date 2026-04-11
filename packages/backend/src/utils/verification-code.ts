@@ -1,7 +1,6 @@
-import type { UserType } from "base";
 import { nanoid } from "nanoid";
 import { AuthBadError } from "../error";
-import type { CacheConfigType, SendMailPropsType } from "../types";
+import type { CacheConfigType, SendMailPropsType, UserType } from "../types";
 import { keys } from "./cache";
 import type { SmartLogger } from "./smart-logger";
 

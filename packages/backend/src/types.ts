@@ -4,8 +4,9 @@ export type {
 	ProviderType,
 	RoleType,
 	SessionFormatedType as SessionType,
+	SessionType as SessionDBType,
 	UserType,
-} from "base";
+} from "@auth-guard/types";
 export type {
 	AuthStatusReturnType,
 	AuthStatusType,
@@ -32,9 +33,9 @@ export type {
 	UpdateProfileReturnType,
 	UpdateProfileType,
 	UserModelType,
-	VerifieAccountPropsType,
-	VerifieAccountReturnType,
-	VerifieAccountType,
+	VerifyAccountPropsType,
+	VerifyAccountReturnType,
+	VerifyAccountType,
 } from "./types/auth";
 export type {
 	AvatarModelType,

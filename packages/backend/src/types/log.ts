@@ -1,4 +1,4 @@
-import type { UserType } from "base";
+import type { UserType } from "../types";
 
 type LogType = {
 	who: "[SYSTEM]" | (UserType["name"] & {});

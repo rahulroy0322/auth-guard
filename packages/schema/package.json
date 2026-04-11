@@ -17,11 +17,11 @@
 	"license": "MIT",
 	"devDependencies": {
 		"@biomejs/biome": "2.4.8",
-		"base": "workspace:^",
 		"biome-config": "workspace:^",
 		"ts-config": "workspace:^"
 	},
 	"dependencies": {
+		"@auth-guard/types": "workspace:^",
 		"zod": "^4.3.6"
 	}
 }

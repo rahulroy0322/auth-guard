@@ -1,11 +1,10 @@
 import { extname, join } from "node:path";
 import { cwd } from "node:process";
 import { genReqId } from "@auth-guard/backend/utils/request-id";
-import type { ProviderType } from "base";
 import { Router } from "express";
 import multer from "multer";
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE } from "schema";
-import type { AuthExpressReturnType } from "./types";
+import type { AuthExpressReturnType, ProviderType } from "./types";
 
 type FileType = {
 	originalname: string;
@@ -65,8 +64,8 @@ const authRouter = <T extends ProviderType>(
 	authRouter.post("/start-verification", props.startVerification);
 	authRouter
 		.route("/verify")
-		.patch(props.verifieAccount)
-		.get(props.verifieAccount);
+		.patch(props.verifyAccount)
+		.get(props.verifyAccount);
 
 	authRouter.post("/forgot-password", props.forgotPassword);
 	authRouter.patch("/reset-password", props.resetPassword);

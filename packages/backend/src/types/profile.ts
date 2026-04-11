@@ -1,4 +1,4 @@
-import type { ProfileType } from "base";
+import type { ProfileType } from "../types";
 
 type ProfileModelType = {
 	findByUserId: (userId: ProfileType["userId"]) => Promise<ProfileType[]>;

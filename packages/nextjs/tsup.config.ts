@@ -38,7 +38,15 @@ export default defineConfig([
 		clean: true,
 		minify: true,
 		platform: "node",
-		external: [/next/, "bcrypt", "jsonwebtoken", "nanoid", "zod"],
-		noExternal: [/@auth-guard\/backend/, /@auth-guard\/react/, "schema"],
+		external: [
+			/next/,
+			"bcrypt",
+			"jsonwebtoken",
+			"nanoid",
+			"zod",
+			"@auth-guard/react",
+			"@auth-guard/backend",
+		],
+		noExternal: ["schema"],
 	},
 ]);

@@ -27,5 +27,5 @@ export {
 	Show,
 	useGuard,
 } from "@auth-guard/react";
-
+export type * from "./server/types";
 import "@auth-guard/react/styles.css";

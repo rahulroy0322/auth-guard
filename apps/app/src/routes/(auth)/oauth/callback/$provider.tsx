@@ -1,6 +1,6 @@
+import type { ProviderType } from "@auth-guard/react";
 import { useGuard } from "@auth-guard/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import type { ProviderType } from "base";
 import { type FC, useEffect } from "react";
 
 const OAuthCallbackRoute: FC = () => {
