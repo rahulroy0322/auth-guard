@@ -1,6 +1,6 @@
 {
 	"name": "@auth-guard/nextjs",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Next.js client library for Auth Guard with provider state, auth UI, account panels, and DIY auth forms.",
 	"sideEffects": false,
 	"private": false,
@@ -50,7 +50,7 @@
 	},
 	"license": "MIT",
 	"bugs": "https://github.com/rahulroy0322/auth-guard/issues",
-	"homepage": "https://github.com/rahulroy0322/auth-guard/blob/main/packages/nextjs/README.md",
+	"homepage": "https://github.com/rahulroy0322/auth-guard/tree/main/packages/nextjs#readme",
 	"keywords": [
 		"auth",
 		"authentication",
@@ -75,6 +75,8 @@
 		"tsup": "^8.5.1"
 	},
 	"peerDependencies": {
+		"@auth-guard/backend": "^0",
+		"@auth-guard/react": "^0",
 		"next": "^15 || ^16",
 		"react": "^18 || ^19",
 		"react-dom": "^18 || ^19",

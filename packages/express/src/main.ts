@@ -2,7 +2,6 @@ import { unlink } from "node:fs/promises";
 import { init as core } from "@auth-guard/backend";
 import { AuthServerError } from "@auth-guard/backend/error";
 import { genReqId } from "@auth-guard/backend/utils/request-id";
-import type { ProviderType } from "base";
 import type { Request, RequestHandler, Response } from "express";
 import {
 	loginSchema,
@@ -16,6 +15,7 @@ import type {
 	AuthExpressPropsType,
 	AuthExpressReturnType,
 	AuthExpressType,
+	ProviderType,
 	ResType,
 	UpdateProfileType,
 } from "./types";
@@ -150,7 +150,7 @@ const init: AuthExpressType = <T extends ProviderType>({
 		} satisfies ResType);
 	};
 
-	const verifieAccount: RequestHandler = async (req, res) => {
+	const verifyAccount: RequestHandler = async (req, res) => {
 		const data = verifySchema.parse({
 			...req.body,
 			...req.query,
@@ -159,7 +159,7 @@ const init: AuthExpressType = <T extends ProviderType>({
 		const {
 			token: { access, refresh },
 			user,
-		} = await coreApi.verifieAccount({
+		} = await coreApi.verifyAccount({
 			...data,
 			...getDeviceInfo(req, res),
 		});
@@ -214,7 +214,7 @@ const init: AuthExpressType = <T extends ProviderType>({
 
 	const me: RequestHandler = async (req, res) => {
 		if (!req.user) {
-			throw new AuthServerError("some event dosn't handled properly!");
+			throw new AuthServerError("some event wasn't handled properly!");
 		}
 
 		res.status(200).json({
@@ -238,7 +238,7 @@ const init: AuthExpressType = <T extends ProviderType>({
 		res.status(200).json({
 			success: true,
 			data: {
-				message: "Logged Out Succesfully",
+				message: "Logged Out Successfully",
 			},
 		} satisfies ResType);
 	};
@@ -458,7 +458,7 @@ const init: AuthExpressType = <T extends ProviderType>({
 		logout,
 		me,
 		startVerification,
-		verifieAccount,
+		verifyAccount,
 		forgotPassword,
 		resetPassword,
 		tokenRefresh,
@@ -476,4 +476,5 @@ const init: AuthExpressType = <T extends ProviderType>({
 const auth = init;
 
 export * from "@auth-guard/backend/error";
+export * from "./types";
 export { auth, init };

@@ -1,7 +1,6 @@
-import type { UserType } from "base";
 import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { AuthError, AuthExpiredError, AuthWrongTokenError } from "../error";
-import type { JwtConfigType, TokenType } from "../types";
+import type { JwtConfigType, TokenType, UserType } from "../types";
 import type { SmartLogger } from "./smart-logger";
 import { signToken, verifyToken } from "./token";
 

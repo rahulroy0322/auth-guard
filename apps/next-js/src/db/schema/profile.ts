@@ -1,4 +1,4 @@
-import type { ProfileType, ProviderType } from "base";
+import type { ProfileType, ProviderType } from "@auth-guard/nextjs";
 import { pgTable, primaryKey, uuid, varchar } from "drizzle-orm/pg-core";
 import { times } from "./helper";
 import { User } from "./user";

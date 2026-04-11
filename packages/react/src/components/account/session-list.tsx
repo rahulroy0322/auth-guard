@@ -4,14 +4,14 @@ import {
 	RiSmartphoneLine,
 	RiWindowsLine,
 } from "@remixicon/react";
-import type { SessionFormatedType } from "base";
 import { type FC, useEffect, useState } from "react";
 import { Button } from "ui/components/ui/button";
 import { cn } from "ui/lib/utils";
+import type { SessionType } from "../../types";
 import { showAuthError } from "../shared/error";
 import { useAccountActions } from "./actions";
 
-type DeviceCardPropsType = SessionFormatedType;
+type DeviceCardPropsType = SessionType;
 
 const { format } = Intl.DateTimeFormat(undefined, {
 	dateStyle: "medium",
@@ -116,7 +116,7 @@ const DeviceCard: FC<DeviceCardPropsType> = ({
 
 const SessionList: FC = () => {
 	const { fetchSessions } = useAccountActions();
-	const [sessions, setSessions] = useState<SessionFormatedType[]>([]);
+	const [sessions, setSessions] = useState<SessionType[]>([]);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {

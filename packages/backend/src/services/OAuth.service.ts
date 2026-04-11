@@ -1,9 +1,8 @@
-import type { ProviderType } from "base";
 import type { ProfileCacheModel } from "../cache/profile";
 import type { UserCacheModel } from "../cache/user";
 import { AuthInvalidCodeError, AuthServerError } from "../error";
 import type { OAuth } from "../OAuth/base";
-import type { UserModelType } from "../types";
+import type { ProviderType, UserModelType } from "../types";
 import type { OAuthLoginType, OAuthStartType } from "../types/OAuth";
 import type { ProfileModelType } from "../types/profile";
 import type { SessionModelType } from "../types/session";

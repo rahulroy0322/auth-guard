@@ -520,4 +520,4 @@ All endpoints return consistent JSON responses and appropriate HTTP status codes
 
 ## License
 
-[MIT](https://github.com/rahulroy0322/auth-guard/blob/main/LICENSE)
+[MIT](https://github.com/rahulroy0322/auth-guard/tree/main?tab=MIT-1-ov-file)

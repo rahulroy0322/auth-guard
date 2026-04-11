@@ -1,5 +1,9 @@
 import type { IncomingMessage } from "node:http";
-import type { SessionFormatedType, SessionType, UserType } from "base";
+import type {
+	SessionFormatedType,
+	SessionType,
+	UserType,
+} from "@auth-guard/types";
 import type { CodeType } from "./code";
 
 type _UserType = Omit<UserType, "avatar" | "profiles">;
@@ -73,16 +77,16 @@ type StartVerificationType = (
 	data: StartVerificationPropsType,
 ) => Promise<StartVerificationReturnType>;
 
-type VerifieAccountPropsType = Pick<
+type VerifyAccountPropsType = Pick<
 	SessionType,
 	"deviceId" | "deviceName" | "deviceType"
 > & {
 	id: UserType["id"];
 	code: CodeType;
 };
-type VerifieAccountReturnType = LoginReturnType;
-type VerifieAccountType = (
-	data: VerifieAccountPropsType,
+type VerifyAccountReturnType = LoginReturnType;
+type VerifyAccountType = (
+	data: VerifyAccountPropsType,
 ) => Promise<LoginReturnType>;
 
 type UpdateProfileReturnType = Omit<LoginReturnType, "token">;
@@ -137,7 +141,7 @@ export type {
 	UpdateProfileReturnType,
 	UpdateProfileType,
 	UserModelType,
-	VerifieAccountPropsType,
-	VerifieAccountReturnType,
-	VerifieAccountType,
+	VerifyAccountPropsType,
+	VerifyAccountReturnType,
+	VerifyAccountType,
 };

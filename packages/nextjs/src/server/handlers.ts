@@ -1,8 +1,6 @@
 import type { IncomingMessage } from "node:http";
 import { AuthServerError } from "@auth-guard/backend/error";
-import type { AuthReturnType } from "@auth-guard/backend/types/main";
 import { genReqId } from "@auth-guard/backend/utils/request-id";
-import type { ProviderType } from "@auth-guard/react";
 import { cookies, headers } from "next/headers";
 import { type NextRequest, NextResponse, userAgent } from "next/server";
 import {
@@ -12,7 +10,12 @@ import {
 	verifySchema,
 } from "schema";
 import { provider, providerCallback } from "./regex";
-import type { HandlerType, ResType } from "./types";
+import type {
+	AuthReturnType,
+	HandlerType,
+	ProviderType,
+	ResType,
+} from "./types";
 
 const options = {
 	sameSite: "strict",
@@ -183,7 +186,7 @@ const startVerification: HandlerType = async (coreApi, req) => {
 		},
 	);
 };
-const verifieAccount: HandlerType = async (coreApi, req) => {
+const verifyAccount: HandlerType = async (coreApi, req) => {
 	const data = verifySchema.parse({
 		...Object.fromEntries(req.nextUrl.searchParams),
 		...(await req.json()),
@@ -192,7 +195,7 @@ const verifieAccount: HandlerType = async (coreApi, req) => {
 	const {
 		token: { access, refresh },
 		user,
-	} = await coreApi.verifieAccount({
+	} = await coreApi.verifyAccount({
 		...data,
 		...(await getDeviceInfo()),
 	});
@@ -512,5 +515,5 @@ export {
 	startVerification,
 	tokenRefresh,
 	updateProfile,
-	verifieAccount,
+	verifyAccount,
 };

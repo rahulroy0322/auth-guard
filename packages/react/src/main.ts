@@ -1,13 +1,4 @@
 export type {
-	AvatarType,
-	ProfileType,
-	ProviderType,
-	RoleType,
-	SessionFormatedType as SessionType,
-	UserType,
-} from "base";
-
-export type {
 	AuthBaseButtonPropsType,
 	LoginButtonPropsType,
 	RegisterButtonPropsType,
@@ -18,7 +9,6 @@ export {
 	ProfileButton,
 	RegisterButton,
 } from "./components/main";
-
 export { GuardProvider, useGuard } from "./provider";
 export type {
 	GuardProviderConfigType,
@@ -28,6 +18,14 @@ export type {
 	RegisterSchemaType,
 	VerificationStateType,
 } from "./provider.types";
+export type {
+	AvatarType,
+	ProfileType,
+	ProviderType,
+	RoleType,
+	SessionType,
+	UserType,
+} from "./types";
 
 type OAuthProviderType = Omit<OAuthProviderOptionType, "onClick">;
 

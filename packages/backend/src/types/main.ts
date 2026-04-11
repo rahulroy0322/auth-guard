@@ -1,4 +1,4 @@
-import type { ProviderType } from "base";
+import type { ProviderType } from "../types";
 import type {
 	AuthStatusType,
 	CheckAuthType,
@@ -12,7 +12,7 @@ import type {
 	TokenRefreshType,
 	UpdateProfileType,
 	UserModelType,
-	VerifieAccountType,
+	VerifyAccountType,
 } from "./auth";
 import type { AvatarModelType, RemoveAvatarType } from "./avatar";
 import type { CacheConfigType } from "./cache";
@@ -49,7 +49,7 @@ type AuthReturnType<T extends ProviderType> = {
 	oAuthStart: OAuthStartType<T>;
 	loginWithProvider: OAuthLoginType<T>;
 	startVerification: StartVerificationType;
-	verifieAccount: VerifieAccountType;
+	verifyAccount: VerifyAccountType;
 	// pass
 	forgotPassword: ForgotPasswordType;
 	resetPassword: ResetPasswordType;

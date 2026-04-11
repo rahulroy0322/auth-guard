@@ -1,5 +1,5 @@
 import type { IncomingMessage } from "node:http";
-import type { AvatarType } from "base";
+import type { AvatarType } from "../types";
 import type { ReturnUserType, SafeUserType } from "./auth";
 
 type AvatarModelType = {

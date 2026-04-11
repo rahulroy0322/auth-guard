@@ -1,4 +1,3 @@
-import type { ProviderType } from "base";
 import { AvatarCacheModel } from "./cache/avatar";
 import { ProfileCacheModel } from "./cache/profile";
 import { UserCacheModel } from "./cache/user";
@@ -12,7 +11,12 @@ import { ProfileService } from "./services/profile.service";
 import { SessionService } from "./services/session.service";
 import { UserService } from "./services/user.service";
 import { VerificationService } from "./services/verification.service";
-import type { AuthPropsType, AuthReturnType, AuthType } from "./types/index";
+import type {
+	AuthPropsType,
+	AuthReturnType,
+	AuthType,
+	ProviderType,
+} from "./types";
 import { CodeFlowHelper } from "./utils/code-flow";
 import { SmartLogger } from "./utils/smart-logger";
 import { TokenBanManager } from "./utils/token-ban";
@@ -179,7 +183,7 @@ const init: AuthType = <T extends ProviderType>({
 
 		// register
 		startVerification: verificationService.startVerification,
-		verifieAccount: verificationService.verifieAccount,
+		verifyAccount: verificationService.verifyAccount,
 
 		// pass
 		forgotPassword: passwordService.forgotPassword,
@@ -194,4 +198,5 @@ const init: AuthType = <T extends ProviderType>({
 
 const auth = init;
 
+export * from "./types";
 export { auth, init };

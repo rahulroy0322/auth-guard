@@ -1,4 +1,4 @@
-import type { AvatarType } from "base";
+import type { AvatarType } from "@auth-guard/express/types";
 import { boolean, pgTable, uuid, varchar } from "drizzle-orm/pg-core";
 import { defaults } from "./helper";
 import { User } from "./user";
