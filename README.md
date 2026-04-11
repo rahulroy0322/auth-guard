@@ -1,162 +1,87 @@
+# AuthGuard
 
-use `pnpm new` to create new branch
+AuthGuard is an open-source authentication framework designed for developers who want full control over their user data without relying on third-party services like Clerk or Kinde.
 
-# Turborepo starter
+## Why AuthGuard?
 
-This Turborepo starter is maintained by the Turborepo core team.
+- **Own Your Data**: Keep user data in your own database
+- **No Vendor Lock-in**: Avoid dependency on external auth providers
+- **Framework Agnostic**: Works with Express, React, and more
+- **Self-Hosted**: Run entirely on your infrastructure
 
-## Using this example
+## Feature Comparison
 
-Run the following command:
+| Feature | AuthGuard | Clerk | Kinde |
+|---------|-----------|-------|-------|
+| **Pricing & Licensing** | | | |
+| Open Source | ✅ MIT License | ❌ Proprietary | ❌ Proprietary |
+| Free Tier | ✅ Unlimited | ✅ Limited | ✅ Limited |
+| Self-Hosted | ✅ Full control | ❌ Cloud-only | ❌ Cloud-only |
+| **Core Features** | | | |
+| Email/Password Auth | ✅ | ✅ | ✅ |
+| Social OAuth | ✅ (Google, GitHub) | ✅ (20+ providers) | ✅ (Multiple) |
+| Session Management | ✅ JWT | ✅ | ✅ |
+| User Management | ✅ | ✅ | ✅ |
+| **Security Features** | | | |
+| MFA/2FA | 🔄 Planned | ✅ TOTP, SMS, Authenticator | ✅ |
+| WebAuthn / FIDO2 (Hardware/Biometric Auth) | 🔄 Planned | ✅ | ✅ |
+| Password Hashing | ✅ bcrypt | ✅ | ✅ |
+| Rate Limiting | ✅ | ✅ | ✅ |
+| **OAuth Providers** | | | |
+| Google | ✅ | ✅ | ✅ |
+| GitHub | ✅ | ✅ | ✅ |
+| Apple | 🔄 Planned | ✅ | ✅ |
+| Microsoft | ❌ | ✅ | ✅ |
+| **Framework Support** | | | |
+| React | ✅ | ✅ | ✅ |
+| Next.js | ✅ | ✅ | ✅ |
+| Express | ✅ | ✅ | ✅ |
+| Vue | 🔄 Planned | ✅ | ✅ |
+| Angular | 🔄 Planned | ✅ | ✅ |
+| **Deployment** | | | |
+| Self-Hosting | ✅ | ❌ | ❌ |
+| Database Control | ✅ Your own DB | ❌ Clerk-managed | ❌ Kinde-managed |
+| Custom Domains | ✅ | ✅ (Paid) | ✅ (Paid) |
+| **Advanced Features** | | | |
+| Webhooks | ❌ | ✅ | ✅ |
+| Admin Dashboard | ❌ | ✅ | ✅ |
+| Analytics | ❌ | ✅ | ✅ |
+| Custom UI | ✅ Fully customizable | ✅ Limited customization | ✅ Limited customization |
 
-```sh
-npx create-turbo@latest
+**Legend:** ✅ = Available, 🔄 = Planned/Roadmap, ❌ = Not Available
+
+## Installation
+
+```bash
+npm install @auth-guard/express @auth-guard/react
+# or
+yarn add @auth-guard/express @auth-guard/react
+# or
+pnpm add @auth-guard/express @auth-guard/react
 ```
 
-## What's inside?
+## Future Roadmap
 
-This Turborepo includes the following packages/apps:
+### Backend Support
+- [ ] Fastify
+- [ ] Hono
+- [ ] NestJS
 
-### Apps and Packages
+### Frontend Support
+- [ ] Vue
+- [ ] Angular
+- [ ] Solid
+- [ ] Svelte
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+### Security Enhancements
+- [ ] MFA/2FA Support
+- [ ] WebAuthn/FIDO2 Support
+- [ ] Additional OAuth Providers (Apple, Microsoft)
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+## Contributing
 
-### Utilities
+We welcome contributions! Please see our [CONTRIBUTING](CONTRIBUTING.md) guide.
 
-This Turborepo has some additional tools already setup for you:
+## License
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
-
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo build --filter=docs
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+[MIT](LICENSE) © 2026 AuthGuard Team
