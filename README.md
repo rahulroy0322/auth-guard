@@ -31,7 +31,7 @@ AuthGuard is an open-source authentication framework designed for developers who
 | Google | ✅ | ✅ | ✅ |
 | GitHub | ✅ | ✅ | ✅ |
 | Apple | 🔄 Planned | ✅ | ✅ |
-| Microsoft | ❌ | ✅ | ✅ |
+| Microsoft | 🔄 Planned | ✅ | ✅ |
 | **Framework Support** | | | |
 | React | ✅ | ✅ | ✅ |
 | Next.js | ✅ | ✅ | ✅ |
