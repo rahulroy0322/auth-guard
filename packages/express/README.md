@@ -114,7 +114,7 @@ Initializes the authentication middleware with the provided options.
 
 #### Returns
 
-An object with: which has all the function to make authentication
+An object containing all the functions required to perform authentication.
 
 ## Routes
 
