@@ -79,8 +79,8 @@ const guard = auth({
         callbackUri: `<your-backend-url>/oauth/callback/`,
         providers: {
             [providers]: {
-                clientId: <clinet-id>,
-                clientSecret: <clinet-secret>,
+				clientId: <client-id>,
+                clientSecret: <client-secret>,
             }
         },
     },

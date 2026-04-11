@@ -50,7 +50,7 @@ const authGuard = auth({
 	extractToken: {
         access: extractAccessToken as () => Promise<string | null>,
         refresh: extractRefreshToken as () => Promise<string | null>,
-    },,
+    },
 	jwt: {
         expires: {
             access: 60 * 15,
@@ -64,8 +64,8 @@ const authGuard = auth({
         callbackUri: `<your-backend-url>/oauth/callback/`,
         providers: {
             [providers]: {
-                clientId: <clinet-id>,
-                clientSecret: <clinet-secret>,
+                clientId: <client-id>,
+                clientSecret: <client-secret>,
             }
         },
     },
@@ -261,8 +261,8 @@ const user = await updateProfile(request, {
 #### `removeAvatar`
 
 > [!WARNING]
-> Not impl yet 
-> Suggested Api
+> Not implemented yet
+> Suggested API
 
 ```ts
 const { removeAvatar } = authGuard;
