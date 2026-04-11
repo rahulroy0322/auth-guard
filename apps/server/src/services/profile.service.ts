@@ -1,5 +1,8 @@
-import type { AuthPropsType } from "@auth-guard/express/types";
-import type { ProfileType, ProviderType } from "base";
+import type {
+	AuthPropsType,
+	ProfileType,
+	ProviderType,
+} from "@auth-guard/express/types";
 import { and, eq, type SQL } from "drizzle-orm";
 import { db } from "../db/main";
 import { Profile } from "../db/schema/profile";

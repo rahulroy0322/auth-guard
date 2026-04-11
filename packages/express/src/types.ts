@@ -1,5 +1,10 @@
-import type { AuthPropsType, AuthReturnType } from "@auth-guard/backend/types";
-import type { ProviderType, SessionFormatedType, UserType } from "base";
+import type {
+	AuthPropsType,
+	AuthReturnType,
+	ProviderType,
+	SessionType,
+	UserType,
+} from "@auth-guard/backend";
 import type { Request, RequestHandler } from "express";
 
 type AuthExpressPropsType<T extends ProviderType> = AuthPropsType<T> & {
@@ -36,7 +41,7 @@ type ResType = {
 				url: string;
 		  }
 		| {
-				sessions: SessionFormatedType[];
+				sessions: SessionType[];
 		  };
 };
 

@@ -68,8 +68,8 @@ class AuthNotVerifiedError extends AuthError {
 	}
 }
 
-// class ForbidenError extends AuthError {
-// 	constructor(msg = "You Don't Sufficient permition") {
+// class ForbiddenError extends AuthError {
+// 	constructor(msg = "You Don't Sufficient permission") {
 // 		super(msg, 403)
 // 	}
 // }

@@ -1,5 +1,4 @@
-import type { AvatarType } from "base";
-import type { CacheConfigType, CacheKeysType } from "../types";
+import type { AvatarType, CacheConfigType, CacheKeysType } from "../types";
 import type { SmartLogger } from "../utils/smart-logger";
 import { CacheModel } from "./base";
 

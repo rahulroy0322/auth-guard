@@ -1,10 +1,10 @@
-import type { UserType } from "base";
 import type { Dispatch, SetStateAction } from "react";
 import type { AuthResType } from "../api/main";
 import type {
 	GuardContextType,
 	VerificationStateType,
 } from "../provider.types";
+import type { UserType } from "../types";
 
 type GuardStateSetterType<T> = Dispatch<SetStateAction<T>>;
 

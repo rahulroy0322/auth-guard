@@ -1,4 +1,4 @@
-import type { SessionType } from "base";
+import type { SessionType } from "@auth-guard/types";
 
 type SessionModelType = {
 	findByToken: (token: SessionType["token"]) => Promise<SessionType | null>;

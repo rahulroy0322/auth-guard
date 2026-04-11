@@ -1,5 +1,9 @@
-import type { AvatarType, ProfileType } from "base";
-import type { ReturnUserType, SafeUserType } from "../types";
+import type {
+	AvatarType,
+	ProfileType,
+	ReturnUserType,
+	SafeUserType,
+} from "../types";
 import { UserSanitizer } from "./user-sanitizer";
 
 type FetchRelationsReturnType = {

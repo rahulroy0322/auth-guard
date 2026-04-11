@@ -1,4 +1,4 @@
-import type { SessionType } from "base";
+import type { SessionDBType } from "@auth-guard/express/types";
 import { boolean, pgTable, uuid, varchar } from "drizzle-orm/pg-core";
 import { defaults } from "./helper";
 import { User } from "./user";
@@ -16,6 +16,6 @@ const Session = pgTable("sessions", {
 		})
 		.notNull(),
 	...defaults,
-}) satisfies { $inferSelect: SessionType };
+}) satisfies { $inferSelect: SessionDBType };
 
 export { Session };

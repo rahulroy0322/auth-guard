@@ -1,5 +1,5 @@
+import type { ProviderType, UserType } from "@auth-guard/nextjs";
 import type { AuthPropsType } from "@auth-guard/nextjs/server";
-import type { ProviderType, UserType } from "base";
 import { eq, type SQL } from "drizzle-orm";
 import { db } from "@/db/main";
 import { User } from "@/db/schema/main";

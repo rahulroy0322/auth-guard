@@ -1,5 +1,8 @@
-import type { AuthPropsType } from "@auth-guard/express/types";
-import type { ProviderType, SessionType } from "base";
+import type {
+	AuthPropsType,
+	ProviderType,
+	SessionDBType as SessionType,
+} from "@auth-guard/express/types";
 import type { SQL } from "drizzle-orm";
 import { db } from "../db/main";
 import { Session } from "../db/schema/session";

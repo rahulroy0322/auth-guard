@@ -1,5 +1,5 @@
-import type { ProviderType } from "base";
 import { AuthServerError } from "../error";
+import type { ProviderType } from "../types";
 import type { OAuthType } from "../types/OAuth";
 import { OAuth } from "./base";
 import { Github } from "./github";

@@ -1,4 +1,4 @@
-import type { SessionType } from "base";
+import type { SessionDBType as SessionType } from "@auth-guard/nextjs";
 import { boolean, pgTable, uuid, varchar } from "drizzle-orm/pg-core";
 import { defaults } from "./helper";
 import { User } from "./user";

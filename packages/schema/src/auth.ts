@@ -1,4 +1,4 @@
-import type { UserType } from "base";
+import type { UserType } from "@auth-guard/types";
 import { z } from "zod";
 
 const passwordSchema = z

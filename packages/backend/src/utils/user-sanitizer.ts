@@ -1,5 +1,4 @@
-import type { UserType } from "base";
-import type { SafeUserType } from "../types";
+import type { SafeUserType, UserType } from "../types";
 
 // biome-ignore lint/complexity/noStaticOnlyClass: ts error
 class UserSanitizer {

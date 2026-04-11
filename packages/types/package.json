@@ -1,0 +1,39 @@
+{
+  "name": "@auth-guard/types",
+  "version": "0.1.0",
+  "description": "",
+  "sideEffects": false,
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "src"
+  ],
+  "exports": {
+    ".": "./src/main.ts"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "check": "biome check",
+    "check:fix": "biome check --fix"
+  },
+  "author": {
+    "name": "Rahul Roy",
+    "email": "rahulroyapd80@gmail.com",
+    "url": "https://github.com/rahulroy0322"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rahulroy0322/auth-guard.git",
+    "directory": "packages/types"
+  },
+  "license": "MIT",
+  "bugs": "https://github.com/rahulroy0322/auth-guard/issues",
+  "homepage": "https://github.com/rahulroy0322/auth-guard/tree/main/packages/types#readme",
+  "devDependencies": {
+    "@biomejs/biome": "2.4.8",
+    "biome-config": "workspace:^",
+    "ts-config": "workspace:^"
+  }
+}

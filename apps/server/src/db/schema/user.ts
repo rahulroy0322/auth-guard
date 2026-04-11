@@ -1,4 +1,4 @@
-import type { RoleType, UserType } from "base";
+import type { RoleType, UserType } from "@auth-guard/express/types";
 import {
 	boolean,
 	customType,

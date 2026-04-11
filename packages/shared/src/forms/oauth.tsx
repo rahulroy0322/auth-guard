@@ -1,5 +1,5 @@
+import type { ProviderType } from "@auth-guard/types";
 import { RiAppleLine, RiGithubLine, RiGoogleLine } from "@remixicon/react";
-import type { ProviderType } from "base";
 import type { ComponentType, FC } from "react";
 import { Button } from "ui/components/ui/button";
 import { Field, FieldSeparator } from "ui/components/ui/field";

@@ -1,4 +1,4 @@
-import type { UserType } from "base";
+import type { UserType } from "@auth-guard/types";
 import { useAppForm } from "form";
 import { type FC, type SubmitEvent, useCallback } from "react";
 import { loginSchema } from "schema";

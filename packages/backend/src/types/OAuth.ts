@@ -1,4 +1,4 @@
-import type { ProviderType, SessionType } from "base";
+import type { ProviderType, SessionType } from "@auth-guard/types";
 import type { OAuth } from "../OAuth/base";
 import type { LoginReturnType } from "./auth";
 

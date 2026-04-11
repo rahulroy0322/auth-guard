@@ -1,6 +1,5 @@
 import { init } from "@auth-guard/backend";
 import { AuthError } from "@auth-guard/backend/error";
-import type { ProviderType } from "@auth-guard/react";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import {
@@ -21,10 +20,10 @@ import {
 	startVerification,
 	tokenRefresh,
 	updateProfile,
-	verifieAccount,
+	verifyAccount,
 } from "./handlers";
 import { provider, providerCallback } from "./regex";
-import type { HandleAuthPropsType, HandlerType } from "./types";
+import type { HandleAuthPropsType, HandlerType, ProviderType } from "./types";
 
 type RouteType = {
 	methods: readonly string[];
@@ -71,7 +70,7 @@ const routes = [
 	{
 		methods: ["GET", "PATCH"],
 		pattern: /\/verify\/?$/,
-		handler: verifieAccount,
+		handler: verifyAccount,
 	},
 	{
 		methods: ["POST"],
@@ -202,5 +201,5 @@ const handleAuth = <T extends ProviderType>(props: HandleAuthPropsType<T>) => {
 
 const auth = handleAuth;
 
-export * from "./types";
+export type * from "./types";
 export { auth, handleAuth };

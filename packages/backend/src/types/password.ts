@@ -1,9 +1,9 @@
 import type { IncomingMessage } from "node:http";
-import type { SessionType, UserType } from "base";
+import type { SessionType, UserType } from "@auth-guard/types";
 import type {
 	LoginReturnType,
 	RegisterReturnType,
-	VerifieAccountPropsType,
+	VerifyAccountPropsType,
 } from "./auth";
 
 type ForgotPasswordPropsType = Pick<UserType, "email">;
@@ -12,7 +12,7 @@ type ForgotPasswordType = (
 	data: ForgotPasswordPropsType,
 ) => Promise<ForgotPasswordReturnType>;
 
-type ResetPasswordPropsType = VerifieAccountPropsType &
+type ResetPasswordPropsType = VerifyAccountPropsType &
 	Pick<SessionType, "deviceType" | "deviceId" | "deviceName"> & {
 		password: string;
 	};
